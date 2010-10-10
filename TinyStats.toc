@@ -1,0 +1,24 @@
+## Interface: 30300
+## X-Compatible-With: 40000
+## Title: TinyStats
+## Version: @project-version@
+## Author: TheVaan & ArcaneMagus  
+## Notes: Shows different stats of you character (Real-time update).|n|cffeda55fBy TheVaan and ArcaneMagus |r
+## Notes-deDE: Zeigt verschiedene Attribute deines Charakters (Echtzeit-Aktuallisierung).|n|cffeda55fBy TheVaan und ArcaneMagus |r
+## SavedVariablesPerCharacter: TinyStats
+## OptionalDeps: LibStub, CallbackHandler-1.0, AceAddon-3.0, AceEvent-3.0, AceTimer-3.0, AceDB-3.0, AceLocale-3.0, AceConsole-3.0, AceGUI-3.0, AceConfig-3.0, LibSharedMedia-3.0, LibDataBroker-1.1, LibTalentQuery-1.0, LibGroupTalents-1.0
+
+embeds.xml
+
+Localization\enUS.lua
+Localization\deDE.lua
+Localization\esES.lua
+Localization\esMX.lua
+Localization\frFR.lua
+Localization\koKR.lua
+Localization\ruRU.lua
+Localization\zhCN.lua
+Localization\zhTW.lua
+
+TinyStats.lua
+Options.lua
