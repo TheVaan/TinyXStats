@@ -1,0 +1,2 @@
+* ändere xOffset in 0 da bei fehlenden stats eine doppelt so große lücke enstand, dafür freizeichen vor jeden sring.
+* add highlight zum Frame wenn nicht FrameLocked macht das verschieben leichter.

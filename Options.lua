@@ -2,21 +2,30 @@
 -- File version: @file-revision@
 -- Project: @project-revision@
 --
-
 if not TinyStats then return end
 
-local L = LibStub:GetLibrary("AceLocale-3.0"):GetLocale("TinyStats")
+local AddonName = "TinyStats"
+local L = LibStub:GetLibrary("AceLocale-3.0"):GetLocale(AddonName)
 local media = LibStub:GetLibrary("LibSharedMedia-3.0")
 
 TinyStats.fonteffects = {
 	["none"] = L["NONE"],
 	["OUTLINE"] = L["OUTLINE"],
-	["THICKOUTLINE"] = L["THICKOUTLINE"],
+	["THICKOUTLINE"] = L["THICKOUTLINE"]
+}
+TinyStats.RoleLocale = {
+	healer = HEALER,
+	caster = PLAYERSTAT_SPELL_COMBAT,
+	melee = PLAYERSTAT_MELEE_COMBAT,
+	hunter = PLAYERSTAT_RANGED_COMBAT,
+	tank = PLAYERSTAT_DEFENSES
 }
 
+
 function TinyStats:Options()
+
 	local options = {
-		name = "TinyStats",
+		name = AddonName.." "..GetAddOnMetadata(AddonName,"Version"),
 	    handler = TinyStats,
 	    type = 'group',
 	    args = {
@@ -24,54 +33,40 @@ function TinyStats:Options()
 				name = L["Reset position"],
 				desc = L["Resets the frame's position"],
 				type = "execute",
-				func = function() tsframe:ClearAllPoints()	tsframe:SetPoint("CENTER", UIParent, "CENTER") end,
+				func = function() 
+						if IsShiftKeyDown() then
+							self.db.profile.debug = not self.db.profile.debug
+						else
+							self.frame:ClearAllPoints() self.frame:SetPoint("CENTER", UIParent, "CENTER")
+						end
+					end,
 				disabled = function() return InCombatLockdown() end,
-				order = 1,
+				order = 1
 			},
 			lock = {
 				name = L["Lock Frame"],
 				desc = L["Locks the position of the text frame"],
 				type = 'toggle',
 				get = function() return self.db.char.FrameLocked end,
-				set = function(info, value)				
+				set = function(info, value)
 					if(value) then
 						self.db.char.FrameLocked = true
-						tsframe:SetMovable(false)
-						fixed = "|cffFF0000"..L["Text is fixed. Uncheck Lock Frame in the options to move!"].."|r"
-						tsframe:SetScript("OnDragStart", function() DEFAULT_CHAT_FRAME:AddMessage(fixed) end)
 					else
 						self.db.char.FrameLocked = false
-						tsframe:SetMovable(true)
-						tsframe:SetScript("OnDragStart", function() tsframe:StartMoving() end)
-						tsframe:SetScript("OnDragStop", function() tsframe:StopMovingOrSizing() self.db.char.xPosition = tsframe:GetLeft() self.db.char.yPosition = tsframe:GetBottom() end)
 					end
+					self:SetDragScript()
 				end,
 				disabled = function() return InCombatLockdown() end,
-				order = 2,
+				order = 2
 			},
-			record = {
-				name = L["Show new records"],
-				desc = L["Whether or not to display a message when a record is broken"],
-				type = 'toggle',
-				get = function() return self.db.char.RecordMsg end,
-				set = function(info, value)				
-					if(value) then
-						self.db.char.RecordMsg = true
-					else
-						self.db.char.RecordMsg = false
-					end
-				end,
-				disabled = function() return InCombatLockdown() end,
-				order = 3,
-			},
-			text = {
-				name = L["Text"],
-				desc = L["Text settings"],
+			style = {
+				name = STAT_CATEGORY_ATTRIBUTES,
+				desc = L["Select which stats to show"],
 				type = 'group',
-				order = 1,
-				args = {			
+				order = 3,
+				args = {
 					hader = {
-						name = L["Text settings"],
+						name = function() return TinyStats.RoleLocale[TinyStats.PlayerRole] end,
 						type = 'header',
 						order = 1,
 					},
@@ -80,6 +75,600 @@ function TinyStats:Options()
 						type = 'description',
 						order = 2,
 					},
+					spelldmg = {
+						hidden = function() return not self.defaults.char.Style.SP[TinyStats.PlayerRole] end,
+						name = STAT_SPELLPOWER,
+						desc = STAT_SPELLPOWER.." "..SHOW.."/"..HIDE,
+						width = 'double',
+						type = 'toggle',
+						get = function() return self.db.char.Style.SP[TinyStats.PlayerRole] end,
+						set = function(info, value)
+							if(value) then
+								self.db.char.Style.SP[TinyStats.PlayerRole] = true
+							else
+								self.db.char.Style.SP[TinyStats.PlayerRole] = false
+							end
+							self:Stats()
+						end,
+						disabled = function() return InCombatLockdown() end,
+						order = 3
+					},
+					spelldmgcolor = {
+						hidden = function() return not self.defaults.char.Style.SP[TinyStats.PlayerRole] end,
+						name = "",
+						desc = "",
+						width = 'half',
+						type = 'color',
+						get = function()
+							local c = self.db.char.Color.sp
+							return c.r, c.g, c.b
+						end,
+						set = function(info, r, g, b)
+							local c = self.db.char.Color.sp
+							c.r, c.g, c.b = r, g, b
+							self:SetStringColors()
+							self:Stats()
+						end,
+						order = 4,
+					},
+					ap = {
+						hidden = function() return not self.defaults.char.Style.AP[TinyStats.PlayerRole] end,
+						name = STAT_ATTACK_POWER,
+						desc = STAT_ATTACK_POWER.." "..SHOW.."/"..HIDE,
+						width = 'double',
+						type = 'toggle',
+						get = function() return self.db.char.Style.AP[TinyStats.PlayerRole] end,
+						set = function(info, value)				
+							if(value) then
+								self.db.char.Style.AP[TinyStats.PlayerRole] = true
+							else
+								self.db.char.Style.AP[TinyStats.PlayerRole] = false
+							end
+							self:Stats()
+						end,
+						disabled = function() return InCombatLockdown() end,
+						order = 3,
+					},
+					apcolor = {
+						hidden = function() return not self.defaults.char.Style.AP[TinyStats.PlayerRole] end,
+						name = "",
+						desc = "",
+						width = 'half',
+						type = 'color',
+						get = function()
+							local c = self.db.char.Color.ap
+							return c.r, c.g, c.b
+						end,
+						set = function(info, r, g, b)
+							local c = self.db.char.Color.ap
+							c.r, c.g, c.b = r, g, b
+							self:SetStringColors()
+							self:Stats()
+						end,
+						order = 4,
+					},
+					crit = {
+						hidden = function() return not self.defaults.char.Style.Crit[TinyStats.PlayerRole] end,
+						name = SPELL_CRIT_CHANCE,
+						desc = SPELL_CRIT_CHANCE.." "..SHOW.."/"..HIDE,
+						width = 'double',
+						type = 'toggle',
+						get = function() return self.db.char.Style.Crit[TinyStats.PlayerRole] end,
+						set = function(info, value)
+							if(value) then
+								self.db.char.Style.Crit[TinyStats.PlayerRole] = true
+							else
+								self.db.char.Style.Crit[TinyStats.PlayerRole] = false
+							end
+							self:Stats()
+						end,
+						disabled = function() return InCombatLockdown() end,
+						order = 5
+					},
+					critcolor = {
+						hidden = function() return not self.defaults.char.Style.Crit[TinyStats.PlayerRole] end,
+						name = "",
+						desc = "",
+						width = 'half',
+						type = 'color',
+						get = function()
+							local c = self.db.char.Color.crit
+							return c.r, c.g, c.b
+						end,
+						set = function(info, r, g, b)
+							local c = self.db.char.Color.crit
+							c.r, c.g, c.b = r, g, b
+							self:SetStringColors()
+							self:Stats()
+						end,
+						order = 6,
+					},
+					haste = {
+						hidden = function() return not self.defaults.char.Style.Haste[TinyStats.PlayerRole] end,
+						name = SPELL_HASTE,
+						desc = SPELL_HASTE.." "..SHOW.."/"..HIDE.."\n"..L["(Only rating or percentage display possible!)"],
+						width = 'double',
+						type = 'toggle',
+						get = function() return self.db.char.Style.Haste[TinyStats.PlayerRole] end,
+						set = function(info, value)
+							if(value) then
+								self.db.char.Style.Haste[TinyStats.PlayerRole] = true
+								self.db.char.Style.HastePerc[TinyStats.PlayerRole] = false
+							else
+								self.db.char.Style.Haste[TinyStats.PlayerRole] = false
+							end
+							self:Stats()
+						end,
+						disabled = function() return InCombatLockdown() end,
+						order = 7
+					},
+					hastecolor = {
+						hidden = function() return not self.defaults.char.Style.Haste[TinyStats.PlayerRole] end,
+						name = "",
+						desc = "",
+						width = 'half',
+						type = 'color',
+						get = function()
+							local c = self.db.char.Color.haste
+							return c.r, c.g, c.b
+						end,
+						set = function(info, r, g, b)
+							local c = self.db.char.Color.haste
+							c.r, c.g, c.b = r, g, b
+							self:SetStringColors()
+							self:Stats()
+						end,
+						order = 8,
+					},
+					speed = {
+						hidden = function() return not self.defaults.char.Style.Speed[TinyStats.PlayerRole] end,
+						name = WEAPON_SPEED,
+						desc = WEAPON_SPEED.." "..SHOW.."/"..HIDE,
+						width = 'double',
+						type = 'toggle',
+						get = function() return self.db.char.Style.Speed[TinyStats.PlayerRole] end,
+						set = function(info, value)				
+							if(value) then
+								self.db.char.Style.Speed[TinyStats.PlayerRole] = true
+							else
+								self.db.char.Style.Speed[TinyStats.PlayerRole] = false
+							end
+							self:Stats()
+						end,
+						disabled = function() return InCombatLockdown() end,
+						order = 7,
+					},
+					speedcolor = {
+						hidden = function() return not self.defaults.char.Style.Speed[TinyStats.PlayerRole] end,
+						name = "",
+						desc = "",
+						width = 'half',
+						type = 'color',
+						get = function()
+							local c = self.db.char.Color.haste
+							return c.r, c.g, c.b
+						end,
+						set = function(info, r, g, b)
+							local c = self.db.char.Color.haste
+							c.r, c.g, c.b = r, g, b
+							self:SetStringColors()
+							self:Stats()
+						end,
+						order = 8,
+					},
+					hasteperc = {
+						hidden = function() return not self.defaults.char.Style.Haste[TinyStats.PlayerRole] end,
+						name = L["Percent Haste"],
+						desc = L["Percent Haste"].." "..SHOW.."/"..HIDE.."\n"..L["(Only rating or percentage display possible!)"],
+						width = 'full',
+						type = 'toggle',
+						get = function() return self.db.char.Style.HastePerc[TinyStats.PlayerRole] end,
+						set = function(info, value)
+							if(value) then
+								self.db.char.Style.HastePerc[TinyStats.PlayerRole] = true
+								self.db.char.Style.Haste[TinyStats.PlayerRole] = false
+							else
+								self.db.char.Style.HastePerc[TinyStats.PlayerRole] = false
+							end
+							self:Stats()
+						end,
+						disabled = function() return InCombatLockdown() end,
+						order = 9
+					},
+					hit = {
+						hidden = function() return not self.defaults.char.Style.Hit[TinyStats.PlayerRole] end,
+						name = STAT_HIT_CHANCE,
+						desc = STAT_HIT_CHANCE.." "..SHOW.."/"..HIDE,
+						width = 'double',
+						type = 'toggle',
+						get = function() return self.db.char.Style.Hit[TinyStats.PlayerRole] end,
+						set = function(info, value)
+							if(value) then
+								self.db.char.Style.Hit[TinyStats.PlayerRole] = true
+							else
+								self.db.char.Style.Hit[TinyStats.PlayerRole] = false
+							end
+							self:Stats()
+						end,
+						disabled = function() return InCombatLockdown() end,
+						order = 10
+					},
+					hitcolor = {
+						hidden = function() return not self.defaults.char.Style.Hit[TinyStats.PlayerRole] end,
+						name = "",
+						desc = "",
+						width = 'half',
+						type = 'color',
+						get = function()
+							local c = self.db.char.Color.hit
+							return c.r, c.g, c.b
+						end,
+						set = function(info, r, g, b)
+							local c = self.db.char.Color.hit
+							c.r, c.g, c.b = r, g, b
+							self:SetStringColors()
+							self:Stats()
+						end,
+						order = 11,
+					},
+					mastery = {
+						hidden = function() return not (self.defaults.char.Style.Mastery[TinyStats.PlayerRole] and self.Mastery) end,
+						name = STAT_MASTERY,
+						desc = STAT_MASTERY.." "..SHOW.."/"..HIDE,
+						width = 'double',
+						type = 'toggle',
+						get = function() return self.db.char.Style.Mastery[TinyStats.PlayerRole] end,
+						set = function(info, value)
+							if(value) then
+								self.db.char.Style.Mastery[TinyStats.PlayerRole] = true
+							else
+								self.db.char.Style.Mastery[TinyStats.PlayerRole] = false
+							end
+							self:Stats()
+						end,
+						disabled = function() return InCombatLockdown() end,
+						order = 12
+					},
+					masterycolor = {
+						hidden = function() return not (self.defaults.char.Style.Mastery[TinyStats.PlayerRole] and self.Mastery) end,
+						name = "",
+						desc = "",
+						width = 'half',
+						type = 'color',
+						get = function()
+							local c = self.db.char.Color.mastery
+							return c.r, c.g, c.b
+						end,
+						set = function(info, r, g, b)
+							local c = self.db.char.Color.mastery
+							c.r, c.g, c.b = r, g, b
+							self:SetStringColors()
+							self:Stats()
+						end,
+						order = 13,
+					},
+					spirit = {
+						hidden = function() return not self.defaults.char.Style.Spirit[TinyStats.PlayerRole] end,
+						name = ITEM_MOD_SPIRIT_SHORT,
+						desc = ITEM_MOD_SPIRIT_SHORT.." "..SHOW.."/"..HIDE,
+						width = 'double',
+						type = 'toggle',
+						get = function() return self.db.char.Style.Spirit[TinyStats.PlayerRole] end,
+						set = function(info, value)
+							if(value) then
+								self.db.char.Style.Spirit[TinyStats.PlayerRole] = true
+							else
+								self.db.char.Style.Spirit[TinyStats.PlayerRole] = false
+							end
+							self:Stats()
+						end,
+						disabled = function() return InCombatLockdown() end,
+						order = 14
+					},
+					spiritcolor = {
+						hidden = function() return not self.defaults.char.Style.Spirit[TinyStats.PlayerRole] end,
+						name = "",
+						desc = "",
+						width = 'half',
+						type = 'color',
+						get = function()
+							local c = self.db.char.Color.spirit
+							return c.r, c.g, c.b
+						end,
+						set = function(info, r, g, b)
+							local c = self.db.char.Color.spirit
+							c.r, c.g, c.b = r, g, b
+							self:SetStringColors()
+							self:Stats()
+						end,
+						order = 15,
+					},
+					mp5 = {
+						hidden = function() return not self.defaults.char.Style.Spirit[TinyStats.PlayerRole] end,
+						name = ITEM_MOD_MANA_REGENERATION_SHORT.." "..L["out of combat"],
+						desc = ITEM_MOD_MANA_REGENERATION_SHORT.." "..L["out of combat"].." "..SHOW.."/"..HIDE,
+						width = 'double',
+						type = 'toggle',
+						get = function() return self.db.char.Style.MP5[TinyStats.PlayerRole] end,
+						set = function(info, value)
+							if(value) then
+								self.db.char.Style.MP5[TinyStats.PlayerRole] = true
+								self.db.char.Style.MP5auto[TinyStats.PlayerRole] = false
+							else
+								self.db.char.Style.MP5[TinyStats.PlayerRole] = false
+							end
+							self:Stats()
+						end,
+						disabled = function() return InCombatLockdown() end,
+						order = 16
+					},
+					mp5color = {
+						hidden = function() return not self.defaults.char.Style.Spirit[TinyStats.PlayerRole] end,
+						name = "",
+						desc = "",
+						width = 'half',
+						type = 'color',
+						get = function()
+							local c = self.db.char.Color.mp5
+							return c.r, c.g, c.b
+						end,
+						set = function(info, r, g, b)
+							local c = self.db.char.Color.mp5
+							c.r, c.g, c.b = r, g, b
+							self:SetStringColors()
+							self:Stats()
+						end,
+						order = 17,
+					},
+					mp5ic = {
+						hidden = function() return not self.defaults.char.Style.Spirit[TinyStats.PlayerRole] end,
+						name = ITEM_MOD_MANA_REGENERATION_SHORT.." "..L["in combat"],
+						desc = ITEM_MOD_MANA_REGENERATION_SHORT.." "..L["in combat"].." "..SHOW.."/"..HIDE,
+						width = 'full',
+						type = 'toggle',
+						get = function() return self.db.char.Style.MP5ic[TinyStats.PlayerRole] end,
+						set = function(info, value)
+							if(value) then
+								self.db.char.Style.MP5ic[TinyStats.PlayerRole] = true
+								self.db.char.Style.MP5auto[TinyStats.PlayerRole] = false
+							else
+								self.db.char.Style.MP5ic[TinyStats.PlayerRole] = false
+							end
+							self:Stats()
+						end,
+						disabled = function() return InCombatLockdown() end,
+						order = 18
+					},
+					mp5auto = {
+						hidden = function() return not self.defaults.char.Style.Spirit[TinyStats.PlayerRole] end,
+						name = ITEM_MOD_MANA_REGENERATION_SHORT.." ("..L["automatic"]..")",
+						desc = L["Automatically selects which mana regeneration to show"],
+						width = 'full',
+						type = 'toggle',
+						get = function() return self.db.char.Style.MP5auto[TinyStats.PlayerRole] end,
+						set = function(info, value)
+							if(value) then
+								self.db.char.Style.MP5[TinyStats.PlayerRole] = false
+								self.db.char.Style.MP5ic[TinyStats.PlayerRole] = false
+								self.db.char.Style.MP5auto[TinyStats.PlayerRole] = true
+							else
+								self.db.char.Style.MP5auto[TinyStats.PlayerRole] = false
+							end
+							self:Stats()
+						end,
+						disabled = function() return InCombatLockdown() end,
+						order = 19
+					},
+					fr = {
+						hidden = function() return not self.defaults.char.Style.Fr[TinyStats.PlayerRole] end,
+						name = STAT_FOCUS_REGEN,
+						desc = STAT_FOCUS_REGEN.." "..SHOW.."/"..HIDE,
+						width = 'double',
+						type = 'toggle',
+						get = function() return self.db.char.Style.Fr[TinyStats.PlayerRole] end,
+						set = function(info, value)				
+							if(value) then
+								self.db.char.Style.Fr[TinyStats.PlayerRole] = true
+							else
+								self.db.char.Style.Fr[TinyStats.PlayerRole] = false
+							end
+							self:Stats()
+						end,
+						disabled = function() return InCombatLockdown() end,
+						order = 16,
+					},
+					frcolor = {
+						hidden = function() return not self.defaults.char.Style.Fr[TinyStats.PlayerRole] end,
+						name = "",
+						desc = "",
+						width = 'half',
+						type = 'color',
+						get = function()
+							local c = self.db.char.Color.fr
+							return c.r, c.g, c.b
+						end,
+						set = function(info, r, g, b)
+							local c = self.db.char.Color.fr
+							c.r, c.g, c.b = r, g, b
+							self:SetStringColors()
+							self:Stats()
+						end,
+						order = 17,
+					},
+					DC = {
+						hidden = function() return not self.defaults.char.Style.DC[TinyStats.PlayerRole] end,
+						name = STAT_DODGE,
+						desc = STAT_DODGE.." "..SHOW.."/"..HIDE,
+						width = 'double',
+						type = 'toggle',
+						get = function() return self.db.char.Style.DC[TinyStats.PlayerRole] end,
+						set = function(info, value)
+							if(value) then
+								self.db.char.Style.DC[TinyStats.PlayerRole] = true
+							else
+								self.db.char.Style.DC[TinyStats.PlayerRole] = false
+							end
+							self:Stats()
+						end,
+						disabled = function() return InCombatLockdown() end,
+						order = 20
+					},
+					dccolor = {
+						hidden = function() return not self.defaults.char.Style.DC[TinyStats.PlayerRole] end,
+						name = "",
+						desc = "",
+						width = 'half',
+						type = 'color',
+						get = function()
+							local c = self.db.char.Color.dc
+							return c.r, c.g, c.b
+						end,
+						set = function(info, r, g, b)
+							local c = self.db.char.Color.dc
+							c.r, c.g, c.b = r, g, b
+							self:SetStringColors()
+							self:Stats()
+						end,
+						order = 21,
+					},
+					PC = {
+						hidden = function() return not self.defaults.char.Style.PC[TinyStats.PlayerRole] end,
+						name = STAT_PARRY,
+						desc = STAT_PARRY.." "..SHOW.."/"..HIDE,
+						width = 'double',
+						type = 'toggle',
+						get = function() return self.db.char.Style.PC[TinyStats.PlayerRole] end,
+						set = function(info, value)
+							if(value) then
+								self.db.char.Style.PC[TinyStats.PlayerRole] = true
+							else
+								self.db.char.Style.PC[TinyStats.PlayerRole] = false
+							end
+							self:Stats()
+						end,
+						disabled = function() return InCombatLockdown() end,
+						order = 22
+					},
+					pccolor = {
+						hidden = function() return not self.defaults.char.Style.PC[TinyStats.PlayerRole] end,
+						name = "",
+						desc = "",
+						width = 'half',
+						type = 'color',
+						get = function()
+							local c = self.db.char.Color.pc
+							return c.r, c.g, c.b
+						end,
+						set = function(info, r, g, b)
+							local c = self.db.char.Color.pc
+							c.r, c.g, c.b = r, g, b
+							self:SetStringColors()
+							self:Stats()
+						end,
+						order = 23,
+					},
+					BC = {
+						hidden = function() return not self.defaults.char.Style.BC[TinyStats.PlayerRole] end,
+						name = STAT_BLOCK,
+						desc = STAT_BLOCK.." "..SHOW.."/"..HIDE,
+						width = 'double',
+						type = 'toggle',
+						get = function() return self.db.char.Style.BC[TinyStats.PlayerRole] end,
+						set = function(info, value)
+							if(value) then
+								self.db.char.Style.BC[TinyStats.PlayerRole] = true
+							else
+								self.db.char.Style.BC[TinyStats.PlayerRole] = false
+							end
+							self:Stats()
+						end,
+						disabled = function() return InCombatLockdown() end,
+						order = 24
+					},
+					bccolor = {
+						hidden = function() return not self.defaults.char.Style.BC[TinyStats.PlayerRole] end,
+						name = "",
+						desc = "",
+						width = 'half',
+						type = 'color',
+						get = function()
+							local c = self.db.char.Color.bc
+							return c.r, c.g, c.b
+						end,
+						set = function(info, r, g, b)
+							local c = self.db.char.Color.bc
+							c.r, c.g, c.b = r, g, b
+							self:SetStringColors()
+							self:Stats()
+						end,
+						order = 25,
+					},
+					header1 = {
+						name = "",
+						type = 'header',
+						order = 30
+					},
+					showrecords = {
+						name = L["Show records"],
+						desc = L["Whether or not to show record values"],
+						width = 'full',
+						type = 'toggle',
+						get = function() return self.db.char.Style.showRecords end,
+						set = function(info, value)
+							if(value) then
+								self.db.char.Style.showRecords = true
+							else
+								self.db.char.Style.showRecords = false
+							end
+							self:Stats()
+						end,
+						disabled = function() return InCombatLockdown() end,
+						order = 31
+					},
+					resetrecords = {
+						name = L["Reset records"],
+						desc = L["Clears your current records"],
+						type = 'execute',
+						func = function()
+							if IsShiftKeyDown() then
+								TinyStatsDB = {}
+							else
+								local spec = "Spec"..GetActiveTalentGroup()
+								for stat, num in pairs(self.defaults.char[spec]) do
+									--if string.find(stat,"Highest") then
+										self.db.char[spec][stat] = num
+									--end
+								end
+								self:Stats()
+							end
+						end,
+						disabled = function() return InCombatLockdown() end,
+						order = 32
+					},
+					resetcolor = {
+						name = L["Reset colors"],
+						desc = L["Clears your current color settings"],
+						type = 'execute',
+						func = function()
+							for stat, c in pairs(self.defaults.char.Color) do
+								self.db.char.Color[stat].r = c.r 
+								self.db.char.Color[stat].g = c.g
+								self.db.char.Color[stat].b = c.b 								
+							end
+							self:SetStringColors()
+							self:Stats()
+						end,
+						disabled = function() return InCombatLockdown() end,
+						order = 33,
+					}
+				}
+			},
+			text = {
+				name = L["Text"],
+				desc = L["Text settings"],
+				type = 'group',
+				order = 5,
+				args = {
 					oocalpha = {
 						name = L["Text Alpha"].." "..L["out of combat"],
 						desc = L["Alpha of the text"].." ("..L["out of combat"]..")",
@@ -92,10 +681,10 @@ function TinyStats:Options()
 						get = function() return self.db.char.outOfCombatAlpha end,
 						set = function(info, newValue)
 							self.db.char.outOfCombatAlpha = newValue
-							tsframe:SetAlpha(self.db.char.outOfCombatAlpha)
+							self.frame:SetAlpha(self.db.char.outOfCombatAlpha)
 						end,
 						disabled = function() return InCombatLockdown() end,
-						order = 3,
+						order = 1
 					},
 					icalpha = {
 						name = L["Text Alpha"].." "..L["in combat"],
@@ -109,42 +698,13 @@ function TinyStats:Options()
 						get = function() return self.db.char.inCombatAlpha end,
 						set = function(info, newValue)
 							self.db.char.inCombatAlpha = newValue
-							tsframe:SetAlpha(self.db.char.inCombatAlpha)
+							self.frame:SetAlpha(self.db.char.inCombatAlpha)
 						end,
 						disabled = function() return InCombatLockdown() end,
-						order = 4,
-					},
-					font = {
-						name = L["Font"],
-						type = 'select',
-						get = function() return self.db.char.Font end,
-						set = function(info, newValue)
-							self.db.char.Font = newValue
-							local font = media:Fetch("font", self.db.char.Font)
-							tsstring:SetFont(font, self.db.char.Size, self.db.char.FontEffect)
-						end,
-						values = self.fonts,
-						order = 5,
-					},
-					spaceline2 = {
-						name = "",
-						type = 'description',
-						order = 6,
-					},
-					fonteffect = {
-						name = L["Font border"],
-						type = 'select',
-						get = function() return self.db.char.FontEffect end,
-						set = function(info, newValue)
-							self.db.char.FontEffect = newValue
-							local font = media:Fetch("font", self.db.char.Font)
-							tsstring:SetFont(font, self.db.char.Size, self.db.char.FontEffect)
-						end,
-						values = self.fonteffects,
-						order = 7,
+						order = 2
 					},
 					barfontsize = {
-						name = L["Font size"],
+						name = FONT_SIZE,
 						width = 'full',
 						type = 'range',
 						min = 6,
@@ -154,60 +714,147 @@ function TinyStats:Options()
 						set = function(info, newValue)
 							self.db.char.Size = newValue
 							local font = media:Fetch("font", self.db.char.Font)
-							tsstring:SetFont(font, self.db.char.Size, self.db.char.FontEffect)
+							for k, fontObject in pairs(self.strings) do
+								fontObject:SetFont(font, self.db.char.Size, self.db.char.FontEffect)
+							end
+							self:InitializeFrame()
 						end,
-						order = 8,
+						order = 3
 					},
-				},
-			},
-			style = {
-				name = L["Stats"],
-				desc = L["Select which stats to show"],
-				type = 'group',
-				order = 2,
-				args = {
-					hader = {
-						name = L["Stats"],
-						type = 'header',
-						order = 1,
+					font = {
+						name = L["Font"],
+						type = 'select',
+						get = function() return self.db.char.Font end,
+						set = function(info, newValue)
+							self.db.char.Font = newValue
+							local font = media:Fetch("font", self.db.char.Font)
+							for k, fontObject in pairs(self.strings) do
+								fontObject:SetFont(font, self.db.char.Size, self.db.char.FontEffect)
+							end
+						end,
+						values = self.fonts,
+						order = 4
 					},
-					spaceline3 = {
-						name = "\n",
-						type = 'description',
-						order = 2,
+					fonteffect = {
+						name = L["Font border"],
+						type = 'select',
+						get = function() return self.db.char.FontEffect end,
+						set = function(info, newValue)
+							self.db.char.FontEffect = newValue
+							local font = media:Fetch("font", self.db.char.Font)
+							for k, fontObject in pairs(self.strings) do
+								fontObject:SetFont(font, self.db.char.Size, self.db.char.FontEffect)
+							end
+						end,
+						values = self.fonteffects,
+						order = 5
 					},
---					fill in
---					stats here
-					spaceline4 = {
-						name = "\n",
-						type = 'description',
-						order = 99,
+					vertical = {
+						name = L["Display stats vertically"],
+						desc = L["Whether or not to show stats vertically"],
+						width = 'full',
+						type = 'toggle',
+						get = function() return self.db.char.Style.vertical end,
+						set = function(info, value)
+							if(value) then
+								self.db.char.Style.vertical = true
+							else
+								self.db.char.Style.vertical = false
+							end
+							self:Stats()
+							self:SetTextAnchors()
+						end,
+						disabled = function() return InCombatLockdown() end,
+						order = 6
 					},
-					resetrecords = {
-						name = L["Reset records"],
-						desc = L["Clears your current records"],
-						type = 'execute',
-						func = function()
-							self.db.char.HighestSpelldmg = 0
-							self.db.char.HighestSpellCrit = 0
-							self.db.char.HighestHaste = 0
-							self.db.char.HighestHastePerc = 0
-							self.db.char.HighestSpellHit = 0
-							self.db.char.HighestMP5if = 0
-							self.db.char.HighestMP5 = 0
-							self.db.char.HighestAp = 0
-							self.db.char.HighestMeleeCrit = 0
-							self.db.char.FastestMh = 500
-							self.db.char.FastestOh = 500
-							self.db.char.HighestMeleeHit = 0
+					labels = {
+						name = L["Show labels"],
+						desc = L["Whether or not to show labels for each stat"],
+						type = 'toggle',
+						get = function() return self.db.char.Style.labels end,
+						set = function(info, value)
+							if(value) then
+								self.db.char.Style.labels = true
+							else
+								self.db.char.Style.labels = false
+							end
 							self:Stats()
 						end,
 						disabled = function() return InCombatLockdown() end,
-						order = 100,
+						order = 7
 					},
-				},
+					LDBtext = {
+						name = L["Broker Text"],
+						desc = L["Displays stats in the LDB text field."],
+						width = 'full',
+						type = 'toggle',
+						get = function() return self.db.char.Style.LDBtext end,
+						set = function(info, value)
+							if(value) then
+								self.db.char.Style.LDBtext = true
+							else
+								self.db.char.Style.LDBtext = false
+							end
+							self:Stats()
+						end,
+						disabled = function() return InCombatLockdown() end,
+						order = 8
+					},
+					spaceline4 = {
+						name = " ",
+						type = 'description',
+						order = 9,
+					},
+					record = {
+						name = L["Announce records"],
+						desc = L["Whether or not to display a message when a record is broken"],
+						type = 'toggle',
+						get = function() return self.db.char.RecordMsg end,
+						set = function(info, value)
+							if(value) then
+								self.db.char.RecordMsg = true
+							else
+								self.db.char.RecordMsg = false
+							end
+						end,
+						disabled = function() return InCombatLockdown() end,
+						order = 10
+					},
+					recordSound = {
+						name = L["Play sound on record"],
+						desc = L["Whether or not to play a sound when a record is broken"],
+						type = 'toggle',
+						get = function() return self.db.char.RecordSound end,
+						set = function(info, value)
+							if(value) then
+								self.db.char.RecordSound = true
+							else
+								self.db.char.RecordSound = false
+							end
+						end,
+						disabled = function() return InCombatLockdown() end,
+						order = 11,
+					},
+					spaceline5 = {
+						name = " ",
+						type = 'description',
+						order = 12,
+					},
+					selectSound = {
+						name = L["Sound"],
+						type = 'select',
+						dialogControl = "LSM30_Sound",
+						get = function() return self.db.char.RecordSoundFile end,
+						set = function(info, value) self.db.char.RecordSoundFile = value end,
+						values = AceGUIWidgetLSMlists.sound,
+						disabled = function() return InCombatLockdown() end,
+						order = 13,
+					},
+				}
 			},
-		},
+			
+		}
 	}
+	
 	return options
 end
