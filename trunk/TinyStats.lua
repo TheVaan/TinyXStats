@@ -1,42 +1,51 @@
 --   ----------------------------------------
---  |  TinyStats by TheVaan and ArcaneMagus  |
+--  |    TinyStats by TheVaan and Marhu_     |
 --  | based on TMS and TCS - for all classes |
 --   ----------------------------------------
 --
 -- File version: @file-revision@
 -- Project: @project-revision@
 --
-
+local AddonName = "TinyStats"
 local AceAddon = LibStub("AceAddon-3.0")
 local media = LibStub:GetLibrary("LibSharedMedia-3.0")
-TinyStats = AceAddon:NewAddon("TinyStats", "AceConsole-3.0", "AceEvent-3.0", "AceTimer-3.0")
-local L = LibStub:GetLibrary("AceLocale-3.0"):GetLocale("TinyStats")
+TinyStats = AceAddon:NewAddon(AddonName, "AceConsole-3.0", "AceEvent-3.0", "AceTimer-3.0")
+local L = LibStub:GetLibrary("AceLocale-3.0"):GetLocale(AddonName)
 local LGT = LibStub:GetLibrary("LibGroupTalents-1.0");
-local isInFight = false
---Localize buff names
-local hasteBuffs = {
-	bloodlust = GetSpellInfo(2825),
-	heroism = GetSpellInfo(32182),
-	wrathOfAir = GetSpellInfo(2895),
-	elementalMastery = GetSpellInfo(64701),
-	moonkinAura = GetSpellInfo(24907),
-	concentrationAura = GetSpellInfo(19746),
-	crusaderAura = GetSpellInfo(32223),
-	devotionAura = GetSpellInfo(465),
-	retributionAura = GetSpellInfo(7294),
-	shaodowResistanceAura = GetSpellInfo(19876),
-	frostResistanceAura = GetSpellInfo(19888),
-	fireResistanceAura = GetSpellInfo(19891)
-}
 
 local ldb = LibStub:GetLibrary("LibDataBroker-1.1");
-local TSBroker = ldb:NewDataObject("TinyStats", { 
+local TSBroker = ldb:NewDataObject(AddonName, {
 	type = "data source",
-	label = "TinyStats", 
+	label = AddonName,
 	icon = "Interface\\Icons\\Ability_Mage_ArcaneBarrage",
 	text = "--"
 	})
-	
+
+local isInFight = false
+local SpecChangedPause = GetTime()
+local MasteryName = GetSpellInfo(86474)
+
+local backdrop = {
+	bgFile = "Interface\\Tooltips\\UI-Tooltip-Background",
+	edgeFile = "",
+	tile = false, tileSize = 16, edgeSize = 0,
+	insets = { left = 0, right = 0, top = 0, bottom = 0 }
+}
+
+local function Debug(...)
+	if TinyStats.db.profile.debug then
+		local text = ""
+		for i = 1, select("#", ...) do
+			if type(select(i, ...)) == "boolean" then
+				text = text..(select(i, ...) and "true" or "false").." "
+			else
+				text = text..(select(i, ...) or "nil").." "
+			end
+		end
+		DEFAULT_CHAT_FRAME:AddMessage("|cFFCCCC99"..AddonName..": |r"..text)
+	end
+end	
+
 TinyStats.fonts = {}
 
 TinyStats.defaults = {
@@ -50,49 +59,134 @@ TinyStats.defaults = {
 		inCombatAlpha = 1,
 		outOfCombatAlpha = .3,
 		RecordMsg = true,
-		HighestSpelldmg = 0,
-		HighestSpellCrit = 0,
-		HighestSpellHaste = 0,
-		HighestSpellHastePerc = 0,
-		HighestSpellHit = 0,
-		HighestMP5if = 0,
-		HighestMP5 = 0,
-		HighestAp = 0,
-		HighestMeleeCrit = 0,
-		FastestMh = 500,
-		FastestOh = 500,
-		HighestMeleeHit = 0,
+		RecordSound = false,
+		RecordSoundFile = "Fanfare3",
+		Spec1 = {
+			HighestSpelldmg = 0,
+			HighestAp = 0,
+			HighestCrit = "0.00",
+			HighestHaste = 0,
+			HighestHastePerc = "0.00",
+			FastestMh = 500,
+			FastestOh = 500,
+			FastestRs = 500,
+			HighestHit = "0.00",
+			HighestMP5if = 0,
+			HighestMP5 = 0,
+			HighestSpirit = 0,
+			HighestFr = "0.00",
+			HighestMastery = "0.00",
+			HighestDC = "0.00",
+			HighestPC = "0.00",
+			HighestBC = "0.00"
+		},
+		Spec2 = {
+			HighestSpelldmg = 0,
+			HighestAp = 0,
+			HighestCrit = "0.00",
+			HighestHaste = 0,
+			HighestHastePerc = "0.00",
+			FastestMh = 500,
+			FastestOh = 500,
+			FastestRs = 500,
+			HighestHit = "0.00",
+			HighestMP5if = 0,
+			HighestMP5 = 0,
+			HighestSpirit = 0,
+			HighestFr = "0.00",
+			HighestMastery = "0.00",
+			HighestDC = "0.00",
+			HighestPC = "0.00",
+			HighestBC = "0.00"
+		},
 		Style = {
-			Spelldmg = true,
-			SpellCrit = true,
-			Haste = true,
-			HastePerc = false,
-			SpellHit = false,
-			MP5 = false,
-			Ap = true,
-			MeleeCrit = true,
-			Speed = true,
-			MeleeHit = false,
+			SP = {
+				healer = true,
+				caster = true
+			},
+			AP = {
+				melee = true,
+				hunter = true,
+				tank = true
+			},
+			Crit = {
+				healer = true,
+				caster = true,
+				melee = true,
+				hunter = true,
+				tank = true
+			},
+			Haste = {
+				healer = true,
+				caster = true
+			},
+			HastePerc = {},
+			Speed = {
+				melee = true,
+				hunter = true,
+				tank = true
+			},
+			Hit = {
+				caster = true,
+				melee = true,
+				hunter = true,
+				tank = true
+			},
+			Mastery = {
+				healer = true,
+				caster = true,
+				melee = true,
+				hunter = true,
+				tank = true
+			},
+			Spirit = {
+				healer = true,
+				caster = true
+			},
+			Fr = {
+				hunter = true
+			},
+			DC = {
+				tank = true
+			},
+			PC = {
+				tank = true
+			},
+			BC = {
+				tank = true
+			},
+			MP5 = {},
+			MP5ic = {},
+			MP5auto = {},
+			showRecords = true,
+			vertical = false,
+			labels = false,
+			LDBtext = true
 		},
 		Color = {
 			sp = {
 				r = 1.0,
-				g = 0.9372549019607843,
-				b = 0
-			},
-			spellCrit = {
-				r = 1.0,
-				g = 0,
-				b = 1.0
-			},
-			spellHit = {
-				r = 0,
 				g = 0.803921568627451,
 				b = 0
 			},
+			ap = {
+				r = 1,
+				g = 0.803921568627451,
+				b = 0
+			},
+			crit = {
+				r = 1.0,
+				g = 0,
+				b = 0.6549019607843137
+			},
+			hit = {
+				r = 0.07058823529411765,
+				g = 0.7686274509803921,
+				b = 0
+			},
 			haste = {
-				r = 0.1176470588235294,
-				g = 0.5647058823529412,
+				r = 0,
+				g = 0.611764705882353,
 				b = 1.0
 			},
 			mp5 = {
@@ -100,148 +194,215 @@ TinyStats.defaults = {
 				g = 1.0,
 				b = 1.0
 			},
-			ap = {
-				r = 1,
-				g = 0.803921568627451,
-				b = 0
+			spirit = {
+				r = 1.0,
+				g = 1.0,
+				b = 1.0
 			},
-			meleeCrit = {
-				r = 1,
-				g = 0,
-				b = 0.6549019607843137
+			mastery = {
+				r = 1.0,
+				g = 1.0,
+				b = 1.0
 			},
-			speed = {
-				r = 0,
-				g = 0.611764705882353,
-				b = 1
+			fr = {
+				r = 0.9,
+				g = 0.9,
+				b = 0.9
 			},
-			meleeHit = {
-				r = 0.07058823529411765,
-				g = 0.7686274509803921,
-				b = 0
+			dc = {
+				r = 0.0,
+				g = 1.0,
+				b = 0.788235294117647
+			},
+			pc = {
+				r = 1.0,
+				g = 0.5098039215686274,
+				b = 0.0
+			},
+			bc = {
+				r = 0.9098039215686274,
+				g = 0.0,
+				b = 1.0
 			}
-		}
+		},
 	}
 }
 
-TinyStats.tsframe = CreateFrame("Frame","TinyStatsFrame",UIParent)
-TinyStats.tsframe:SetWidth(100)
-TinyStats.tsframe:SetHeight(15)
-TinyStats.tsframe:SetFrameStrata("BACKGROUND")
-TinyStats.tsframe:EnableMouse(true)
-TinyStats.tsframe:RegisterForDrag("LeftButton")
+TinyStats.frame = CreateFrame("Frame",AddonName.."Frame",UIParent)
+TinyStats.frame:SetWidth(100)
+TinyStats.frame:SetHeight(15)
+TinyStats.frame:SetFrameStrata("BACKGROUND")
+TinyStats.frame:EnableMouse(true)
+TinyStats.frame:RegisterForDrag("LeftButton")
 
 TinyStats.strings = {
-	spString = TinyStats.tsframe:CreateFontString(),
-	spellCritString = TinyStats.tsframe:CreateFontString(),
-	spellHitString = TinyStats.tsframe:CreateFontString(),
-	hasteString = TinyStats.tsframe:CreateFontString(),
-	mp5String = TinyStats.tsframe:CreateFontString(),
-	apString = TinyStats.tsframe:CreateFontString(),
-	meleeCritString = TinyStats.tsframe:CreateFontString(),
-	speedString = TinyStats.tsframe:CreateFontString(),
-	meleeHitString = TinyStats.tsframe:CreateFontString(),
-
-	spRecordString = TinyStats.tsframe:CreateFontString(),
-	spellCritRecordString = TinyStats.tsframe:CreateFontString(),
-	spellHitRecordString = TinyStats.tsframe:CreateFontString(),
-	hasteRecordString = TinyStats.tsframe:CreateFontString(),
-	mp5RecordString = TinyStats.tsframe:CreateFontString(),
-	apRecordString = TinyStats.tsframe:CreateFontString(),
-	meleeCritRecordString = TinyStats.tsframe:CreateFontString(),
-	speedRecordString = TinyStats.tsframe:CreateFontString(),
-	meleeHitRecordString = TinyStats.tsframe:CreateFontString(),
+	spString = TinyStats.frame:CreateFontString(),
+	apString = TinyStats.frame:CreateFontString(),
+	critString = TinyStats.frame:CreateFontString(),
+	hasteString = TinyStats.frame:CreateFontString(),
+	hitString = TinyStats.frame:CreateFontString(),
+	masteryString = TinyStats.frame:CreateFontString(),
+	spiritString = TinyStats.frame:CreateFontString(),
+	mp5String = TinyStats.frame:CreateFontString(),
+	dcString = TinyStats.frame:CreateFontString(),
+	bcString = TinyStats.frame:CreateFontString(),
+	pcString = TinyStats.frame:CreateFontString(),
+	
+	spRecordString = TinyStats.frame:CreateFontString(),
+	apRecordString = TinyStats.frame:CreateFontString(),
+	critRecordString = TinyStats.frame:CreateFontString(),
+	hasteRecordString = TinyStats.frame:CreateFontString(),
+	hitRecordString = TinyStats.frame:CreateFontString(),
+	masteryRecordString = TinyStats.frame:CreateFontString(),
+	spiritRecordString = TinyStats.frame:CreateFontString(),
+	mp5RecordString = TinyStats.frame:CreateFontString(),
+	dcRecordString = TinyStats.frame:CreateFontString(),
+	bcRecordString = TinyStats.frame:CreateFontString(),
+	pcRecordString = TinyStats.frame:CreateFontString()
 }
 
 function TinyStats:SetStringColors()
 	local c = self.db.char.Color
 	self.strings.spString:SetTextColor(c.sp.r, c.sp.g, c.sp.b, 1.0)
-	self.strings.spellCritString:SetTextColor(c.spellCrit.r, c.spellCrit.g, c.spellCrit.b, 1.0)
-	self.strings.spellHitString:SetTextColor(c.spellHit.r, c.spellHit.g, c.spellHit.b, 1.0)
-	self.strings.hasteString:SetTextColor(c.haste.r, c.haste.g, c.haste.b, 1.0)
-	self.strings.mp5String:SetTextColor(c.mp5.r, c.mp5.g, c.mp5.b, 1.0)
 	self.strings.apString:SetTextColor(c.ap.r, c.ap.g, c.ap.b, 1.0)
-	self.strings.meleeCritString:SetTextColor(c.meleeCrit.r, c.meleeCrit.g, c.meleeCrit.b, 1.0)
-	self.strings.speedString:SetTextColor(c.speed.r, c.speed.g, c.speed.b, 1.0)
-	self.strings.meleeHitString:SetTextColor(c.meleeHit.r, c.meleeHit.g, c.meleeHit.b, 1.0)
-	
+	self.strings.critString:SetTextColor(c.crit.r, c.crit.g, c.crit.b, 1.0)
+	self.strings.hasteString:SetTextColor(c.haste.r, c.haste.g, c.haste.b, 1.0)
+	self.strings.hitString:SetTextColor(c.hit.r, c.hit.g, c.hit.b, 1.0)
+	self.strings.masteryString:SetTextColor(c.mastery.r, c.mastery.g, c.mastery.b, 1.0)
+	self.strings.spiritString:SetTextColor(c.spirit.r, c.spirit.g, c.spirit.b, 1.0)
+	self.strings.mp5String:SetTextColor(c.mp5.r, c.mp5.g, c.mp5.b, 1.0)
+	self.strings.dcString:SetTextColor(c.dc.r, c.dc.g, c.dc.b, 1.0)
+	self.strings.bcString:SetTextColor(c.bc.r, c.bc.g, c.bc.b, 1.0)
+	self.strings.pcString:SetTextColor(c.pc.r, c.pc.g, c.pc.b, 1.0)
+
 	self.strings.spRecordString:SetTextColor(c.sp.r, c.sp.g, c.sp.b, 1.0)
-	self.strings.spellCritRecordString:SetTextColor(c.spellCrit.r, c.spellCrit.g, c.spellCrit.b, 1.0)
-	self.strings.spellHitRecordString:SetTextColor(c.spellHit.r, c.spellHit.g, c.spellHit.b, 1.0)
-	self.strings.hasteRecordString:SetTextColor(c.haste.r, c.haste.g, c.haste.b, 1.0)
-	self.strings.mp5RecordString:SetTextColor(c.mp5.r, c.mp5.g, c.mp5.b, 1.0)
 	self.strings.apRecordString:SetTextColor(c.ap.r, c.ap.g, c.ap.b, 1.0)
-	self.strings.meleeCritRecordString:SetTextColor(c.meleeCrit.r, c.meleeCrit.g, c.meleeCrit.b, 1.0)
-	self.strings.speedRecordString:SetTextColor(c.speed.r, c.speed.g, c.speed.b, 1.0)
-	self.strings.meleeHitRecordString:SetTextColor(c.meleeHit.r, c.meleeHit.g, c.meleeHit.b, 1.0)
+	self.strings.critRecordString:SetTextColor(c.crit.r, c.crit.g, c.crit.b, 1.0)
+	self.strings.hasteRecordString:SetTextColor(c.haste.r, c.haste.g, c.haste.b, 1.0)
+	self.strings.hitRecordString:SetTextColor(c.hit.r, c.hit.g, c.hit.b, 1.0)
+	self.strings.masteryRecordString:SetTextColor(c.mastery.r, c.mastery.g, c.mastery.b, 1.0)
+	self.strings.spiritRecordString:SetTextColor(c.spirit.r, c.spirit.g, c.spirit.b, 1.0)
+	self.strings.mp5RecordString:SetTextColor(c.mp5.r, c.mp5.g, c.mp5.b, 1.0)
+	self.strings.dcRecordString:SetTextColor(c.dc.r, c.dc.g, c.dc.b, 1.0)
+	self.strings.bcRecordString:SetTextColor(c.bc.r, c.bc.g, c.bc.b, 1.0)
+	self.strings.pcRecordString:SetTextColor(c.pc.r, c.pc.g, c.pc.b, 1.0)
 end
 
 function TinyStats:SetTextAnchors()
-	local offsetX, offsetY = 3, 0
+	local offsetX, offsetY = 0, 0
 	if (not self.db.char.Style.vertical) then
-		self.strings.spString:SetPoint("TOPLEFT", self.tsframe)
-		self.strings.spellCritString:SetPoint("TOPLEFT", self.strings.spString, "TOPRIGHT", offsetX, offsetY)
-		self.strings.spellHitString:SetPoint("TOPLEFT", self.strings.spellCritString, "TOPRIGHT", offsetX, offsetY)
-		self.strings.hasteString:SetPoint("TOPLEFT", self.strings.spellHitString, "TOPRIGHT", offsetX, offsetY)
-		self.strings.mp5String:SetPoint("TOPLEFT", self.strings.hasteString, "TOPRIGHT", offsetX, offsetY)
-		self.strings.apString:SetPoint("TOPLEFT", self.strings.mp5String, "TOPRIGHT", offsetX, offsetY)
-		self.strings.meleeCritString:SetPoint("TOPLEFT", self.strings.apString, "TOPRIGHT", offsetX, offsetY)
-		self.strings.speedString:SetPoint("TOPLEFT", self.strings.meleeCritString, "TOPRIGHT", offsetX, offsetY)
-		self.strings.meleeHitString:SetPoint("TOPLEFT", self.strings.speedString, "TOPRIGHT", offsetX, offsetY)
-		
+		self.strings.spString:SetPoint("TOPLEFT", self.frame,"TOPLEFT", offsetX, offsetY)
+		self.strings.apString:SetPoint("TOPLEFT", self.strings.spString, "TOPRIGHT", offsetX, offsetY)
+		self.strings.critString:SetPoint("TOPLEFT", self.strings.apString, "TOPRIGHT", offsetX, offsetY)
+		self.strings.hasteString:SetPoint("TOPLEFT", self.strings.critString, "TOPRIGHT", offsetX, offsetY)
+		self.strings.hitString:SetPoint("TOPLEFT", self.strings.hasteString, "TOPRIGHT", offsetX, offsetY)
+		self.strings.masteryString:SetPoint("TOPLEFT", self.strings.hitString, "TOPRIGHT", offsetX, offsetY)
+		self.strings.spiritString:SetPoint("TOPLEFT", self.strings.masteryString, "TOPRIGHT", offsetX, offsetY)
+		self.strings.mp5String:SetPoint("TOPLEFT", self.strings.spiritString, "TOPRIGHT", offsetX, offsetY)
+		self.strings.dcString:SetPoint("TOPLEFT", self.strings.mp5String, "TOPRIGHT", offsetX, offsetY)
+		self.strings.pcString:SetPoint("TOPLEFT", self.strings.dcString, "TOPRIGHT", offsetX, offsetY)
+		self.strings.bcString:SetPoint("TOPLEFT", self.strings.pcString, "TOPRIGHT", offsetX, offsetY)
+
 		self.strings.spRecordString:SetPoint("TOPLEFT", self.strings.spString, "BOTTOMLEFT")
-		self.strings.spellCritRecordString:SetPoint("TOPLEFT", self.strings.spRecordString, "TOPRIGHT", offsetX, offsetY)
-		self.strings.spellHitRecordString:SetPoint("TOPLEFT", self.strings.spellCritRecordString, "TOPRIGHT", offsetX, offsetY)
-		self.strings.hasteRecordString:SetPoint("TOPLEFT", self.strings.spellHitRecordString, "TOPRIGHT", offsetX, offsetY)
-		self.strings.mp5RecordString:SetPoint("TOPLEFT", self.strings.hasteRecordString, "TOPRIGHT", offsetX, offsetY)
-		self.strings.apRecordString:SetPoint("TOPLEFT", self.strings.apString, "BOTTOMLEFT")
-		self.strings.meleeCritRecordString:SetPoint("TOPLEFT", self.strings.apRecordString, "TOPRIGHT", offsetX, offsetY)
-		self.strings.speedRecordString:SetPoint("TOPLEFT", self.strings.meleeCritRecordString, "TOPRIGHT", offsetX, offsetY)
-		self.strings.meleeHitRecordString:SetPoint("TOPLEFT", self.strings.speedRecordString, "TOPRIGHT", offsetX, offsetY)
+		self.strings.apRecordString:SetPoint("TOPLEFT", self.strings.spRecordString, "TOPRIGHT", offsetX, offsetY)
+		self.strings.critRecordString:SetPoint("TOPLEFT", self.strings.apRecordString, "TOPRIGHT", offsetX, offsetY)
+		self.strings.hasteRecordString:SetPoint("TOPLEFT", self.strings.critRecordString, "TOPRIGHT", offsetX, offsetY)
+		self.strings.hitRecordString:SetPoint("TOPLEFT", self.strings.hasteRecordString, "TOPRIGHT", offsetX, offsetY)
+		self.strings.masteryRecordString:SetPoint("TOPLEFT", self.strings.hitRecordString, "TOPRIGHT", offsetX, offsetY)
+		self.strings.spiritRecordString:SetPoint("TOPLEFT", self.strings.masteryRecordString, "TOPRIGHT", offsetX, offsetY)
+		self.strings.mp5RecordString:SetPoint("TOPLEFT", self.strings.spiritRecordString, "TOPRIGHT", offsetX, offsetY)
+		self.strings.dcRecordString:SetPoint("TOPLEFT", self.strings.mp5RecordString, "TOPRIGHT", offsetX, offsetY)
+		self.strings.pcRecordString:SetPoint("TOPLEFT", self.strings.dcRecordString, "TOPRIGHT", offsetX, offsetY)
+		self.strings.bcRecordString:SetPoint("TOPLEFT", self.strings.pcRecordString, "TOPRIGHT", offsetX, offsetY)
 	else
-		self.strings.spString:SetPoint("TOPLEFT", self.tsframe)
-		self.strings.spellCritString:SetPoint("TOPLEFT", self.strings.spString, "BOTTOMLEFT")
-		self.strings.spellHitString:SetPoint("TOPLEFT", self.strings.spellCritString, "BOTTOMLEFT")
-		self.strings.hasteString:SetPoint("TOPLEFT", self.strings.spellHitString, "BOTTOMLEFT")
-		self.strings.mp5String:SetPoint("TOPLEFT", self.strings.hasteString, "BOTTOMLEFT")
-		self.strings.apString:SetPoint("TOPLEFT", self.strings.mp5String, "BOTTOMLEFT")
-		self.strings.meleeCritString:SetPoint("TOPLEFT", self.strings.apString, "BOTTOMLEFT")
-		self.strings.speedString:SetPoint("TOPLEFT", self.strings.meleeCritString, "BOTTOMLEFT")
-		self.strings.meleeHitString:SetPoint("TOPLEFT", self.strings.speedString, "BOTTOMLEFT")
-		
+		self.strings.spString:SetPoint("TOPLEFT", self.frame,"TOPLEFT", offsetX, offsetY)
+		self.strings.apString:SetPoint("TOPLEFT", self.strings.spString, "BOTTOMLEFT")
+		self.strings.critString:SetPoint("TOPLEFT", self.strings.apString, "BOTTOMLEFT")
+		self.strings.hasteString:SetPoint("TOPLEFT", self.strings.critString, "BOTTOMLEFT")
+		self.strings.hitString:SetPoint("TOPLEFT", self.strings.hasteString, "BOTTOMLEFT")
+		self.strings.masteryString:SetPoint("TOPLEFT", self.strings.hitString, "BOTTOMLEFT")
+		self.strings.spiritString:SetPoint("TOPLEFT", self.strings.masteryString, "BOTTOMLEFT")
+		self.strings.mp5String:SetPoint("TOPLEFT", self.strings.spiritString, "BOTTOMLEFT")
+		self.strings.dcString:SetPoint("TOPLEFT", self.strings.mp5String, "BOTTOMLEFT")
+		self.strings.pcString:SetPoint("TOPLEFT", self.strings.dcString, "BOTTOMLEFT")
+		self.strings.bcString:SetPoint("TOPLEFT", self.strings.pcString, "BOTTOMLEFT")
+
 		self.strings.spRecordString:SetPoint("TOPLEFT", self.strings.spString, "TOPRIGHT", offsetX, offsetY)
-		self.strings.spellCritRecordString:SetPoint("TOPLEFT", self.strings.spellCritString, "TOPRIGHT", offsetX, offsetY)
-		self.strings.spellHitRecordString:SetPoint("TOPLEFT", self.strings.spellHitString, "TOPRIGHT", offsetX, offsetY)
-		self.strings.hasteRecordString:SetPoint("TOPLEFT", self.strings.hasteString, "TOPRIGHT", offsetX, offsetY)
-		self.strings.mp5RecordString:SetPoint("TOPLEFT", self.strings.mp5String, "TOPRIGHT", offsetX, offsetY)
 		self.strings.apRecordString:SetPoint("TOPLEFT", self.strings.apString, "TOPRIGHT", offsetX, offsetY)
-		self.strings.meleeCritRecordString:SetPoint("TOPLEFT", self.strings.meleeCritString, "TOPRIGHT", offsetX, offsetY)
-		self.strings.speedRecordString:SetPoint("TOPLEFT", self.strings.speedString, "TOPRIGHT", offsetX, offsetY)
-		self.strings.meleeHitRecordString:SetPoint("TOPLEFT", self.strings.meleeHitString, "TOPRIGHT", offsetX, offsetY)
+		self.strings.critRecordString:SetPoint("TOPLEFT", self.strings.critString, "TOPRIGHT", offsetX, offsetY)
+		self.strings.hasteRecordString:SetPoint("TOPLEFT", self.strings.hasteString, "TOPRIGHT", offsetX, offsetY)
+		self.strings.hitRecordString:SetPoint("TOPLEFT", self.strings.hitString, "TOPRIGHT", offsetX, offsetY)
+		self.strings.masteryRecordString:SetPoint("TOPLEFT", self.strings.masteryString, "TOPRIGHT", offsetX, offsetY)
+		self.strings.spiritRecordString:SetPoint("TOPLEFT", self.strings.spiritString, "TOPRIGHT", offsetX, offsetY)
+		self.strings.mp5RecordString:SetPoint("TOPLEFT", self.strings.mp5String, "TOPRIGHT", offsetX, offsetY)
+		self.strings.dcRecordString:SetPoint("TOPLEFT", self.strings.dcString, "TOPRIGHT", offsetX, offsetY)
+		self.strings.pcRecordString:SetPoint("TOPLEFT", self.strings.pcString, "TOPRIGHT", offsetX, offsetY)
+		self.strings.bcRecordString:SetPoint("TOPLEFT", self.strings.bcString, "TOPRIGHT", offsetX, offsetY)
 	end
+end
+
+function TinyStats:SetDragScript()
+	if self.db.char.FrameLocked then
+		self.frame:SetMovable(false)
+		fixed = "|cffFF0000"..L["Text is fixed. Uncheck Lock Frame in the options to move!"].."|r"
+		self.frame:SetScript("OnDragStart", function() DEFAULT_CHAT_FRAME:AddMessage(fixed) end)
+		self.frame:SetScript("OnEnter", nil)
+		self.frame:SetScript("OnLeave", nil)
+	else				
+		self.frame:SetMovable(true)
+		self.frame:SetScript("OnDragStart", function() self.frame:StartMoving() end)
+		self.frame:SetScript("OnDragStop", function() self.frame:StopMovingOrSizing() self.db.char.xPosition = self.frame:GetLeft() self.db.char.yPosition = self.frame:GetBottom() end)
+		self.frame:SetScript("OnEnter", function() self.frame:SetBackdrop(backdrop) end)
+		self.frame:SetScript("OnLeave", function() self.frame:SetBackdrop(nil) end)
+	end
+end
+
+function TinyStats:InitializeFrame()
+	self.frame:SetPoint("BOTTOMLEFT", UIParent, "BOTTOMLEFT", self.db.char.xPosition, self.db.char.yPosition)
+	local font = media:Fetch("font", self.db.char.Font)
+	for k, fontObject in pairs(self.strings) do
+		fontObject:SetFontObject(GameFontNormal)
+		if not fontObject:SetFont(font, self.db.char.Size, self.db.char.FontEffect) then
+			fontObject:SetFont("Fonts\\FRIZQT__.TTF", self.db.char.Size, self.db.char.FontEffect)
+		end
+		fontObject:SetJustifyH("LEFT")
+		fontObject:SetJustifyV("MIDDLE")
+	end
+	self.strings.spString:SetText(" ")
+	self.strings.spString:SetHeight(self.strings.spString:GetStringHeight())
+	self.strings.spString:SetText("")
+	self:SetTextAnchors()
+	self:SetStringColors()
+	self:SetDragScript()
+	self:Stats()
 end
 
 function TinyStats:OnInitialize()
 	local AceConfigReg = LibStub("AceConfigRegistry-3.0")
 	local AceConfigDialog = LibStub("AceConfigDialog-3.0")
-	
-	self.db = LibStub("AceDB-3.0"):New("TinyStats", TinyStats.defaults, "char")
-	LibStub("AceConfig-3.0"):RegisterOptionsTable("TinyStats", self:Options(), "tscmd")
+
+	self.db = LibStub("AceDB-3.0"):New(AddonName.."DB", TinyStats.defaults, "char")
+	LibStub("AceConfig-3.0"):RegisterOptionsTable(AddonName, self:Options(), "tscmd")
 	media.RegisterCallback(self, "LibSharedMedia_Registered")
-	
-	self:RegisterChatCommand("ts", function() AceConfigDialog:Open("TinyStats") end)	
-	self:RegisterChatCommand("tinystats", function() AceConfigDialog:Open("TinyStats") end)	
-	self.optionsFrame = AceConfigDialog:AddToBlizOptions("TinyStats", "TinyStats")
+
+	self:RegisterChatCommand("ts", function() AceConfigDialog:Open(AddonName) end)
+	self:RegisterChatCommand(AddonName, function() AceConfigDialog:Open(AddonName) end)
+	self.optionsFrame = AceConfigDialog:AddToBlizOptions(AddonName, AddonName)
 	self.db:RegisterDefaults(self.defaults)
-	local version = GetAddOnMetadata("TinyStats","Version")
-	DEFAULT_CHAT_FRAME:AddMessage("|cffffd700TinyStats |cff00ff00~v"..version.."~|cffffd700: "..L["Open the configuration menu with /ts or /tinystats"].."|r")
+	
+	local version = GetAddOnMetadata(AddonName,"Version")
+	local loaded = L["Open the configuration menu with /ts or /TinyStats"].."|r"
+	DEFAULT_CHAT_FRAME:AddMessage("|cffffd700"..AddonName.." |cff00ff00~v"..version.."~|cffffd700: "..loaded)
+	
+	TSBroker.OnClick = function(frame, button)	AceConfigDialog:Open(AddonName)	end
+	TSBroker.OnTooltipShow = function(tt) tt:AddLine(AddonName) end
+	
 end
 
 function TinyStats:OnEnable()
 	self:LibSharedMedia_Registered()
+	self:InitializeFrame()
 	self:RegisterEvent("PLAYER_ENTERING_WORLD", "OnEvent")
-	self:RegisterEvent("ADDON_LOADED", "OnEvent")
-	self:RegisterEvent("VARIABLES_LOADED", "OnEvent")
 	self:RegisterEvent("UNIT_AURA", "OnEvent")
 	self:RegisterEvent("UPDATE_SHAPESHIFT_FORM", "OnEvent")
 	self:RegisterEvent("UNIT_INVENTORY_CHANGED", "OnEvent")
@@ -256,42 +417,887 @@ function TinyStats:LibSharedMedia_Registered()
 	media:Register("font", "LucidaSD", [[Interface\Addons\TinyStats\Fonts\LucidaSD.ttf]])
 	media:Register("font", "Teen", [[Interface\Addons\TinyStats\Fonts\Teen.ttf]])
 	media:Register("font", "Vera", [[Interface\Addons\TinyStats\Fonts\Vera.ttf]])
+	media:Register("sound", "Fanfare1", [[Interface\Addons\TinyStats\Sound\Fanfare.ogg]])
+	media:Register("sound", "Fanfare2", [[Interface\Addons\TinyStats\Sound\Fanfare2.ogg]])
+	media:Register("sound", "Fanfare3", [[Interface\Addons\TinyStats\Sound\Fanfare3.ogg]])
 	
 	for k, v in pairs(media:List("font")) do
 		self.fonts[v] = v
 	end
 end
 
-function TinyStats:OnEvent(event, arg1)
-	if (event == "ADDON_LOADED") then
-		self.tsframe:SetPoint("BOTTOMLEFT", UIParent, "BOTTOMLEFT", self.db.char.xPosition, self.db.char.yPosition)
-		local font = media:Fetch("font", self.db.char.Font)
-		for k, fontObject in pairs(self.strings) do
-			fontObject:SetFontObject(GameFontNormal)
-			fontObject:SetFont(font, self.db.char.Size, self.db.char.FontEffect)
-			fontObject:SetJustifyH("LEFT")
-			fontObject:SetJustifyV("MIDDLE")
-		end
-		self.strings.spString:SetText(" ")
-		self.strings.spString:SetHeight(self.strings.spString:GetStringHeight())
-		self.strings.spString:SetText("")
-		self:SetTextAnchors()
-		self:SetStringColors()
+local orgSetActiveTalentGroup = _G.SetActiveTalentGroup;
+function SetActiveTalentGroup(...)	
+	SpecChangedPause = GetTime() + 30
+	TinyStats:ScheduleTimer("Stats", 32)
+	return orgSetActiveTalentGroup(...)
+end
+
+function TinyStats:OnEvent(event, arg1) 
+	Debug(event)
+	if (event == "PLAYER_TALENT_UPDATE") then	--/run TinyStats:OnEvent("PLAYER_TALENT_UPDATE")
+		self:ScheduleTimer("GetUnitRole", 3)
 	end
 	if ((event == "PLAYER_REGEN_ENABLED") or (event == "PLAYER_ENTERING_WORLD")) then
-		self.tsframe:SetAlpha(self.db.char.outOfCombatAlpha)
+		self.frame:SetAlpha(self.db.char.outOfCombatAlpha)
 		isInFight = false
 	end
 	if (event == "PLAYER_REGEN_DISABLED") then
-		self.tsframe:SetAlpha(self.db.char.inCombatAlpha)
+		self.frame:SetAlpha(self.db.char.inCombatAlpha)
 		isInFight = true
-	end
-	if (self.db.char.FrameLocked == true) then
-		local fixed = "|cffFF0000"..L["Text is fixed. Uncheck Lock Frame in the options to move!"].."|r"
-		self.tsframe:SetScript("OnDragStart", function() DEFAULT_CHAT_FRAME:AddMessage(fixed) end)
 	end
 	if (event == "UNIT_AURA" and arg1 == "player") then
 		self:ScheduleTimer("Stats", .8)
 	end
-  	self:Stats()
+	if (event ~= "UNIT_AURA") then
+		self:Stats()
+	end
+
+end
+
+local function HexColor(stat)
+
+	local c = TinyStats.db.char.Color[stat]
+	local hexColor = string.format("|cff%2X%2X%2X", 255*c.r, 255*c.g, 255*c.b)
+	return hexColor
+	
+end
+
+local function GetAttackPower()
+	local base, buff, debuff
+	if TinyStats.PlayerRole == "hunter" then
+		base, buff, debuff = UnitRangedAttackPower("player")
+	else
+		base, buff, debuff = UnitAttackPower("player")
+	end
+	local pow = base + buff + debuff
+	return pow
+end
+
+local function GetSpellDamage()
+	local spelldamage = 0
+	for i = 2, 7, 1 do -- Start at 2 to skip physical damage , MAX_SPELL_SCHOOLS
+		if (spelldamage < GetSpellBonusDamage(i)) then
+			spelldamage = GetSpellBonusDamage(i)
+		end
+	end
+	if (spelldamage < GetSpellBonusHealing()) then
+		spelldamage = GetSpellBonusHealing()
+	end
+	return spelldamage
+end
+
+local function GetCrit()
+	local critchance = 0
+	if TinyStats.PlayerRole == "healer" or TinyStats.PlayerRole == "caster" then
+		for i = 2, 7, 1 do
+			if (critchance < GetSpellCritChance(i)) then
+				critchance = GetSpellCritChance(i)
+			end
+		end
+	else
+		critchance = GetCritChance("player")
+	end
+	return critchance
+end
+
+local function GetHaste()
+	-- berechnet den Faktor Tempo/prozent ~128,05
+	local FaktorHastePercent = GetCombatRating(CR_HASTE_SPELL)/GetCombatRatingBonus(CR_HASTE_SPELL)
+	
+	local hasteperc = UnitSpellHaste("player")
+	local haste = hasteperc * FaktorHastePercent
+	
+	return string.format("%.0f",haste), string.format("%.2f",hasteperc)
+end
+
+local function GetWeaponSpeed(spec)
+	local speed, fastestSpeed = 500, 500
+	local mainSpeed, offSpeed = UnitAttackSpeed("player")
+	if (offSpeed == nil) then
+		if (mainSpeed > 0) then
+			mainSpeed = string.format("%.2f", mainSpeed)
+			speed = mainSpeed
+			fastestSpeed = TinyStats.db.char[spec].FastestMh
+		else
+			speed = 500
+			mainSpeed = 500
+		end
+	else
+		if (mainSpeed > 0) then
+			mainSpeed = string.format("%.2f", mainSpeed)
+			offSpeed = string.format("%.2f", offSpeed)
+			speed = mainSpeed.."s "..offSpeed
+		else
+			speed = 500
+			mainSpeed = 500
+			offSpeed = nil
+			fastestSpeed = 500
+		end	
+		fastestSpeed = TinyStats.db.char[spec].FastestMh.."s "..TinyStats.db.char[spec].FastestOh
+	end	
+	return mainSpeed, offSpeed, speed, fastestSpeed
+end
+
+local function GetRangedSpeed(spec)
+	-- If no ranged attack then set to n/a
+	local hasRelic = UnitHasRelicSlot("player");	
+	local rangedTexture = GetInventoryItemTexture("player", 18);
+	local fastestSpeed = TinyStats.db.char[spec].FastestRs
+	if ( rangedTexture and not hasRelic ) then
+		local speed = UnitRangedDamage("player")
+		if speed > 0.00 then
+			return string.format("%.2f",speed ),fastestSpeed
+		else
+			return 500, fastestSpeed
+		end
+	else
+		return NOT_APPLICABLE, fastestSpeed
+	end
+	
+end
+
+local function GetHit()
+	local CombatRating = 0
+	local HitModifier = 0
+	if TinyStats.PlayerRole == "healer" or TinyStats.PlayerRole == "caster" then
+		CombatRating = GetCombatRatingBonus(CR_HIT_SPELL) or 0;
+		HitModifier = GetSpellHitModifier() or 0;
+	else
+		CombatRating = GetCombatRatingBonus(CR_HIT_MELEE) or 0;
+		HitModifier = GetHitModifier() or 0;
+	end
+	return string.format("%.2f", CombatRating + HitModifier);
+end
+
+function TinyStats:GetUnitRole()
+	local class = select(2, UnitClass("player"))
+	local role = ""
+	if class == "HUNTER" then
+		role = "hunter"
+	else
+		role = LGT:GetUnitRole("player",true)
+	end
+	if not role then
+		if GetAttackPower() > GetSpellDamage() then
+			role = "melee"
+		else
+			role = "caster"
+		end
+	end
+	if (not self.PlayerRole or self.PlayerRole ~= role) then
+		self.PlayerRole = role
+		self.Mastery = GetSpellInfo(MasteryName)
+		self:Stats()
+	end
+		
+	Debug("you are:", role, self.Mastery)
+	return role
+end
+
+function TinyStats:Stats()
+	local style = self.db.char.Style
+	local spec = "Spec"..GetActiveTalentGroup()
+	local spelldmg = GetSpellDamage()
+	local pow = GetAttackPower()
+	local crit = string.format("%.2f",GetCrit())
+	local haste, hasteperc = GetHaste()
+	local mainSpeed, offSpeed, speed, fastestSpeed = 500, nil, 500, 500
+	if style.Speed[self.PlayerRole] then
+		if self.PlayerRole == "hunter" then
+			speed, fastestSpeed = GetRangedSpeed(spec)
+		else
+			mainSpeed, offSpeed, speed, fastestSpeed = GetWeaponSpeed(spec)
+		end
+	end
+	local hit = GetHit()
+	local mastery = string.format("%.2f", GetMastery())
+	local s, spirit = UnitStat("player", 5)
+	local base, casting = GetManaRegen()
+	base = floor(base * 5.0)
+	casting = floor(casting * 5.0)
+	local fr = string.format("%.2f", GetPowerRegen() or 0)
+	local DodgeChance,BlockChance,ParryChance = 0,0,0
+	if self.PlayerRole == "tank" then
+		DodgeChance = string.format("%.2f",GetDodgeChance())
+		ParryChance = string.format("%.2f",GetParryChance())
+		BlockChance = string.format("%.2f",GetBlockChance())
+	end
+	
+	local recordBroken = "|cffFF0000"..L["Record broken!"]..": "
+	local recordIsBroken = false
+	
+	if SpecChangedPause <= GetTime() then
+		if (style.SP[self.PlayerRole] and tonumber(spelldmg) > tonumber(self.db.char[spec].HighestSpelldmg)) then
+			self.db.char[spec].HighestSpelldmg = spelldmg
+			if (self.db.char.RecordMsg == true) then
+				DEFAULT_CHAT_FRAME:AddMessage(recordBroken..STAT_SPELLPOWER..": |c00ffef00"..self.db.char[spec].HighestSpelldmg.."|r")
+				recordIsBroken = true
+			end
+		end
+		if (style.AP[self.PlayerRole] and tonumber(pow) > tonumber(self.db.char[spec].HighestAp)) then
+			self.db.char[spec].HighestAp = pow
+			if (self.db.char.RecordMsg == true) then
+				DEFAULT_CHAT_FRAME:AddMessage(recordBroken..STAT_ATTACK_POWER..": |c00ffef00"..self.db.char[spec].HighestAp.."|r")
+				recordIsBroken = true
+			end
+		end
+		if (style.Crit[self.PlayerRole] and tonumber(crit) > tonumber(self.db.char[spec].HighestCrit)) then
+			self.db.char[spec].HighestCrit = crit
+			if (self.db.char.RecordMsg == true) then
+				DEFAULT_CHAT_FRAME:AddMessage(recordBroken..SPELL_CRIT_CHANCE..": |c00ffef00".. self.db.char[spec].HighestCrit.."%|r")
+				recordIsBroken = true
+			end
+		end
+		if (style.Haste[self.PlayerRole] or style.HastePerc[self.PlayerRole]) then
+			if (tonumber(haste) > tonumber(self.db.char[spec].HighestHaste) or tonumber(hasteperc) > tonumber(self.db.char[spec].HighestHastePerc)) then
+				self.db.char[spec].HighestHaste = haste
+				self.db.char[spec].HighestHastePerc = hasteperc
+				if (self.db.char.RecordMsg == true) then
+					DEFAULT_CHAT_FRAME:AddMessage(recordBroken..SPELL_HASTE..": |c00ffef00"..self.db.char[spec].HighestHaste.."|r")
+					DEFAULT_CHAT_FRAME:AddMessage(recordBroken..L["Percent Haste"]..": |c00ffef00"..self.db.char[spec].HighestHastePerc.."%|r")
+					recordIsBroken = true
+				end
+			end
+		end
+		if (style.Speed[self.PlayerRole]) then
+			if self.PlayerRole == "hunter" then
+				if (tonumber(speed) and (tonumber(speed) < tonumber(self.db.char[spec].FastestRs))) then
+					self.db.char[spec].FastestRs = speed
+					if (self.db.char.RecordMsg == true) then
+						DEFAULT_CHAT_FRAME:AddMessage(recordBroken..STAT_ATTACK_SPEED..": |c00ffef00"..self.db.char[spec].FastestRs.."|r")
+						recordIsBroken = true
+					end
+					fastestSpeed = self.db.char[spec].FastestRs
+				end
+			else
+				if (tonumber(mainSpeed) < tonumber(self.db.char[spec].FastestMh)) then
+					self.db.char[spec].FastestMh = mainSpeed
+					if (self.db.char.RecordMsg == true) then
+						DEFAULT_CHAT_FRAME:AddMessage(recordBroken..WEAPON_SPEED..(offSpeed and " (MainHand)" or "")..": |c00ffef00"..self.db.char[spec].FastestMh.."|r")
+						recordIsBroken = true
+					end
+					fastestSpeed = self.db.char[spec].FastestMh
+				end
+				if (offSpeed and (tonumber(offSpeed) < tonumber(self.db.char[spec].FastestOh))) then
+					self.db.char[spec].FastestOh = offSpeed
+					if (self.db.char.RecordMsg == true) then
+						DEFAULT_CHAT_FRAME:AddMessage(recordBroken..WEAPON_SPEED.." (OffHand): |c00ffef00"..self.db.char[spec].FastestOh.."|r")
+						recordIsBroken = true
+					end
+					fastestSpeed = self.db.char[spec].FastestMh.."s "..self.db.char[spec].FastestOh
+				end
+			end
+		end
+		if (style.Hit[self.PlayerRole] and tonumber(hit) > tonumber(self.db.char[spec].HighestHit)) then
+			self.db.char[spec].HighestHit = hit
+			if (self.db.char.RecordMsg == true) then
+				DEFAULT_CHAT_FRAME:AddMessage(recordBroken..STAT_HIT_CHANCE..": |c00ffef00"..self.db.char[spec].HighestHit.."%|r")
+				recordIsBroken = true
+			end
+		end
+		if (style.Mastery[self.PlayerRole] and self.Mastery) then
+			if (tonumber(mastery) > tonumber(self.db.char[spec].HighestMastery)) then
+				self.db.char[spec].HighestMastery = mastery
+				if (self.db.char.RecordMsg == true) then
+					DEFAULT_CHAT_FRAME:AddMessage(recordBroken..STAT_MASTERY..": |c00ffef00"..self.db.char[spec].HighestMastery.."|r")
+					recordIsBroken = true
+				end
+			end
+		end
+		if (style.Spirit[self.PlayerRole] and tonumber(spirit) > tonumber(self.db.char[spec].HighestSpirit)) then
+			self.db.char[spec].HighestSpirit = spirit
+			if (self.db.char.RecordMsg == true) then
+				DEFAULT_CHAT_FRAME:AddMessage(recordBroken..ITEM_MOD_SPIRIT_SHORT..": |c00ffef00"..self.db.char[spec].HighestSpirit.."|r")
+				recordIsBroken = true
+			end
+		end
+		if (style.MP5[self.PlayerRole] or style.MP5ic[self.PlayerRole] or style.MP5auto[self.PlayerRole]) then
+			if (tonumber(base) > tonumber(self.db.char[spec].HighestMP5)) then
+				self.db.char[spec].HighestMP5 = base
+				if (self.db.char.RecordMsg == true) then
+					DEFAULT_CHAT_FRAME:AddMessage(recordBroken..ITEM_MOD_MANA_REGENERATION_SHORT.." "..L["out of combat"]..": |c00ffef00"..self.db.char[spec].HighestMP5.."|r")
+					recordIsBroken = true
+				end
+			end
+			if (tonumber(casting) > tonumber(self.db.char[spec].HighestMP5if)) then
+				self.db.char[spec].HighestMP5if = casting
+				if (self.db.char.RecordMsg == true) then
+					DEFAULT_CHAT_FRAME:AddMessage(recordBroken..ITEM_MOD_MANA_REGENERATION_SHORT.." "..L["in combat"]..": |c00ffef00"..self.db.char[spec].HighestMP5if.."|r")
+					recordIsBroken = true
+				end
+			end
+		end
+		if (style.Fr[self.PlayerRole] and tonumber(fr) > tonumber(self.db.char[spec].HighestFr)) then
+			self.db.char[spec].HighestFr = fr
+			if (self.db.char.RecordMsg == true) then
+				DEFAULT_CHAT_FRAME:AddMessage(recordBroken..STAT_FOCUS_REGEN..": |c00ffef00"..self.db.char[spec].HighestFr.."|r")
+				recordIsBroken = true
+			end
+		end
+		if (style.DC[self.PlayerRole] and tonumber(DodgeChance) > tonumber(self.db.char[spec].HighestDC)) then
+			self.db.char[spec].HighestDC = DodgeChance
+			if (self.db.char.RecordMsg == true) then
+				DEFAULT_CHAT_FRAME:AddMessage(recordBroken..STAT_DODGE..": |c00ffef00"..self.db.char[spec].HighestDC.."|r")
+				recordIsBroken = true
+			end
+		end
+		if (style.PC[self.PlayerRole] and tonumber(ParryChance) > tonumber(self.db.char[spec].HighestPC)) then
+			self.db.char[spec].HighestPC = ParryChance
+			if (self.db.char.RecordMsg == true) then
+				DEFAULT_CHAT_FRAME:AddMessage(recordBroken..STAT_PARRY..": |c00ffef00"..self.db.char[spec].HighestPC.."|r")
+				recordIsBroken = true
+			end
+		end
+		if (style.BC[self.PlayerRole] and tonumber(BlockChance) > tonumber(self.db.char[spec].HighestBC)) then
+			self.db.char[spec].HighestBC = BlockChance
+			if (self.db.char.RecordMsg == true) then
+				DEFAULT_CHAT_FRAME:AddMessage(recordBroken..STAT_BLOCK..": |c00ffef00"..self.db.char[spec].HighestBC.."|r")
+				recordIsBroken = true
+			end
+		end
+	end
+	
+	if ((recordIsBroken == true) and (self.db.char.RecordSound == true)) then
+		PlaySoundFile(media:Fetch("sound", self.db.char.RecordSoundFile),"Master")
+	end
+	
+	local ldbString = ""
+	local ldbRecord = ""
+	
+	if (style.showRecords) then ldbRecord = "|n" end
+	
+	if (style.SP[self.PlayerRole]) then
+		local spTempString = " "
+		local spRecordTempString = " "
+		ldbString = ldbString..HexColor("sp")
+		if (style.labels) then
+			spTempString = spTempString..L["Sp:"]
+			ldbString = ldbString..L["Sp:"]
+		end
+		spTempString = spTempString..spelldmg
+		ldbString = ldbString..spelldmg.." "
+		if (style.showRecords) then
+			ldbRecord = ldbRecord..HexColor("sp")
+			if (style.vertical) then
+				if (style.labels) then
+					ldbRecord = ldbRecord..L["Sp:"]
+				end
+				spRecordTempString = spRecordTempString.."("..self.db.char[spec].HighestSpelldmg..")"
+				ldbRecord = ldbRecord..self.db.char[spec].HighestSpelldmg.." "
+			else
+				if (style.labels) then
+					spRecordTempString = spRecordTempString..L["Sp:"]
+					ldbRecord = ldbRecord..L["Sp:"]
+				end
+				spRecordTempString = spRecordTempString..self.db.char[spec].HighestSpelldmg
+				ldbRecord = ldbRecord..self.db.char[spec].HighestSpelldmg.." "
+			end
+		end
+		self.strings.spString:SetText(spTempString)
+		self.strings.spRecordString:SetText(spRecordTempString)
+	else
+		self.strings.spString:SetText("")
+		self.strings.spRecordString:SetText("")
+	end
+	if (style.AP[self.PlayerRole]) then
+		local apTempString = " "
+		local apRecordTempString = " "
+		ldbString = ldbString..HexColor("ap")
+		if (style.labels) then
+			apTempString = apTempString..L["Ap:"]
+			ldbString = ldbString..L["Ap:"]
+		end
+		apTempString = apTempString..pow
+		ldbString = ldbString..pow.." "
+		if (style.showRecords) then
+			ldbRecord = ldbRecord..HexColor("ap")
+			if (style.vertical) then
+				apRecordTempString = apRecordTempString.."("..self.db.char[spec].HighestAp..")"
+				if (style.labels) then
+					ldbRecord = ldbRecord..L["Ap:"]
+				end
+				ldbRecord = ldbRecord..self.db.char[spec].HighestAp.." "
+			else
+				if (style.labels) then
+					apRecordTempString = apRecordTempString..L["Ap:"]
+					ldbRecord = ldbRecord..L["Ap:"]
+				end
+				apRecordTempString = apRecordTempString..self.db.char[spec].HighestAp
+				ldbRecord = ldbRecord..self.db.char[spec].HighestAp.." "
+			end
+		end
+		self.strings.apString:SetText(apTempString)
+		self.strings.apRecordString:SetText(apRecordTempString)
+	else
+		self.strings.apString:SetText("")
+		self.strings.apRecordString:SetText("")
+	end
+	if (style.Crit[self.PlayerRole]) then
+		local critTempString = " "
+		local critRecordTempString = " "
+		ldbString = ldbString..HexColor("crit")
+		if (style.labels) then
+			critTempString = critTempString..L["Crit:"]
+			ldbString = ldbString..L["Crit:"]
+		end
+		critTempString = critTempString..crit.."%"
+		ldbString = ldbString..crit.."% "
+		if (style.showRecords) then
+			ldbRecord = ldbRecord..HexColor("crit")
+			if (style.vertical) then
+				if (style.labels) then
+					ldbRecord = ldbRecord..L["Crit:"]
+				end
+				critRecordTempString = critRecordTempString.."("..self.db.char[spec].HighestCrit.."%)"
+				ldbRecord = ldbRecord..self.db.char[spec].HighestCrit.."% "
+			else
+				if (style.labels) then
+					critRecordTempString = critRecordTempString..L["Crit:"]
+					ldbRecord = ldbRecord..L["Crit:"]
+				end
+				critRecordTempString = critRecordTempString..self.db.char[spec].HighestCrit.."%"
+				ldbRecord = ldbRecord..self.db.char[spec].HighestCrit.."% "
+			end
+		end
+		self.strings.critString:SetText(critTempString)
+		self.strings.critRecordString:SetText(critRecordTempString)
+	else
+		self.strings.critString:SetText("")
+		self.strings.critRecordString:SetText("")
+	end
+	if (style.Haste[self.PlayerRole]) then
+		local hasteTempString = " "
+		local hasteRecordTempString = " "
+		ldbString = ldbString..HexColor("haste")
+		if (style.labels) then
+			hasteTempString = hasteTempString..L["Haste:"]
+			ldbString = ldbString..L["Haste:"]
+		end
+		hasteTempString = hasteTempString..haste
+		ldbString = ldbString..haste.." "
+		if (style.showRecords) then
+			ldbRecord = ldbRecord..HexColor("haste")
+			if (style.vertical) then
+				if (style.labels) then
+					ldbRecord = ldbRecord..L["Haste:"]
+				end
+				hasteRecordTempString = hasteRecordTempString.."("..self.db.char[spec].HighestHaste..")"
+				ldbRecord = ldbRecord..self.db.char[spec].HighestHaste.." "
+			else
+				if (style.labels) then
+					hasteRecordTempString = hasteRecordTempString..L["Haste:"]
+					ldbRecord = ldbRecord..L["Haste:"]
+				end
+				hasteRecordTempString = hasteRecordTempString..self.db.char[spec].HighestHaste
+				ldbRecord = ldbRecord..self.db.char[spec].HighestHaste.." "
+			end
+		end
+		self.strings.hasteString:SetText(hasteTempString)
+		self.strings.hasteRecordString:SetText(hasteRecordTempString)
+	elseif (style.HastePerc[self.PlayerRole]) then
+		local hasteTempString = " "
+		local hasteRecordTempString = " "
+		ldbString = ldbString..HexColor("haste")
+		if (style.labels) then
+			hasteTempString = hasteTempString..SPELL_HASTE_ABBR..":"
+			ldbString = ldbString..SPELL_HASTE_ABBR..":"
+		end
+		hasteTempString = hasteTempString..hasteperc.."%"
+		ldbString = ldbString..hasteperc.."% "
+		if (style.showRecords) then
+			ldbRecord = ldbRecord..HexColor("haste")
+			if (style.vertical) then
+				if (style.labels) then
+					ldbRecord = ldbRecord..SPELL_HASTE_ABBR..":"
+				end
+				hasteRecordTempString = hasteRecordTempString.."("..self.db.char[spec].HighestHastePerc.."%)"
+				ldbRecord = ldbRecord..self.db.char[spec].HighestHastePerc.."% "
+			else
+				if (style.labels) then
+					hasteRecordTempString = hasteRecordTempString..SPELL_HASTE_ABBR..":"
+					ldbRecord = ldbRecord..SPELL_HASTE_ABBR..":"
+				end
+				hasteRecordTempString = hasteRecordTempString..self.db.char[spec].HighestHastePerc.."%"
+				ldbRecord = ldbRecord..self.db.char[spec].HighestHastePerc.."% "
+			end
+		end
+		self.strings.hasteString:SetText(hasteTempString)
+		self.strings.hasteRecordString:SetText(hasteRecordTempString)
+	elseif (style.Speed[self.PlayerRole]) then
+		local hasteTempString = " "
+		local hasteRecordTempString = " "
+		ldbString = ldbString..HexColor("haste")
+		if (style.labels) then
+			hasteTempString = hasteTempString..L["Speed:"]
+			ldbString = ldbString..L["Speed:"]
+		end
+		hasteTempString = hasteTempString..speed.."s"
+		ldbString = ldbString..speed.."s "
+		if (style.showRecords) then
+			ldbRecord = ldbRecord..HexColor("haste")
+			if (style.vertical) then
+				if (style.labels) then
+					ldbRecord = ldbRecord..L["Speed:"]
+				end
+				hasteRecordTempString = hasteRecordTempString.."("..fastestSpeed.."s)"
+				ldbRecord = ldbRecord..fastestSpeed.."s "
+			else
+				if (style.labels) then
+					hasteRecordTempString = hasteRecordTempString..L["Speed:"]
+					ldbRecord = ldbRecord..L["Speed:"]
+				end
+				hasteRecordTempString = hasteRecordTempString..fastestSpeed.."s"
+				ldbRecord = ldbRecord..fastestSpeed.."s "
+			end
+		end
+		self.strings.hasteString:SetText(hasteTempString)
+		self.strings.hasteRecordString:SetText(hasteRecordTempString)
+	else
+		self.strings.hasteString:SetText("")
+		self.strings.hasteRecordString:SetText("")
+	end
+	if (style.Hit[self.PlayerRole]) then
+		local hitTempString = " "
+		local hitRecordTempString = " "
+		ldbString = ldbString..HexColor("hit")
+		if (style.labels) then
+			hitTempString = hitTempString..L["Hit:"]
+			ldbString = ldbString..L["Hit:"]
+		end
+		hitTempString = hitTempString..hit.."%"
+		ldbString = ldbString..hit.."% "
+		if (style.showRecords) then
+			ldbRecord = ldbRecord..HexColor("hit")
+			if (style.vertical) then
+				if (style.labels) then
+					ldbRecord = ldbRecord..L["Hit:"]
+				end
+				hitRecordTempString = hitRecordTempString.."("..self.db.char[spec].HighestHit.."%)"
+				ldbRecord = ldbRecord..self.db.char[spec].HighestHit.."% "
+			else
+				if (style.labels) then
+					hitRecordTempString = hitRecordTempString..L["Hit:"]
+					ldbRecord = ldbRecord..L["Hit:"]
+				end
+				hitRecordTempString = hitRecordTempString..self.db.char[spec].HighestHit.."%"
+				ldbRecord = ldbRecord..self.db.char[spec].HighestHit.."% "
+			end
+		end
+		self.strings.hitString:SetText(hitTempString)
+		self.strings.hitRecordString:SetText(hitRecordTempString)
+	else
+		self.strings.hitString:SetText("")
+		self.strings.hitRecordString:SetText("")
+	end
+	if (style.Mastery[self.PlayerRole] and self.Mastery) then
+		local masteryTempString = " "
+		local masteryRecordTempString = " "
+		ldbString = ldbString..HexColor("mastery")
+		if (style.labels) then
+			masteryTempString = masteryTempString..L["Mas:"]
+			ldbString = ldbString..L["Mas:"]
+		end
+		masteryTempString = masteryTempString..mastery
+		ldbString = ldbString..mastery.." "
+		if (style.showRecords) then
+			ldbRecord = ldbRecord..HexColor("mastery")
+			if (style.vertical) then
+				if (style.labels) then
+					ldbRecord = ldbRecord..L["Mas:"]
+				end
+				masteryRecordTempString = masteryRecordTempString.."("..self.db.char[spec].HighestMastery..")"
+				ldbRecord = ldbRecord..self.db.char[spec].HighestMastery.." "
+			else
+				if (style.labels) then
+					masteryRecordTempString = masteryRecordTempString..L["Mas:"]
+					ldbRecord = ldbRecord..L["Mas:"]
+				end
+				masteryRecordTempString = masteryRecordTempString..self.db.char[spec].HighestMastery
+				ldbRecord = ldbRecord..self.db.char[spec].HighestMastery.." "
+			end
+		end
+		self.strings.masteryString:SetText(masteryTempString)
+		self.strings.masteryRecordString:SetText(masteryRecordTempString)
+	else
+		self.strings.masteryString:SetText("")
+		self.strings.masteryRecordString:SetText("")
+	end
+	if (style.Spirit[self.PlayerRole]) then
+		local spiritTempString = " "
+		local spiritRecordTempString = " "
+		ldbString = ldbString..HexColor("spirit")
+		if (style.labels) then
+			spiritTempString = spiritTempString..L["Spi:"]
+			ldbString = ldbString..L["Spi:"]
+		end
+		spiritTempString = spiritTempString..spirit
+		ldbString = ldbString..spirit.." "
+		if (style.showRecords) then
+			ldbRecord = ldbRecord..HexColor("spirit")
+			if (style.vertical) then
+				if (style.labels) then
+					ldbRecord = ldbRecord..L["Spi:"]
+				end
+				spiritRecordTempString = spiritRecordTempString.."("..self.db.char[spec].HighestSpirit..")"
+				ldbRecord = ldbRecord..self.db.char[spec].HighestSpirit.." "
+			else
+				if (style.labels) then
+					spiritRecordTempString = spiritRecordTempString..L["Spi:"]
+					ldbRecord = ldbRecord..L["Spi:"]
+				end
+				spiritRecordTempString = spiritRecordTempString..self.db.char[spec].HighestSpirit
+				ldbRecord = ldbRecord..self.db.char[spec].HighestSpirit.." "
+			end
+		end
+		self.strings.spiritString:SetText(spiritTempString)
+		self.strings.spiritRecordString:SetText(spiritRecordTempString)
+	else
+		self.strings.spiritString:SetText("")
+		self.strings.spiritRecordString:SetText("")
+	end
+		
+	local mp5TempString = " "
+	local mp5RecordTempString = " "
+	
+	if (style.MP5[self.PlayerRole]) then
+		ldbString = ldbString..HexColor("mp5")
+		if (style.labels) then
+			mp5TempString = mp5TempString..L["MP5:"]
+			ldbString = ldbString..L["MP5:"]
+		end
+		mp5TempString = mp5TempString..base.."mp5 "
+		ldbString = ldbString..base.."mp5 "
+		if (style.showRecords) then
+			ldbRecord = ldbRecord..HexColor("mp5")
+			if (style.vertical) then
+				if (style.labels) then
+					ldbRecord = ldbRecord..L["MP5:"]
+				end
+				mp5RecordTempString = mp5RecordTempString.."("..self.db.char[spec].HighestMP5.."mp5)"
+				ldbRecord = ldbRecord..self.db.char[spec].HighestMP5.."mp5 "
+			else
+				if (style.labels) then
+					mp5RecordTempString = mp5RecordTempString..L["MP5:"]
+					ldbRecord = ldbRecord..L["MP5:"]
+				end
+				mp5RecordTempString = mp5RecordTempString..self.db.char[spec].HighestMP5.."mp5 "
+				ldbRecord = ldbRecord..self.db.char[spec].HighestMP5.."mp5 "
+			end
+		end
+		self.strings.mp5String:SetText(mp5TempString)
+		self.strings.mp5RecordString:SetText(mp5RecordTempString)
+	end
+	if (style.MP5ic[self.PlayerRole]) then
+		ldbString = ldbString..HexColor("mp5")
+		if (style.labels) then
+			mp5TempString = mp5TempString..L["MP5-ic:"]
+			ldbString = ldbString..L["MP5-ic:"]
+		end
+		mp5TempString = mp5TempString..casting.."mp5 "
+		ldbString = ldbString..casting.."mp5 "
+		if (style.showRecords) then
+			ldbRecord = ldbRecord..HexColor("mp5")
+			if (style.vertical) then
+				if (style.labels) then
+					ldbRecord = ldbRecord..L["MP5-ic:"]
+				end
+				mp5RecordTempString = mp5RecordTempString.."("..self.db.char[spec].HighestMP5if.."mp5)"
+				ldbRecord = ldbRecord..self.db.char[spec].HighestMP5if.."mp5 "
+			else
+				if (style.labels) then
+					mp5RecordTempString = mp5RecordTempString..L["MP5-ic:"]
+					ldbRecord = ldbRecord..L["MP5-ic:"]
+				end
+				mp5RecordTempString = mp5RecordTempString..self.db.char[spec].HighestMP5if.."mp5 "
+				ldbRecord = ldbRecord..self.db.char[spec].HighestMP5if.."mp5 "
+			end
+		end
+		self.strings.mp5String:SetText(mp5TempString)
+		self.strings.mp5RecordString:SetText(mp5RecordTempString)
+	end
+	if (style.MP5auto[self.PlayerRole]) then
+		ldbString = ldbString..HexColor("mp5")
+		if (style.labels) then
+			mp5TempString = mp5TempString..L["MP5:"]
+			ldbString = ldbString..L["MP5:"]
+		end
+		if (isInFight) then
+			mp5TempString = mp5TempString..casting.."mp5"
+			ldbString = ldbString..casting.."mp5 "
+		else
+			mp5TempString = mp5TempString..base.."mp5"
+			ldbString = ldbString..base.."mp5 "
+		end
+		if (style.showRecords) then
+			ldbRecord = ldbRecord..HexColor("mp5")
+			if (style.vertical) then
+				if (style.labels) then
+					ldbRecord = ldbRecord..L["MP5:"]
+				end
+				if (isInFight) then
+					mp5RecordTempString = mp5RecordTempString.."("..self.db.char[spec].HighestMP5if.."mp5)"
+					ldbRecord = ldbRecord..self.db.char[spec].HighestMP5if.."mp5"
+				else
+					mp5RecordTempString = mp5RecordTempString.."("..self.db.char[spec].HighestMP5.."mp5)"
+					ldbRecord = ldbRecord..self.db.char[spec].HighestMP5.."mp5"
+				end
+			else
+				if (style.labels) then
+					mp5RecordTempString = mp5RecordTempString..L["MP5:"]
+					ldbRecord = ldbRecord..L["MP5:"]
+				end
+				if (isInFight) then
+					mp5RecordTempString = mp5RecordTempString..self.db.char[spec].HighestMP5if.."mp5"
+					ldbRecord = ldbRecord..self.db.char[spec].HighestMP5if.."mp5"
+				else
+					mp5RecordTempString = mp5RecordTempString..self.db.char[spec].HighestMP5.."mp5"
+					ldbRecord = ldbRecord..self.db.char[spec].HighestMP5.."mp5"
+				end
+			end
+		end
+		self.strings.mp5String:SetText(mp5TempString)
+		self.strings.mp5RecordString:SetText(mp5RecordTempString)
+	end
+	if (style.Fr[self.PlayerRole]) then
+		ldbString = ldbString..HexColor("fr")
+		if (style.labels) then
+			mp5TempString = mp5TempString..L["FR:"]
+			ldbString = ldbString..L["FR:"]
+		end
+		mp5TempString = mp5TempString..fr
+		ldbString = ldbString..fr.." "
+		if (style.showRecords) then
+			ldbRecord = ldbRecord..HexColor("fr")
+			if (style.vertical) then
+				if (style.labels) then
+					ldbRecord = ldbRecord..L["FR:"]
+				end
+				mp5RecordTempString = mp5RecordTempString.."("..self.db.char[spec].HighestFr..")"
+				ldbRecord = ldbRecord..self.db.char[spec].HighestFr.." "
+			else
+				if (style.labels) then
+					mp5RecordTempString = mp5RecordTempString..L["FR:"]
+					ldbRecord = ldbRecord..L["FR:"]
+				end
+				mp5RecordTempString = mp5RecordTempString..self.db.char[spec].HighestFr
+				ldbRecord = ldbRecord..self.db.char[spec].HighestFr.." "
+			end
+		end
+		self.strings.mp5String:SetText(mp5TempString)
+		self.strings.mp5RecordString:SetText(mp5RecordTempString)
+	end
+	if (not style.MP5[self.PlayerRole] and
+		not style.MP5ic[self.PlayerRole] and
+		not style.MP5auto[self.PlayerRole] and
+		not style.Fr[self.PlayerRole]) then
+			self.strings.mp5String:SetText("")
+			self.strings.mp5RecordString:SetText("")
+	end
+	
+	if (style.DC[self.PlayerRole]) then
+		local dcTempString = " "
+		local dcRecordTempString = " "
+		ldbString = ldbString..HexColor("dc")
+		if (style.labels) then
+			dcTempString = dcTempString..L["DC:"]
+			ldbString = ldbString..L["DC:"]
+		end
+		dcTempString = dcTempString..DodgeChance.."%"
+		ldbString = ldbString..DodgeChance.."% "
+		if (style.showRecords) then
+			ldbRecord = ldbRecord..HexColor("dc")
+			if (style.vertical) then
+				if (style.labels) then
+					ldbRecord = ldbRecord..L["DC:"]
+				end
+				dcRecordTempString = dcRecordTempString.."("..self.db.char[spec].HighestDC.."%)"
+				ldbRecord = ldbRecord..self.db.char[spec].HighestDC.."% "
+			else
+				if (style.labels) then
+					dcRecordTempString = dcRecordTempString..L["DC:"]
+					ldbRecord = ldbRecord..L["DC:"]
+				end
+				dcRecordTempString = dcRecordTempString..self.db.char[spec].HighestDC.."%"
+				ldbRecord = ldbRecord..self.db.char[spec].HighestDC.."% "
+			end
+		end
+		self.strings.dcString:SetText(dcTempString)
+		self.strings.dcRecordString:SetText(dcRecordTempString)
+	else
+		self.strings.dcString:SetText("")
+		self.strings.dcRecordString:SetText("")
+	end
+	if (style.PC[self.PlayerRole]) then
+		local pcTempString = " "
+		local pcRecordTempString = " "
+		ldbString = ldbString..HexColor("pc")
+		if (style.labels) then
+			pcTempString = pcTempString..L["PC:"]
+			ldbString = ldbString..L["PC:"]
+		end
+		pcTempString = pcTempString..ParryChance.."%"
+		ldbString = ldbString..ParryChance.."% "
+		if (style.showRecords) then
+			ldbRecord = ldbRecord..HexColor("pc")
+			if (style.vertical) then
+				if (style.labels) then
+					ldbRecord = ldbRecord..L["PC:"]
+				end
+				pcRecordTempString = pcRecordTempString.."("..self.db.char[spec].HighestPC.."%)"
+				ldbRecord = ldbRecord..self.db.char[spec].HighestPC.."% "
+			else
+				if (style.labels) then
+					pcRecordTempString = pcRecordTempString..L["PC:"]
+					ldbRecord = ldbRecord..L["PC:"]
+				end
+				pcRecordTempString = pcRecordTempString..self.db.char[spec].HighestPC.."%"
+				ldbRecord = ldbRecord..self.db.char[spec].HighestPC.."% "
+			end
+		end
+		self.strings.pcString:SetText(pcTempString)
+		self.strings.pcRecordString:SetText(pcRecordTempString)
+	else
+		self.strings.pcString:SetText("")
+		self.strings.pcRecordString:SetText("")
+	end
+	if (style.BC[self.PlayerRole]) then
+		local bcTempString = " "
+		local bcRecordTempString = " "
+		ldbString = ldbString..HexColor("bc")
+		if (style.labels) then
+			bcTempString = bcTempString..L["BC:"]
+			ldbString = ldbString..L["BC:"]
+		end
+		bcTempString = bcTempString..BlockChance.."%"
+		ldbString = ldbString..BlockChance.."% "
+		if (style.showRecords) then
+			ldbRecord = ldbRecord..HexColor("bc")
+			if (style.vertical) then
+				if (style.labels) then
+					ldbRecord = ldbRecord..L["BC:"]
+				end
+				bcRecordTempString = bcRecordTempString.."("..self.db.char[spec].HighestBC.."%)"
+				ldbRecord = ldbRecord..self.db.char[spec].HighestBC.."% "
+			else
+				if (style.labels) then
+					bcRecordTempString = bcRecordTempString..L["BC:"]
+					ldbRecord = ldbRecord..L["BC:"]
+				end
+				bcRecordTempString = bcRecordTempString..self.db.char[spec].HighestBC.."%"
+				ldbRecord = ldbRecord..self.db.char[spec].HighestBC.."% "
+			end
+		end
+		self.strings.bcString:SetText(bcTempString)
+		self.strings.bcRecordString:SetText(bcRecordTempString)
+	else
+		self.strings.bcString:SetText("")
+		self.strings.bcRecordString:SetText("")
+	end
+	
+	if (style.LDBtext) then
+		TSBroker.text = ldbString..ldbRecord.."|r"
+	else
+		TSBroker.text = ""
+	end
 end
