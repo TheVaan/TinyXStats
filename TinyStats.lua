@@ -78,7 +78,8 @@ TinyStats.defaults = {
 			HighestMastery = "0.00",
 			HighestDC = "0.00",
 			HighestPC = "0.00",
-			HighestBC = "0.00"
+			HighestBC = "0.00",
+			HighestTA = "0.00"
 		},
 		Spec2 = {
 			HighestSpelldmg = 0,
@@ -97,7 +98,8 @@ TinyStats.defaults = {
 			HighestMastery = "0.00",
 			HighestDC = "0.00",
 			HighestPC = "0.00",
-			HighestBC = "0.00"
+			HighestBC = "0.00",
+			HighestTA = "0.00"
 		},
 		Style = {
 			SP = {
@@ -153,6 +155,9 @@ TinyStats.defaults = {
 				tank = true
 			},
 			BC = {
+				tank = true
+			},
+			TA = {
 				tank = true
 			},
 			MP5 = {},
@@ -223,6 +228,11 @@ TinyStats.defaults = {
 				r = 0.9098039215686274,
 				g = 0.0,
 				b = 1.0
+			},
+			ta = {
+				r = 0.6941176470588235,
+				g = 1,
+				b = 0
 			}
 		},
 	}
@@ -247,6 +257,7 @@ TinyStats.strings = {
 	dcString = TinyStats.frame:CreateFontString(),
 	bcString = TinyStats.frame:CreateFontString(),
 	pcString = TinyStats.frame:CreateFontString(),
+	taString = TinyStats.frame:CreateFontString(),
 	
 	spRecordString = TinyStats.frame:CreateFontString(),
 	apRecordString = TinyStats.frame:CreateFontString(),
@@ -258,7 +269,8 @@ TinyStats.strings = {
 	mp5RecordString = TinyStats.frame:CreateFontString(),
 	dcRecordString = TinyStats.frame:CreateFontString(),
 	bcRecordString = TinyStats.frame:CreateFontString(),
-	pcRecordString = TinyStats.frame:CreateFontString()
+	pcRecordString = TinyStats.frame:CreateFontString(),
+	taRecordString = TinyStats.frame:CreateFontString()
 }
 
 function TinyStats:SetStringColors()
@@ -274,6 +286,7 @@ function TinyStats:SetStringColors()
 	self.strings.dcString:SetTextColor(c.dc.r, c.dc.g, c.dc.b, 1.0)
 	self.strings.bcString:SetTextColor(c.bc.r, c.bc.g, c.bc.b, 1.0)
 	self.strings.pcString:SetTextColor(c.pc.r, c.pc.g, c.pc.b, 1.0)
+	self.strings.taString:SetTextColor(c.ta.r, c.ta.g, c.ta.b, 1.0)
 
 	self.strings.spRecordString:SetTextColor(c.sp.r, c.sp.g, c.sp.b, 1.0)
 	self.strings.apRecordString:SetTextColor(c.ap.r, c.ap.g, c.ap.b, 1.0)
@@ -286,6 +299,7 @@ function TinyStats:SetStringColors()
 	self.strings.dcRecordString:SetTextColor(c.dc.r, c.dc.g, c.dc.b, 1.0)
 	self.strings.bcRecordString:SetTextColor(c.bc.r, c.bc.g, c.bc.b, 1.0)
 	self.strings.pcRecordString:SetTextColor(c.pc.r, c.pc.g, c.pc.b, 1.0)
+	self.strings.taRecordString:SetTextColor(c.ta.r, c.ta.g, c.ta.b, 1.0)
 end
 
 function TinyStats:SetTextAnchors()
@@ -302,6 +316,7 @@ function TinyStats:SetTextAnchors()
 		self.strings.dcString:SetPoint("TOPLEFT", self.strings.mp5String, "TOPRIGHT", offsetX, offsetY)
 		self.strings.pcString:SetPoint("TOPLEFT", self.strings.dcString, "TOPRIGHT", offsetX, offsetY)
 		self.strings.bcString:SetPoint("TOPLEFT", self.strings.pcString, "TOPRIGHT", offsetX, offsetY)
+		self.strings.taString:SetPoint("TOPLEFT", self.strings.bcString, "TOPRIGHT", offsetX, offsetY)
 
 		self.strings.spRecordString:SetPoint("TOPLEFT", self.strings.spString, "BOTTOMLEFT")
 		self.strings.apRecordString:SetPoint("TOPLEFT", self.strings.spRecordString, "TOPRIGHT", offsetX, offsetY)
@@ -314,6 +329,7 @@ function TinyStats:SetTextAnchors()
 		self.strings.dcRecordString:SetPoint("TOPLEFT", self.strings.mp5RecordString, "TOPRIGHT", offsetX, offsetY)
 		self.strings.pcRecordString:SetPoint("TOPLEFT", self.strings.dcRecordString, "TOPRIGHT", offsetX, offsetY)
 		self.strings.bcRecordString:SetPoint("TOPLEFT", self.strings.pcRecordString, "TOPRIGHT", offsetX, offsetY)
+		self.strings.taRecordString:SetPoint("TOPLEFT", self.strings.bcRecordString, "TOPRIGHT", offsetX, offsetY)
 	else
 		self.strings.spString:SetPoint("TOPLEFT", self.frame,"TOPLEFT", offsetX, offsetY)
 		self.strings.apString:SetPoint("TOPLEFT", self.strings.spString, "BOTTOMLEFT")
@@ -326,6 +342,7 @@ function TinyStats:SetTextAnchors()
 		self.strings.dcString:SetPoint("TOPLEFT", self.strings.mp5String, "BOTTOMLEFT")
 		self.strings.pcString:SetPoint("TOPLEFT", self.strings.dcString, "BOTTOMLEFT")
 		self.strings.bcString:SetPoint("TOPLEFT", self.strings.pcString, "BOTTOMLEFT")
+		self.strings.taString:SetPoint("TOPLEFT", self.strings.bcString, "BOTTOMLEFT")
 
 		self.strings.spRecordString:SetPoint("TOPLEFT", self.strings.spString, "TOPRIGHT", offsetX, offsetY)
 		self.strings.apRecordString:SetPoint("TOPLEFT", self.strings.apString, "TOPRIGHT", offsetX, offsetY)
@@ -338,6 +355,7 @@ function TinyStats:SetTextAnchors()
 		self.strings.dcRecordString:SetPoint("TOPLEFT", self.strings.dcString, "TOPRIGHT", offsetX, offsetY)
 		self.strings.pcRecordString:SetPoint("TOPLEFT", self.strings.pcString, "TOPRIGHT", offsetX, offsetY)
 		self.strings.bcRecordString:SetPoint("TOPLEFT", self.strings.bcString, "TOPRIGHT", offsetX, offsetY)
+		self.strings.taRecordString:SetPoint("TOPLEFT", self.strings.taString, "TOPRIGHT", offsetX, offsetY)
 	end
 end
 
@@ -463,6 +481,24 @@ local function HexColor(stat)
 	
 end
 
+function TinyStats:HideTankStat(Stat)
+	if TinyStats.defaults.char.Style[Stat][TinyStats.PlayerRole] then
+		if TinyStats.class ~= "WARRIOR" and TinyStats.class ~= "PALADIN" then
+			if Stat == "BC" then
+				return true
+			elseif Stat == "PC" and TinyStats.class == "DRUID" then
+				return true
+			else
+				return false
+			end
+		else
+			return false
+		end
+	else
+		return true
+	end
+end
+
 local function GetAttackPower()
 	local base, buff, debuff
 	if TinyStats.PlayerRole == "hunter" then
@@ -570,10 +606,23 @@ local function GetHit()
 	return string.format("%.2f", CombatRating + HitModifier);
 end
 
+local function GetDefense()
+	local missChance = select(2, UnitRace("player")) == "NightElf" and 7 or 5
+	local PlayerLevel = UnitLevel("player");
+	local BossLevel   = UnitLevel("player");
+	local defenseDiff = (BossLevel - PlayerLevel) * 0.20 -- bei 85-85 * 0.20 = 0
+	local missChance = max(0, missChance - defenseDiff)
+	local dodgeChance = max(0, GetDodgeChance() - defenseDiff)
+	local parryChance = max(0, GetParryChance() - defenseDiff)
+	local blockChance = max(0, GetBlockChance() - defenseDiff)
+	local TAvoidance  = missChance + dodgeChance + parryChance + blockChance
+	return string.format("%.2f", TAvoidance), string.format("%.2f", dodgeChance), string.format("%.2f", parryChance), string.format("%.2f", blockChance)
+end
+
 function TinyStats:GetUnitRole()
-	local class = select(2, UnitClass("player"))
+	self.class = select(2, UnitClass("player"))
 	local role = ""
-	if class == "HUNTER" then
+	if self.class == "HUNTER" then
 		role = "hunter"
 	else
 		role = LGT:GetUnitRole("player",true)
@@ -617,11 +666,9 @@ function TinyStats:Stats()
 	base = floor(base * 5.0)
 	casting = floor(casting * 5.0)
 	local fr = string.format("%.2f", GetPowerRegen() or 0)
-	local DodgeChance,BlockChance,ParryChance = 0,0,0
+	local DodgeChance,BlockChance,ParryChance,TAavoidance = 0,0,0,0
 	if self.PlayerRole == "tank" then
-		DodgeChance = string.format("%.2f",GetDodgeChance())
-		ParryChance = string.format("%.2f",GetParryChance())
-		BlockChance = string.format("%.2f",GetBlockChance())
+		TAvoidance,DodgeChance,ParryChance,BlockChance = GetDefense()
 	end
 	
 	local recordBroken = "|cffFF0000"..L["Record broken!"]..": "
@@ -742,17 +789,28 @@ function TinyStats:Stats()
 				recordIsBroken = true
 			end
 		end
-		if (style.PC[self.PlayerRole] and tonumber(ParryChance) > tonumber(self.db.char[spec].HighestPC)) then
-			self.db.char[spec].HighestPC = ParryChance
-			if (self.db.char.RecordMsg == true) then
-				DEFAULT_CHAT_FRAME:AddMessage(recordBroken..STAT_PARRY..": |c00ffef00"..self.db.char[spec].HighestPC.."|r")
-				recordIsBroken = true
+		if (style.PC[self.PlayerRole] and not TinyStats:HideTankStat("PC")) then
+			if tonumber(ParryChance) > tonumber(self.db.char[spec].HighestPC) then
+				self.db.char[spec].HighestPC = ParryChance
+				if (self.db.char.RecordMsg == true) then
+					DEFAULT_CHAT_FRAME:AddMessage(recordBroken..STAT_PARRY..": |c00ffef00"..self.db.char[spec].HighestPC.."|r")
+					recordIsBroken = true
+				end
 			end
 		end
-		if (style.BC[self.PlayerRole] and tonumber(BlockChance) > tonumber(self.db.char[spec].HighestBC)) then
-			self.db.char[spec].HighestBC = BlockChance
+		if (style.BC[self.PlayerRole] and not TinyStats:HideTankStat("BC")) then
+			if tonumber(BlockChance) > tonumber(self.db.char[spec].HighestBC) then
+				self.db.char[spec].HighestBC = BlockChance
+				if (self.db.char.RecordMsg == true) then
+					DEFAULT_CHAT_FRAME:AddMessage(recordBroken..STAT_BLOCK..": |c00ffef00"..self.db.char[spec].HighestBC.."|r")
+					recordIsBroken = true
+				end
+			end
+		end
+		if (style.TA[self.PlayerRole] and tonumber(TAvoidance) > tonumber(self.db.char[spec].HighestTA)) then
+			self.db.char[spec].HighestTA = TAvoidance
 			if (self.db.char.RecordMsg == true) then
-				DEFAULT_CHAT_FRAME:AddMessage(recordBroken..STAT_BLOCK..": |c00ffef00"..self.db.char[spec].HighestBC.."|r")
+				DEFAULT_CHAT_FRAME:AddMessage(recordBroken..L["Total Avoidance"]..": |c00ffef00"..self.db.char[spec].HighestTA.."|r")
 				recordIsBroken = true
 			end
 		end
@@ -1228,7 +1286,7 @@ function TinyStats:Stats()
 		self.strings.dcString:SetText("")
 		self.strings.dcRecordString:SetText("")
 	end
-	if (style.PC[self.PlayerRole]) then
+	if (style.PC[self.PlayerRole] and not TinyStats:HideTankStat("PC")) then
 		local pcTempString = " "
 		local pcRecordTempString = " "
 		ldbString = ldbString..HexColor("pc")
@@ -1261,7 +1319,7 @@ function TinyStats:Stats()
 		self.strings.pcString:SetText("")
 		self.strings.pcRecordString:SetText("")
 	end
-	if (style.BC[self.PlayerRole]) then
+	if (style.BC[self.PlayerRole] and not TinyStats:HideTankStat("BC")) then
 		local bcTempString = " "
 		local bcRecordTempString = " "
 		ldbString = ldbString..HexColor("bc")
@@ -1294,10 +1352,44 @@ function TinyStats:Stats()
 		self.strings.bcString:SetText("")
 		self.strings.bcRecordString:SetText("")
 	end
-	
+	if (style.TA[self.PlayerRole]) then
+		local taTempString = " "
+		local taRecordTempString = " "
+		ldbString = ldbString..HexColor("ta")
+		if (style.labels) then
+			taTempString = taTempString..L["TA:"]
+			ldbString = ldbString..L["TA:"]
+		end
+		taTempString = taTempString..TAvoidance.."%"
+		ldbString = ldbString..TAvoidance.."% "
+		if (style.showRecords) then
+			ldbRecord = ldbRecord..HexColor("ta")
+			if (style.vertical) then
+				if (style.labels) then
+					ldbRecord = ldbRecord..L["TA:"]
+				end
+				taRecordTempString = taRecordTempString.."("..self.db.char[spec].HighestTA.."%)"
+				ldbRecord = ldbRecord..self.db.char[spec].HighestTA.."% "
+			else
+				if (style.labels) then
+					taRecordTempString = taRecordTempString..L["TA:"]
+					ldbRecord = ldbRecord..L["TA:"]
+				end
+				taRecordTempString = taRecordTempString..self.db.char[spec].HighestTA.."%"
+				ldbRecord = ldbRecord..self.db.char[spec].HighestTA.."% "
+			end
+		end
+		self.strings.taString:SetText(taTempString)
+		self.strings.taRecordString:SetText(taRecordTempString)
+	else
+		self.strings.taString:SetText("")
+		self.strings.taRecordString:SetText("")
+	end
+
 	if (style.LDBtext) then
 		TSBroker.text = ldbString..ldbRecord.."|r"
 	else
 		TSBroker.text = ""
 	end
 end
+
