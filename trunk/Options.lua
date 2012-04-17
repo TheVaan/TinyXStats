@@ -21,7 +21,6 @@ TinyStats.RoleLocale = {
 	tank = PLAYERSTAT_DEFENSES
 }
 
-
 function TinyStats:Options()
 
 	local options = {
@@ -532,7 +531,7 @@ function TinyStats:Options()
 						order = 21,
 					},
 					PC = {
-						hidden = function() return not self.defaults.char.Style.PC[TinyStats.PlayerRole] end,
+						hidden = function() return TinyStats:HideTankStat("PC") end,
 						name = STAT_PARRY,
 						desc = STAT_PARRY.." "..SHOW.."/"..HIDE,
 						width = 'double',
@@ -550,7 +549,7 @@ function TinyStats:Options()
 						order = 22
 					},
 					pccolor = {
-						hidden = function() return not self.defaults.char.Style.PC[TinyStats.PlayerRole] end,
+						hidden = function() return TinyStats:HideTankStat("PC") end,
 						name = "",
 						desc = "",
 						width = 'half',
@@ -568,7 +567,7 @@ function TinyStats:Options()
 						order = 23,
 					},
 					BC = {
-						hidden = function() return not self.defaults.char.Style.BC[TinyStats.PlayerRole] end,
+						hidden = function() return TinyStats:HideTankStat("BC") end,
 						name = STAT_BLOCK,
 						desc = STAT_BLOCK.." "..SHOW.."/"..HIDE,
 						width = 'double',
@@ -586,7 +585,7 @@ function TinyStats:Options()
 						order = 24
 					},
 					bccolor = {
-						hidden = function() return not self.defaults.char.Style.BC[TinyStats.PlayerRole] end,
+						hidden = function() return TinyStats:HideTankStat("BC") end,
 						name = "",
 						desc = "",
 						width = 'half',
@@ -602,6 +601,42 @@ function TinyStats:Options()
 							self:Stats()
 						end,
 						order = 25,
+					},
+					TA = {
+						hidden = function() return not self.defaults.char.Style.TA[TinyStats.PlayerRole] end,
+						name = L["Total Avoidance"],
+						desc = L["Total Avoidance"].." "..SHOW.."/"..HIDE,
+						width = 'double',
+						type = 'toggle',
+						get = function() return self.db.char.Style.TA[TinyStats.PlayerRole] end,
+						set = function(info, value)
+							if(value) then
+								self.db.char.Style.TA[TinyStats.PlayerRole] = true
+							else
+								self.db.char.Style.TA[TinyStats.PlayerRole] = false
+							end
+							self:Stats()
+						end,
+						disabled = function() return InCombatLockdown() end,
+						order = 25
+					},
+					tacolor = {
+						hidden = function() return not self.defaults.char.Style.TA[TinyStats.PlayerRole] end,
+						name = "",
+						desc = "",
+						width = 'half',
+						type = 'color',
+						get = function()
+							local c = self.db.char.Color.ta
+							return c.r, c.g, c.b
+						end,
+						set = function(info, r, g, b)
+							local c = self.db.char.Color.ta
+							c.r, c.g, c.b = r, g, b
+							self:SetStringColors()
+							self:Stats()
+						end,
+						order = 26,
 					},
 					header1 = {
 						name = "",
