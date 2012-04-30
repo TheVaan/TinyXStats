@@ -1,3 +1,6 @@
+=== r6 ===
+* rename TinyStats to TinyXStats
+
 === r5 ===
 * add Total Avoidance for tanks
 * remove BlockChance bei Druid and DK
