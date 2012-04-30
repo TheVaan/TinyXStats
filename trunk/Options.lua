@@ -2,18 +2,18 @@
 -- File version: @file-revision@
 -- Project: @project-revision@
 --
-if not TinyStats then return end
+if not TinyXStats then return end
 
-local AddonName = "TinyStats"
+local AddonName = "TinyXStats"
 local L = LibStub:GetLibrary("AceLocale-3.0"):GetLocale(AddonName)
 local media = LibStub:GetLibrary("LibSharedMedia-3.0")
 
-TinyStats.fonteffects = {
+TinyXStats.fonteffects = {
 	["none"] = L["NONE"],
 	["OUTLINE"] = L["OUTLINE"],
 	["THICKOUTLINE"] = L["THICKOUTLINE"]
 }
-TinyStats.RoleLocale = {
+TinyXStats.RoleLocale = {
 	healer = HEALER,
 	caster = PLAYERSTAT_SPELL_COMBAT,
 	melee = PLAYERSTAT_MELEE_COMBAT,
@@ -21,11 +21,11 @@ TinyStats.RoleLocale = {
 	tank = PLAYERSTAT_DEFENSES
 }
 
-function TinyStats:Options()
-
+function TinyXStats:Options()
+	
 	local options = {
 		name = AddonName.." "..GetAddOnMetadata(AddonName,"Version"),
-	    handler = TinyStats,
+	    handler = TinyXStats,
 	    type = 'group',
 	    args = {
 			reset = {
@@ -35,6 +35,7 @@ function TinyStats:Options()
 				func = function() 
 						if IsShiftKeyDown() then
 							self.db.profile.debug = not self.db.profile.debug
+							print(AddonName,"- Debug:",self.db.profile.debug)
 						else
 							self.frame:ClearAllPoints() self.frame:SetPoint("CENTER", UIParent, "CENTER")
 						end
@@ -65,7 +66,7 @@ function TinyStats:Options()
 				order = 3,
 				args = {
 					hader = {
-						name = function() return TinyStats.RoleLocale[TinyStats.PlayerRole] end,
+						name = function() return TinyXStats.RoleLocale[TinyXStats.PlayerRole] end,
 						type = 'header',
 						order = 1,
 					},
@@ -75,17 +76,17 @@ function TinyStats:Options()
 						order = 2,
 					},
 					spelldmg = {
-						hidden = function() return not self.defaults.char.Style.SP[TinyStats.PlayerRole] end,
+						hidden = function() return not self.defaults.char.Style.SP[TinyXStats.PlayerRole] end,
 						name = STAT_SPELLPOWER,
 						desc = STAT_SPELLPOWER.." "..SHOW.."/"..HIDE,
 						width = 'double',
 						type = 'toggle',
-						get = function() return self.db.char.Style.SP[TinyStats.PlayerRole] end,
+						get = function() return self.db.char.Style.SP[TinyXStats.PlayerRole] end,
 						set = function(info, value)
 							if(value) then
-								self.db.char.Style.SP[TinyStats.PlayerRole] = true
+								self.db.char.Style.SP[TinyXStats.PlayerRole] = true
 							else
-								self.db.char.Style.SP[TinyStats.PlayerRole] = false
+								self.db.char.Style.SP[TinyXStats.PlayerRole] = false
 							end
 							self:Stats()
 						end,
@@ -93,7 +94,7 @@ function TinyStats:Options()
 						order = 3
 					},
 					spelldmgcolor = {
-						hidden = function() return not self.defaults.char.Style.SP[TinyStats.PlayerRole] end,
+						hidden = function() return not self.defaults.char.Style.SP[TinyXStats.PlayerRole] end,
 						name = "",
 						desc = "",
 						width = 'half',
@@ -111,17 +112,17 @@ function TinyStats:Options()
 						order = 4,
 					},
 					ap = {
-						hidden = function() return not self.defaults.char.Style.AP[TinyStats.PlayerRole] end,
+						hidden = function() return not self.defaults.char.Style.AP[TinyXStats.PlayerRole] end,
 						name = STAT_ATTACK_POWER,
 						desc = STAT_ATTACK_POWER.." "..SHOW.."/"..HIDE,
 						width = 'double',
 						type = 'toggle',
-						get = function() return self.db.char.Style.AP[TinyStats.PlayerRole] end,
+						get = function() return self.db.char.Style.AP[TinyXStats.PlayerRole] end,
 						set = function(info, value)				
 							if(value) then
-								self.db.char.Style.AP[TinyStats.PlayerRole] = true
+								self.db.char.Style.AP[TinyXStats.PlayerRole] = true
 							else
-								self.db.char.Style.AP[TinyStats.PlayerRole] = false
+								self.db.char.Style.AP[TinyXStats.PlayerRole] = false
 							end
 							self:Stats()
 						end,
@@ -129,7 +130,7 @@ function TinyStats:Options()
 						order = 3,
 					},
 					apcolor = {
-						hidden = function() return not self.defaults.char.Style.AP[TinyStats.PlayerRole] end,
+						hidden = function() return not self.defaults.char.Style.AP[TinyXStats.PlayerRole] end,
 						name = "",
 						desc = "",
 						width = 'half',
@@ -147,17 +148,17 @@ function TinyStats:Options()
 						order = 4,
 					},
 					crit = {
-						hidden = function() return not self.defaults.char.Style.Crit[TinyStats.PlayerRole] end,
+						hidden = function() return not self.defaults.char.Style.Crit[TinyXStats.PlayerRole] end,
 						name = SPELL_CRIT_CHANCE,
 						desc = SPELL_CRIT_CHANCE.." "..SHOW.."/"..HIDE,
 						width = 'double',
 						type = 'toggle',
-						get = function() return self.db.char.Style.Crit[TinyStats.PlayerRole] end,
+						get = function() return self.db.char.Style.Crit[TinyXStats.PlayerRole] end,
 						set = function(info, value)
 							if(value) then
-								self.db.char.Style.Crit[TinyStats.PlayerRole] = true
+								self.db.char.Style.Crit[TinyXStats.PlayerRole] = true
 							else
-								self.db.char.Style.Crit[TinyStats.PlayerRole] = false
+								self.db.char.Style.Crit[TinyXStats.PlayerRole] = false
 							end
 							self:Stats()
 						end,
@@ -165,7 +166,7 @@ function TinyStats:Options()
 						order = 5
 					},
 					critcolor = {
-						hidden = function() return not self.defaults.char.Style.Crit[TinyStats.PlayerRole] end,
+						hidden = function() return not self.defaults.char.Style.Crit[TinyXStats.PlayerRole] end,
 						name = "",
 						desc = "",
 						width = 'half',
@@ -183,18 +184,18 @@ function TinyStats:Options()
 						order = 6,
 					},
 					haste = {
-						hidden = function() return not self.defaults.char.Style.Haste[TinyStats.PlayerRole] end,
+						hidden = function() return not self.defaults.char.Style.Haste[TinyXStats.PlayerRole] end,
 						name = SPELL_HASTE,
 						desc = SPELL_HASTE.." "..SHOW.."/"..HIDE.."\n"..L["(Only rating or percentage display possible!)"],
 						width = 'double',
 						type = 'toggle',
-						get = function() return self.db.char.Style.Haste[TinyStats.PlayerRole] end,
+						get = function() return self.db.char.Style.Haste[TinyXStats.PlayerRole] end,
 						set = function(info, value)
 							if(value) then
-								self.db.char.Style.Haste[TinyStats.PlayerRole] = true
-								self.db.char.Style.HastePerc[TinyStats.PlayerRole] = false
+								self.db.char.Style.Haste[TinyXStats.PlayerRole] = true
+								self.db.char.Style.HastePerc[TinyXStats.PlayerRole] = false
 							else
-								self.db.char.Style.Haste[TinyStats.PlayerRole] = false
+								self.db.char.Style.Haste[TinyXStats.PlayerRole] = false
 							end
 							self:Stats()
 						end,
@@ -202,7 +203,7 @@ function TinyStats:Options()
 						order = 7
 					},
 					hastecolor = {
-						hidden = function() return not self.defaults.char.Style.Haste[TinyStats.PlayerRole] end,
+						hidden = function() return not self.defaults.char.Style.Haste[TinyXStats.PlayerRole] end,
 						name = "",
 						desc = "",
 						width = 'half',
@@ -220,17 +221,17 @@ function TinyStats:Options()
 						order = 8,
 					},
 					speed = {
-						hidden = function() return not self.defaults.char.Style.Speed[TinyStats.PlayerRole] end,
+						hidden = function() return not self.defaults.char.Style.Speed[TinyXStats.PlayerRole] end,
 						name = WEAPON_SPEED,
 						desc = WEAPON_SPEED.." "..SHOW.."/"..HIDE,
 						width = 'double',
 						type = 'toggle',
-						get = function() return self.db.char.Style.Speed[TinyStats.PlayerRole] end,
+						get = function() return self.db.char.Style.Speed[TinyXStats.PlayerRole] end,
 						set = function(info, value)				
 							if(value) then
-								self.db.char.Style.Speed[TinyStats.PlayerRole] = true
+								self.db.char.Style.Speed[TinyXStats.PlayerRole] = true
 							else
-								self.db.char.Style.Speed[TinyStats.PlayerRole] = false
+								self.db.char.Style.Speed[TinyXStats.PlayerRole] = false
 							end
 							self:Stats()
 						end,
@@ -238,7 +239,7 @@ function TinyStats:Options()
 						order = 7,
 					},
 					speedcolor = {
-						hidden = function() return not self.defaults.char.Style.Speed[TinyStats.PlayerRole] end,
+						hidden = function() return not self.defaults.char.Style.Speed[TinyXStats.PlayerRole] end,
 						name = "",
 						desc = "",
 						width = 'half',
@@ -256,18 +257,18 @@ function TinyStats:Options()
 						order = 8,
 					},
 					hasteperc = {
-						hidden = function() return not self.defaults.char.Style.Haste[TinyStats.PlayerRole] end,
+						hidden = function() return not self.defaults.char.Style.Haste[TinyXStats.PlayerRole] end,
 						name = L["Percent Haste"],
 						desc = L["Percent Haste"].." "..SHOW.."/"..HIDE.."\n"..L["(Only rating or percentage display possible!)"],
 						width = 'full',
 						type = 'toggle',
-						get = function() return self.db.char.Style.HastePerc[TinyStats.PlayerRole] end,
+						get = function() return self.db.char.Style.HastePerc[TinyXStats.PlayerRole] end,
 						set = function(info, value)
 							if(value) then
-								self.db.char.Style.HastePerc[TinyStats.PlayerRole] = true
-								self.db.char.Style.Haste[TinyStats.PlayerRole] = false
+								self.db.char.Style.HastePerc[TinyXStats.PlayerRole] = true
+								self.db.char.Style.Haste[TinyXStats.PlayerRole] = false
 							else
-								self.db.char.Style.HastePerc[TinyStats.PlayerRole] = false
+								self.db.char.Style.HastePerc[TinyXStats.PlayerRole] = false
 							end
 							self:Stats()
 						end,
@@ -275,17 +276,17 @@ function TinyStats:Options()
 						order = 9
 					},
 					hit = {
-						hidden = function() return not self.defaults.char.Style.Hit[TinyStats.PlayerRole] end,
+						hidden = function() return not self.defaults.char.Style.Hit[TinyXStats.PlayerRole] end,
 						name = STAT_HIT_CHANCE,
 						desc = STAT_HIT_CHANCE.." "..SHOW.."/"..HIDE,
 						width = 'double',
 						type = 'toggle',
-						get = function() return self.db.char.Style.Hit[TinyStats.PlayerRole] end,
+						get = function() return self.db.char.Style.Hit[TinyXStats.PlayerRole] end,
 						set = function(info, value)
 							if(value) then
-								self.db.char.Style.Hit[TinyStats.PlayerRole] = true
+								self.db.char.Style.Hit[TinyXStats.PlayerRole] = true
 							else
-								self.db.char.Style.Hit[TinyStats.PlayerRole] = false
+								self.db.char.Style.Hit[TinyXStats.PlayerRole] = false
 							end
 							self:Stats()
 						end,
@@ -293,7 +294,7 @@ function TinyStats:Options()
 						order = 10
 					},
 					hitcolor = {
-						hidden = function() return not self.defaults.char.Style.Hit[TinyStats.PlayerRole] end,
+						hidden = function() return not self.defaults.char.Style.Hit[TinyXStats.PlayerRole] end,
 						name = "",
 						desc = "",
 						width = 'half',
@@ -311,17 +312,17 @@ function TinyStats:Options()
 						order = 11,
 					},
 					mastery = {
-						hidden = function() return not (self.defaults.char.Style.Mastery[TinyStats.PlayerRole] and self.Mastery) end,
+						hidden = function() return not (self.defaults.char.Style.Mastery[TinyXStats.PlayerRole] and self.Mastery) end,
 						name = STAT_MASTERY,
 						desc = STAT_MASTERY.." "..SHOW.."/"..HIDE,
 						width = 'double',
 						type = 'toggle',
-						get = function() return self.db.char.Style.Mastery[TinyStats.PlayerRole] end,
+						get = function() return self.db.char.Style.Mastery[TinyXStats.PlayerRole] end,
 						set = function(info, value)
 							if(value) then
-								self.db.char.Style.Mastery[TinyStats.PlayerRole] = true
+								self.db.char.Style.Mastery[TinyXStats.PlayerRole] = true
 							else
-								self.db.char.Style.Mastery[TinyStats.PlayerRole] = false
+								self.db.char.Style.Mastery[TinyXStats.PlayerRole] = false
 							end
 							self:Stats()
 						end,
@@ -329,7 +330,7 @@ function TinyStats:Options()
 						order = 12
 					},
 					masterycolor = {
-						hidden = function() return not (self.defaults.char.Style.Mastery[TinyStats.PlayerRole] and self.Mastery) end,
+						hidden = function() return not (self.defaults.char.Style.Mastery[TinyXStats.PlayerRole] and self.Mastery) end,
 						name = "",
 						desc = "",
 						width = 'half',
@@ -347,17 +348,17 @@ function TinyStats:Options()
 						order = 13,
 					},
 					spirit = {
-						hidden = function() return not self.defaults.char.Style.Spirit[TinyStats.PlayerRole] end,
+						hidden = function() return not self.defaults.char.Style.Spirit[TinyXStats.PlayerRole] end,
 						name = ITEM_MOD_SPIRIT_SHORT,
 						desc = ITEM_MOD_SPIRIT_SHORT.." "..SHOW.."/"..HIDE,
 						width = 'double',
 						type = 'toggle',
-						get = function() return self.db.char.Style.Spirit[TinyStats.PlayerRole] end,
+						get = function() return self.db.char.Style.Spirit[TinyXStats.PlayerRole] end,
 						set = function(info, value)
 							if(value) then
-								self.db.char.Style.Spirit[TinyStats.PlayerRole] = true
+								self.db.char.Style.Spirit[TinyXStats.PlayerRole] = true
 							else
-								self.db.char.Style.Spirit[TinyStats.PlayerRole] = false
+								self.db.char.Style.Spirit[TinyXStats.PlayerRole] = false
 							end
 							self:Stats()
 						end,
@@ -365,7 +366,7 @@ function TinyStats:Options()
 						order = 14
 					},
 					spiritcolor = {
-						hidden = function() return not self.defaults.char.Style.Spirit[TinyStats.PlayerRole] end,
+						hidden = function() return not self.defaults.char.Style.Spirit[TinyXStats.PlayerRole] end,
 						name = "",
 						desc = "",
 						width = 'half',
@@ -383,18 +384,18 @@ function TinyStats:Options()
 						order = 15,
 					},
 					mp5 = {
-						hidden = function() return not self.defaults.char.Style.Spirit[TinyStats.PlayerRole] end,
+						hidden = function() return not self.defaults.char.Style.Spirit[TinyXStats.PlayerRole] end,
 						name = ITEM_MOD_MANA_REGENERATION_SHORT.." "..L["out of combat"],
 						desc = ITEM_MOD_MANA_REGENERATION_SHORT.." "..L["out of combat"].." "..SHOW.."/"..HIDE,
 						width = 'double',
 						type = 'toggle',
-						get = function() return self.db.char.Style.MP5[TinyStats.PlayerRole] end,
+						get = function() return self.db.char.Style.MP5[TinyXStats.PlayerRole] end,
 						set = function(info, value)
 							if(value) then
-								self.db.char.Style.MP5[TinyStats.PlayerRole] = true
-								self.db.char.Style.MP5auto[TinyStats.PlayerRole] = false
+								self.db.char.Style.MP5[TinyXStats.PlayerRole] = true
+								self.db.char.Style.MP5auto[TinyXStats.PlayerRole] = false
 							else
-								self.db.char.Style.MP5[TinyStats.PlayerRole] = false
+								self.db.char.Style.MP5[TinyXStats.PlayerRole] = false
 							end
 							self:Stats()
 						end,
@@ -402,7 +403,7 @@ function TinyStats:Options()
 						order = 16
 					},
 					mp5color = {
-						hidden = function() return not self.defaults.char.Style.Spirit[TinyStats.PlayerRole] end,
+						hidden = function() return not self.defaults.char.Style.Spirit[TinyXStats.PlayerRole] end,
 						name = "",
 						desc = "",
 						width = 'half',
@@ -420,18 +421,18 @@ function TinyStats:Options()
 						order = 17,
 					},
 					mp5ic = {
-						hidden = function() return not self.defaults.char.Style.Spirit[TinyStats.PlayerRole] end,
+						hidden = function() return not self.defaults.char.Style.Spirit[TinyXStats.PlayerRole] end,
 						name = ITEM_MOD_MANA_REGENERATION_SHORT.." "..L["in combat"],
 						desc = ITEM_MOD_MANA_REGENERATION_SHORT.." "..L["in combat"].." "..SHOW.."/"..HIDE,
 						width = 'full',
 						type = 'toggle',
-						get = function() return self.db.char.Style.MP5ic[TinyStats.PlayerRole] end,
+						get = function() return self.db.char.Style.MP5ic[TinyXStats.PlayerRole] end,
 						set = function(info, value)
 							if(value) then
-								self.db.char.Style.MP5ic[TinyStats.PlayerRole] = true
-								self.db.char.Style.MP5auto[TinyStats.PlayerRole] = false
+								self.db.char.Style.MP5ic[TinyXStats.PlayerRole] = true
+								self.db.char.Style.MP5auto[TinyXStats.PlayerRole] = false
 							else
-								self.db.char.Style.MP5ic[TinyStats.PlayerRole] = false
+								self.db.char.Style.MP5ic[TinyXStats.PlayerRole] = false
 							end
 							self:Stats()
 						end,
@@ -439,19 +440,19 @@ function TinyStats:Options()
 						order = 18
 					},
 					mp5auto = {
-						hidden = function() return not self.defaults.char.Style.Spirit[TinyStats.PlayerRole] end,
+						hidden = function() return not self.defaults.char.Style.Spirit[TinyXStats.PlayerRole] end,
 						name = ITEM_MOD_MANA_REGENERATION_SHORT.." ("..L["automatic"]..")",
 						desc = L["Automatically selects which mana regeneration to show"],
 						width = 'full',
 						type = 'toggle',
-						get = function() return self.db.char.Style.MP5auto[TinyStats.PlayerRole] end,
+						get = function() return self.db.char.Style.MP5auto[TinyXStats.PlayerRole] end,
 						set = function(info, value)
 							if(value) then
-								self.db.char.Style.MP5[TinyStats.PlayerRole] = false
-								self.db.char.Style.MP5ic[TinyStats.PlayerRole] = false
-								self.db.char.Style.MP5auto[TinyStats.PlayerRole] = true
+								self.db.char.Style.MP5[TinyXStats.PlayerRole] = false
+								self.db.char.Style.MP5ic[TinyXStats.PlayerRole] = false
+								self.db.char.Style.MP5auto[TinyXStats.PlayerRole] = true
 							else
-								self.db.char.Style.MP5auto[TinyStats.PlayerRole] = false
+								self.db.char.Style.MP5auto[TinyXStats.PlayerRole] = false
 							end
 							self:Stats()
 						end,
@@ -459,17 +460,17 @@ function TinyStats:Options()
 						order = 19
 					},
 					fr = {
-						hidden = function() return not self.defaults.char.Style.Fr[TinyStats.PlayerRole] end,
+						hidden = function() return not self.defaults.char.Style.Fr[TinyXStats.PlayerRole] end,
 						name = STAT_FOCUS_REGEN,
 						desc = STAT_FOCUS_REGEN.." "..SHOW.."/"..HIDE,
 						width = 'double',
 						type = 'toggle',
-						get = function() return self.db.char.Style.Fr[TinyStats.PlayerRole] end,
+						get = function() return self.db.char.Style.Fr[TinyXStats.PlayerRole] end,
 						set = function(info, value)				
 							if(value) then
-								self.db.char.Style.Fr[TinyStats.PlayerRole] = true
+								self.db.char.Style.Fr[TinyXStats.PlayerRole] = true
 							else
-								self.db.char.Style.Fr[TinyStats.PlayerRole] = false
+								self.db.char.Style.Fr[TinyXStats.PlayerRole] = false
 							end
 							self:Stats()
 						end,
@@ -477,7 +478,7 @@ function TinyStats:Options()
 						order = 16,
 					},
 					frcolor = {
-						hidden = function() return not self.defaults.char.Style.Fr[TinyStats.PlayerRole] end,
+						hidden = function() return not self.defaults.char.Style.Fr[TinyXStats.PlayerRole] end,
 						name = "",
 						desc = "",
 						width = 'half',
@@ -495,17 +496,17 @@ function TinyStats:Options()
 						order = 17,
 					},
 					DC = {
-						hidden = function() return not self.defaults.char.Style.DC[TinyStats.PlayerRole] end,
+						hidden = function() return not self.defaults.char.Style.DC[TinyXStats.PlayerRole] end,
 						name = STAT_DODGE,
 						desc = STAT_DODGE.." "..SHOW.."/"..HIDE,
 						width = 'double',
 						type = 'toggle',
-						get = function() return self.db.char.Style.DC[TinyStats.PlayerRole] end,
+						get = function() return self.db.char.Style.DC[TinyXStats.PlayerRole] end,
 						set = function(info, value)
 							if(value) then
-								self.db.char.Style.DC[TinyStats.PlayerRole] = true
+								self.db.char.Style.DC[TinyXStats.PlayerRole] = true
 							else
-								self.db.char.Style.DC[TinyStats.PlayerRole] = false
+								self.db.char.Style.DC[TinyXStats.PlayerRole] = false
 							end
 							self:Stats()
 						end,
@@ -513,7 +514,7 @@ function TinyStats:Options()
 						order = 20
 					},
 					dccolor = {
-						hidden = function() return not self.defaults.char.Style.DC[TinyStats.PlayerRole] end,
+						hidden = function() return not self.defaults.char.Style.DC[TinyXStats.PlayerRole] end,
 						name = "",
 						desc = "",
 						width = 'half',
@@ -531,17 +532,17 @@ function TinyStats:Options()
 						order = 21,
 					},
 					PC = {
-						hidden = function() return TinyStats:HideTankStat("PC") end,
+						hidden = function() return TinyXStats:HideTankStat("PC") end,
 						name = STAT_PARRY,
 						desc = STAT_PARRY.." "..SHOW.."/"..HIDE,
 						width = 'double',
 						type = 'toggle',
-						get = function() return self.db.char.Style.PC[TinyStats.PlayerRole] end,
+						get = function() return self.db.char.Style.PC[TinyXStats.PlayerRole] end,
 						set = function(info, value)
 							if(value) then
-								self.db.char.Style.PC[TinyStats.PlayerRole] = true
+								self.db.char.Style.PC[TinyXStats.PlayerRole] = true
 							else
-								self.db.char.Style.PC[TinyStats.PlayerRole] = false
+								self.db.char.Style.PC[TinyXStats.PlayerRole] = false
 							end
 							self:Stats()
 						end,
@@ -549,7 +550,7 @@ function TinyStats:Options()
 						order = 22
 					},
 					pccolor = {
-						hidden = function() return TinyStats:HideTankStat("PC") end,
+						hidden = function() return TinyXStats:HideTankStat("PC") end,
 						name = "",
 						desc = "",
 						width = 'half',
@@ -567,17 +568,17 @@ function TinyStats:Options()
 						order = 23,
 					},
 					BC = {
-						hidden = function() return TinyStats:HideTankStat("BC") end,
+						hidden = function() return TinyXStats:HideTankStat("BC") end,
 						name = STAT_BLOCK,
 						desc = STAT_BLOCK.." "..SHOW.."/"..HIDE,
 						width = 'double',
 						type = 'toggle',
-						get = function() return self.db.char.Style.BC[TinyStats.PlayerRole] end,
+						get = function() return self.db.char.Style.BC[TinyXStats.PlayerRole] end,
 						set = function(info, value)
 							if(value) then
-								self.db.char.Style.BC[TinyStats.PlayerRole] = true
+								self.db.char.Style.BC[TinyXStats.PlayerRole] = true
 							else
-								self.db.char.Style.BC[TinyStats.PlayerRole] = false
+								self.db.char.Style.BC[TinyXStats.PlayerRole] = false
 							end
 							self:Stats()
 						end,
@@ -585,7 +586,7 @@ function TinyStats:Options()
 						order = 24
 					},
 					bccolor = {
-						hidden = function() return TinyStats:HideTankStat("BC") end,
+						hidden = function() return TinyXStats:HideTankStat("BC") end,
 						name = "",
 						desc = "",
 						width = 'half',
@@ -603,17 +604,17 @@ function TinyStats:Options()
 						order = 25,
 					},
 					TA = {
-						hidden = function() return not self.defaults.char.Style.TA[TinyStats.PlayerRole] end,
+						hidden = function() return not self.defaults.char.Style.TA[TinyXStats.PlayerRole] end,
 						name = L["Total Avoidance"],
 						desc = L["Total Avoidance"].." "..SHOW.."/"..HIDE,
 						width = 'double',
 						type = 'toggle',
-						get = function() return self.db.char.Style.TA[TinyStats.PlayerRole] end,
+						get = function() return self.db.char.Style.TA[TinyXStats.PlayerRole] end,
 						set = function(info, value)
 							if(value) then
-								self.db.char.Style.TA[TinyStats.PlayerRole] = true
+								self.db.char.Style.TA[TinyXStats.PlayerRole] = true
 							else
-								self.db.char.Style.TA[TinyStats.PlayerRole] = false
+								self.db.char.Style.TA[TinyXStats.PlayerRole] = false
 							end
 							self:Stats()
 						end,
@@ -621,7 +622,7 @@ function TinyStats:Options()
 						order = 25
 					},
 					tacolor = {
-						hidden = function() return not self.defaults.char.Style.TA[TinyStats.PlayerRole] end,
+						hidden = function() return not self.defaults.char.Style.TA[TinyXStats.PlayerRole] end,
 						name = "",
 						desc = "",
 						width = 'half',
@@ -666,7 +667,7 @@ function TinyStats:Options()
 						type = 'execute',
 						func = function()
 							if IsShiftKeyDown() then
-								TinyStatsDB = {}
+								TinyXStatsDB = {}
 							else
 								local spec = "Spec"..GetActiveTalentGroup()
 								for stat, num in pairs(self.defaults.char[spec]) do

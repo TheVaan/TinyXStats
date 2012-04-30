@@ -1,15 +1,15 @@
 --   ----------------------------------------
---  |    TinyStats by TheVaan and Marhu_     |
+--  |    TinyXStats by TheVaan and Marhu_    |
 --  | based on TMS and TCS - for all classes |
 --   ----------------------------------------
 --
 -- File version: @file-revision@
 -- Project: @project-revision@
 --
-local AddonName = "TinyStats"
+local AddonName = "TinyXStats"
 local AceAddon = LibStub("AceAddon-3.0")
 local media = LibStub:GetLibrary("LibSharedMedia-3.0")
-TinyStats = AceAddon:NewAddon(AddonName, "AceConsole-3.0", "AceEvent-3.0", "AceTimer-3.0")
+TinyXStats = AceAddon:NewAddon(AddonName, "AceConsole-3.0", "AceEvent-3.0", "AceTimer-3.0")
 local L = LibStub:GetLibrary("AceLocale-3.0"):GetLocale(AddonName)
 local LGT = LibStub:GetLibrary("LibGroupTalents-1.0");
 
@@ -33,7 +33,7 @@ local backdrop = {
 }
 
 local function Debug(...)
-	if TinyStats.db.profile.debug then
+	if TinyXStats.db.profile.debug then
 		local text = ""
 		for i = 1, select("#", ...) do
 			if type(select(i, ...)) == "boolean" then
@@ -46,9 +46,9 @@ local function Debug(...)
 	end
 end	
 
-TinyStats.fonts = {}
+TinyXStats.fonts = {}
 
-TinyStats.defaults = {
+TinyXStats.defaults = {
 	char = {
 		Font = "Vera",
 		FontEffect = "none",
@@ -238,42 +238,42 @@ TinyStats.defaults = {
 	}
 }
 
-TinyStats.frame = CreateFrame("Frame",AddonName.."Frame",UIParent)
-TinyStats.frame:SetWidth(100)
-TinyStats.frame:SetHeight(15)
-TinyStats.frame:SetFrameStrata("BACKGROUND")
-TinyStats.frame:EnableMouse(true)
-TinyStats.frame:RegisterForDrag("LeftButton")
+TinyXStats.frame = CreateFrame("Frame",AddonName.."Frame",UIParent)
+TinyXStats.frame:SetWidth(100)
+TinyXStats.frame:SetHeight(15)
+TinyXStats.frame:SetFrameStrata("BACKGROUND")
+TinyXStats.frame:EnableMouse(true)
+TinyXStats.frame:RegisterForDrag("LeftButton")
 
-TinyStats.strings = {
-	spString = TinyStats.frame:CreateFontString(),
-	apString = TinyStats.frame:CreateFontString(),
-	critString = TinyStats.frame:CreateFontString(),
-	hasteString = TinyStats.frame:CreateFontString(),
-	hitString = TinyStats.frame:CreateFontString(),
-	masteryString = TinyStats.frame:CreateFontString(),
-	spiritString = TinyStats.frame:CreateFontString(),
-	mp5String = TinyStats.frame:CreateFontString(),
-	dcString = TinyStats.frame:CreateFontString(),
-	bcString = TinyStats.frame:CreateFontString(),
-	pcString = TinyStats.frame:CreateFontString(),
-	taString = TinyStats.frame:CreateFontString(),
+TinyXStats.strings = {
+	spString = TinyXStats.frame:CreateFontString(),
+	apString = TinyXStats.frame:CreateFontString(),
+	critString = TinyXStats.frame:CreateFontString(),
+	hasteString = TinyXStats.frame:CreateFontString(),
+	hitString = TinyXStats.frame:CreateFontString(),
+	masteryString = TinyXStats.frame:CreateFontString(),
+	spiritString = TinyXStats.frame:CreateFontString(),
+	mp5String = TinyXStats.frame:CreateFontString(),
+	dcString = TinyXStats.frame:CreateFontString(),
+	bcString = TinyXStats.frame:CreateFontString(),
+	pcString = TinyXStats.frame:CreateFontString(),
+	taString = TinyXStats.frame:CreateFontString(),
 	
-	spRecordString = TinyStats.frame:CreateFontString(),
-	apRecordString = TinyStats.frame:CreateFontString(),
-	critRecordString = TinyStats.frame:CreateFontString(),
-	hasteRecordString = TinyStats.frame:CreateFontString(),
-	hitRecordString = TinyStats.frame:CreateFontString(),
-	masteryRecordString = TinyStats.frame:CreateFontString(),
-	spiritRecordString = TinyStats.frame:CreateFontString(),
-	mp5RecordString = TinyStats.frame:CreateFontString(),
-	dcRecordString = TinyStats.frame:CreateFontString(),
-	bcRecordString = TinyStats.frame:CreateFontString(),
-	pcRecordString = TinyStats.frame:CreateFontString(),
-	taRecordString = TinyStats.frame:CreateFontString()
+	spRecordString = TinyXStats.frame:CreateFontString(),
+	apRecordString = TinyXStats.frame:CreateFontString(),
+	critRecordString = TinyXStats.frame:CreateFontString(),
+	hasteRecordString = TinyXStats.frame:CreateFontString(),
+	hitRecordString = TinyXStats.frame:CreateFontString(),
+	masteryRecordString = TinyXStats.frame:CreateFontString(),
+	spiritRecordString = TinyXStats.frame:CreateFontString(),
+	mp5RecordString = TinyXStats.frame:CreateFontString(),
+	dcRecordString = TinyXStats.frame:CreateFontString(),
+	bcRecordString = TinyXStats.frame:CreateFontString(),
+	pcRecordString = TinyXStats.frame:CreateFontString(),
+	taRecordString = TinyXStats.frame:CreateFontString()
 }
 
-function TinyStats:SetStringColors()
+function TinyXStats:SetStringColors()
 	local c = self.db.char.Color
 	self.strings.spString:SetTextColor(c.sp.r, c.sp.g, c.sp.b, 1.0)
 	self.strings.apString:SetTextColor(c.ap.r, c.ap.g, c.ap.b, 1.0)
@@ -302,7 +302,7 @@ function TinyStats:SetStringColors()
 	self.strings.taRecordString:SetTextColor(c.ta.r, c.ta.g, c.ta.b, 1.0)
 end
 
-function TinyStats:SetTextAnchors()
+function TinyXStats:SetTextAnchors()
 	local offsetX, offsetY = 0, 0
 	if (not self.db.char.Style.vertical) then
 		self.strings.spString:SetPoint("TOPLEFT", self.frame,"TOPLEFT", offsetX, offsetY)
@@ -359,7 +359,7 @@ function TinyStats:SetTextAnchors()
 	end
 end
 
-function TinyStats:SetDragScript()
+function TinyXStats:SetDragScript()
 	if self.db.char.FrameLocked then
 		self.frame:SetMovable(false)
 		fixed = "|cffFF0000"..L["Text is fixed. Uncheck Lock Frame in the options to move!"].."|r"
@@ -375,7 +375,7 @@ function TinyStats:SetDragScript()
 	end
 end
 
-function TinyStats:InitializeFrame()
+function TinyXStats:InitializeFrame()
 	self.frame:SetPoint("BOTTOMLEFT", UIParent, "BOTTOMLEFT", self.db.char.xPosition, self.db.char.yPosition)
 	local font = media:Fetch("font", self.db.char.Font)
 	for k, fontObject in pairs(self.strings) do
@@ -395,11 +395,11 @@ function TinyStats:InitializeFrame()
 	self:Stats()
 end
 
-function TinyStats:OnInitialize()
+function TinyXStats:OnInitialize()
 	local AceConfigReg = LibStub("AceConfigRegistry-3.0")
 	local AceConfigDialog = LibStub("AceConfigDialog-3.0")
 
-	self.db = LibStub("AceDB-3.0"):New(AddonName.."DB", TinyStats.defaults, "char")
+	self.db = LibStub("AceDB-3.0"):New(AddonName.."DB", TinyXStats.defaults, "char")
 	LibStub("AceConfig-3.0"):RegisterOptionsTable(AddonName, self:Options(), "tscmd")
 	media.RegisterCallback(self, "LibSharedMedia_Registered")
 
@@ -409,7 +409,7 @@ function TinyStats:OnInitialize()
 	self.db:RegisterDefaults(self.defaults)
 	
 	local version = GetAddOnMetadata(AddonName,"Version")
-	local loaded = L["Open the configuration menu with /ts or /TinyStats"].."|r"
+	local loaded = L["Open the configuration menu with /ts or /TinyXStats"].."|r"
 	DEFAULT_CHAT_FRAME:AddMessage("|cffffd700"..AddonName.." |cff00ff00~v"..version.."~|cffffd700: "..loaded)
 	
 	TSBroker.OnClick = function(frame, button)	AceConfigDialog:Open(AddonName)	end
@@ -417,7 +417,7 @@ function TinyStats:OnInitialize()
 	
 end
 
-function TinyStats:OnEnable()
+function TinyXStats:OnEnable()
 	self:LibSharedMedia_Registered()
 	self:InitializeFrame()
 	self:RegisterEvent("PLAYER_ENTERING_WORLD", "OnEvent")
@@ -430,14 +430,14 @@ function TinyStats:OnEnable()
 	self:RegisterEvent("PLAYER_TALENT_UPDATE", "OnEvent")
 end
 
-function TinyStats:LibSharedMedia_Registered()
-	media:Register("font", "BaarSophia", [[Interface\Addons\TinyStats\Fonts\BaarSophia.ttf]])
-	media:Register("font", "LucidaSD", [[Interface\Addons\TinyStats\Fonts\LucidaSD.ttf]])
-	media:Register("font", "Teen", [[Interface\Addons\TinyStats\Fonts\Teen.ttf]])
-	media:Register("font", "Vera", [[Interface\Addons\TinyStats\Fonts\Vera.ttf]])
-	media:Register("sound", "Fanfare1", [[Interface\Addons\TinyStats\Sound\Fanfare.ogg]])
-	media:Register("sound", "Fanfare2", [[Interface\Addons\TinyStats\Sound\Fanfare2.ogg]])
-	media:Register("sound", "Fanfare3", [[Interface\Addons\TinyStats\Sound\Fanfare3.ogg]])
+function TinyXStats:LibSharedMedia_Registered()
+	media:Register("font", "BaarSophia", [[Interface\Addons\TinyXStats\Fonts\BaarSophia.ttf]])
+	media:Register("font", "LucidaSD", [[Interface\Addons\TinyXStats\Fonts\LucidaSD.ttf]])
+	media:Register("font", "Teen", [[Interface\Addons\TinyXStats\Fonts\Teen.ttf]])
+	media:Register("font", "Vera", [[Interface\Addons\TinyXStats\Fonts\Vera.ttf]])
+	media:Register("sound", "Fanfare1", [[Interface\Addons\TinyXStats\Sound\Fanfare.ogg]])
+	media:Register("sound", "Fanfare2", [[Interface\Addons\TinyXStats\Sound\Fanfare2.ogg]])
+	media:Register("sound", "Fanfare3", [[Interface\Addons\TinyXStats\Sound\Fanfare3.ogg]])
 	
 	for k, v in pairs(media:List("font")) do
 		self.fonts[v] = v
@@ -447,13 +447,13 @@ end
 local orgSetActiveTalentGroup = _G.SetActiveTalentGroup;
 function SetActiveTalentGroup(...)	
 	SpecChangedPause = GetTime() + 30
-	TinyStats:ScheduleTimer("Stats", 32)
+	TinyXStats:ScheduleTimer("Stats", 32)
 	return orgSetActiveTalentGroup(...)
 end
 
-function TinyStats:OnEvent(event, arg1) 
-	Debug(event)
-	if (event == "PLAYER_TALENT_UPDATE") then	--/run TinyStats:OnEvent("PLAYER_TALENT_UPDATE")
+function TinyXStats:OnEvent(event, arg1) 
+	Debug(event,arg1)
+	if (event == "PLAYER_TALENT_UPDATE") then	--/run TinyXStats:OnEvent("PLAYER_TALENT_UPDATE")
 		self:ScheduleTimer("GetUnitRole", 3)
 	end
 	if ((event == "PLAYER_REGEN_ENABLED") or (event == "PLAYER_ENTERING_WORLD")) then
@@ -475,18 +475,18 @@ end
 
 local function HexColor(stat)
 
-	local c = TinyStats.db.char.Color[stat]
+	local c = TinyXStats.db.char.Color[stat]
 	local hexColor = string.format("|cff%2X%2X%2X", 255*c.r, 255*c.g, 255*c.b)
 	return hexColor
 	
 end
 
-function TinyStats:HideTankStat(Stat)
-	if TinyStats.defaults.char.Style[Stat][TinyStats.PlayerRole] then
-		if TinyStats.class ~= "WARRIOR" and TinyStats.class ~= "PALADIN" then
+function TinyXStats:HideTankStat(Stat)
+	if TinyXStats.defaults.char.Style[Stat][TinyXStats.PlayerRole] then
+		if TinyXStats.class ~= "WARRIOR" and TinyXStats.class ~= "PALADIN" then
 			if Stat == "BC" then
 				return true
-			elseif Stat == "PC" and TinyStats.class == "DRUID" then
+			elseif Stat == "PC" and TinyXStats.class == "DRUID" then
 				return true
 			else
 				return false
@@ -501,7 +501,7 @@ end
 
 local function GetAttackPower()
 	local base, buff, debuff
-	if TinyStats.PlayerRole == "hunter" then
+	if TinyXStats.PlayerRole == "hunter" then
 		base, buff, debuff = UnitRangedAttackPower("player")
 	else
 		base, buff, debuff = UnitAttackPower("player")
@@ -525,7 +525,7 @@ end
 
 local function GetCrit()
 	local critchance = 0
-	if TinyStats.PlayerRole == "healer" or TinyStats.PlayerRole == "caster" then
+	if TinyXStats.PlayerRole == "healer" or TinyXStats.PlayerRole == "caster" then
 		for i = 2, 7, 1 do
 			if (critchance < GetSpellCritChance(i)) then
 				critchance = GetSpellCritChance(i)
@@ -554,7 +554,7 @@ local function GetWeaponSpeed(spec)
 		if (mainSpeed > 0) then
 			mainSpeed = string.format("%.2f", mainSpeed)
 			speed = mainSpeed
-			fastestSpeed = TinyStats.db.char[spec].FastestMh
+			fastestSpeed = TinyXStats.db.char[spec].FastestMh
 		else
 			speed = 500
 			mainSpeed = 500
@@ -570,7 +570,7 @@ local function GetWeaponSpeed(spec)
 			offSpeed = nil
 			fastestSpeed = 500
 		end	
-		fastestSpeed = TinyStats.db.char[spec].FastestMh.."s "..TinyStats.db.char[spec].FastestOh
+		fastestSpeed = TinyXStats.db.char[spec].FastestMh.."s "..TinyXStats.db.char[spec].FastestOh
 	end	
 	return mainSpeed, offSpeed, speed, fastestSpeed
 end
@@ -579,7 +579,7 @@ local function GetRangedSpeed(spec)
 	-- If no ranged attack then set to n/a
 	local hasRelic = UnitHasRelicSlot("player");	
 	local rangedTexture = GetInventoryItemTexture("player", 18);
-	local fastestSpeed = TinyStats.db.char[spec].FastestRs
+	local fastestSpeed = TinyXStats.db.char[spec].FastestRs
 	if ( rangedTexture and not hasRelic ) then
 		local speed = UnitRangedDamage("player")
 		if speed > 0.00 then
@@ -596,7 +596,7 @@ end
 local function GetHit()
 	local CombatRating = 0
 	local HitModifier = 0
-	if TinyStats.PlayerRole == "healer" or TinyStats.PlayerRole == "caster" then
+	if TinyXStats.PlayerRole == "healer" or TinyXStats.PlayerRole == "caster" then
 		CombatRating = GetCombatRatingBonus(CR_HIT_SPELL) or 0;
 		HitModifier = GetSpellHitModifier() or 0;
 	else
@@ -619,7 +619,7 @@ local function GetDefense()
 	return string.format("%.2f", TAvoidance), string.format("%.2f", dodgeChance), string.format("%.2f", parryChance), string.format("%.2f", blockChance)
 end
 
-function TinyStats:GetUnitRole()
+function TinyXStats:GetUnitRole()
 	self.class = select(2, UnitClass("player"))
 	local role = ""
 	if self.class == "HUNTER" then
@@ -644,7 +644,7 @@ function TinyStats:GetUnitRole()
 	return role
 end
 
-function TinyStats:Stats()
+function TinyXStats:Stats()
 	local style = self.db.char.Style
 	local spec = "Spec"..GetActiveTalentGroup()
 	local spelldmg = GetSpellDamage()
@@ -789,7 +789,7 @@ function TinyStats:Stats()
 				recordIsBroken = true
 			end
 		end
-		if (style.PC[self.PlayerRole] and not TinyStats:HideTankStat("PC")) then
+		if (style.PC[self.PlayerRole] and not TinyXStats:HideTankStat("PC")) then
 			if tonumber(ParryChance) > tonumber(self.db.char[spec].HighestPC) then
 				self.db.char[spec].HighestPC = ParryChance
 				if (self.db.char.RecordMsg == true) then
@@ -798,7 +798,7 @@ function TinyStats:Stats()
 				end
 			end
 		end
-		if (style.BC[self.PlayerRole] and not TinyStats:HideTankStat("BC")) then
+		if (style.BC[self.PlayerRole] and not TinyXStats:HideTankStat("BC")) then
 			if tonumber(BlockChance) > tonumber(self.db.char[spec].HighestBC) then
 				self.db.char[spec].HighestBC = BlockChance
 				if (self.db.char.RecordMsg == true) then
@@ -1252,7 +1252,6 @@ function TinyStats:Stats()
 			self.strings.mp5String:SetText("")
 			self.strings.mp5RecordString:SetText("")
 	end
-	
 	if (style.DC[self.PlayerRole]) then
 		local dcTempString = " "
 		local dcRecordTempString = " "
@@ -1286,7 +1285,7 @@ function TinyStats:Stats()
 		self.strings.dcString:SetText("")
 		self.strings.dcRecordString:SetText("")
 	end
-	if (style.PC[self.PlayerRole] and not TinyStats:HideTankStat("PC")) then
+	if (style.PC[self.PlayerRole] and not TinyXStats:HideTankStat("PC")) then
 		local pcTempString = " "
 		local pcRecordTempString = " "
 		ldbString = ldbString..HexColor("pc")
@@ -1319,7 +1318,7 @@ function TinyStats:Stats()
 		self.strings.pcString:SetText("")
 		self.strings.pcRecordString:SetText("")
 	end
-	if (style.BC[self.PlayerRole] and not TinyStats:HideTankStat("BC")) then
+	if (style.BC[self.PlayerRole] and not TinyXStats:HideTankStat("BC")) then
 		local bcTempString = " "
 		local bcRecordTempString = " "
 		ldbString = ldbString..HexColor("bc")
