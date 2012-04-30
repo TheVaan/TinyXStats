@@ -403,13 +403,13 @@ function TinyXStats:OnInitialize()
 	LibStub("AceConfig-3.0"):RegisterOptionsTable(AddonName, self:Options(), "tscmd")
 	media.RegisterCallback(self, "LibSharedMedia_Registered")
 
-	self:RegisterChatCommand("ts", function() AceConfigDialog:Open(AddonName) end)
+	self:RegisterChatCommand("txs", function() AceConfigDialog:Open(AddonName) end)
 	self:RegisterChatCommand(AddonName, function() AceConfigDialog:Open(AddonName) end)
 	self.optionsFrame = AceConfigDialog:AddToBlizOptions(AddonName, AddonName)
 	self.db:RegisterDefaults(self.defaults)
 	
 	local version = GetAddOnMetadata(AddonName,"Version")
-	local loaded = L["Open the configuration menu with /ts or /TinyXStats"].."|r"
+	local loaded = L["Open the configuration menu with /txs or /TinyXStats"].."|r"
 	DEFAULT_CHAT_FRAME:AddMessage("|cffffd700"..AddonName.." |cff00ff00~v"..version.."~|cffffd700: "..loaded)
 	
 	TSBroker.OnClick = function(frame, button)	AceConfigDialog:Open(AddonName)	end
