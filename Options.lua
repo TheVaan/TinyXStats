@@ -37,6 +37,7 @@ function TinyXStats:Options()
 							self.db.profile.debug = not self.db.profile.debug
 							print(AddonName,"- Debug:",self.db.profile.debug)
 						else
+							self.db.char.FrameHide = false
 							self.frame:ClearAllPoints() self.frame:SetPoint("CENTER", UIParent, "CENTER")
 						end
 					end,
@@ -63,7 +64,7 @@ function TinyXStats:Options()
 				name = STAT_CATEGORY_ATTRIBUTES,
 				desc = L["Select which stats to show"],
 				type = 'group',
-				order = 3,
+				order = 10,
 				args = {
 					hader = {
 						name = function() return TinyXStats.RoleLocale[TinyXStats.PlayerRole] end,
@@ -703,7 +704,7 @@ function TinyXStats:Options()
 				name = L["Text"],
 				desc = L["Text settings"],
 				type = 'group',
-				order = 5,
+				order = 11,
 				args = {
 					oocalpha = {
 						name = L["Text Alpha"].." "..L["out of combat"],
@@ -719,7 +720,7 @@ function TinyXStats:Options()
 							self.db.char.outOfCombatAlpha = newValue
 							self.frame:SetAlpha(self.db.char.outOfCombatAlpha)
 						end,
-						disabled = function() return InCombatLockdown() end,
+						disabled = function() return InCombatLockdown() or self.db.char.FrameHide end,
 						order = 1
 					},
 					icalpha = {
@@ -736,7 +737,7 @@ function TinyXStats:Options()
 							self.db.char.inCombatAlpha = newValue
 							self.frame:SetAlpha(self.db.char.inCombatAlpha)
 						end,
-						disabled = function() return InCombatLockdown() end,
+						disabled = function() return InCombatLockdown() or self.db.char.FrameHide end,
 						order = 2
 					},
 					barfontsize = {
@@ -755,6 +756,7 @@ function TinyXStats:Options()
 							end
 							self:InitializeFrame()
 						end,
+						disabled = function() return InCombatLockdown() or self.db.char.FrameHide end,
 						order = 3
 					},
 					font = {
@@ -769,6 +771,7 @@ function TinyXStats:Options()
 							end
 						end,
 						values = self.fonts,
+						disabled = function() return InCombatLockdown() or self.db.char.FrameHide end,
 						order = 4
 					},
 					fonteffect = {
@@ -783,6 +786,7 @@ function TinyXStats:Options()
 							end
 						end,
 						values = self.fonteffects,
+						disabled = function() return InCombatLockdown() or self.db.char.FrameHide end,
 						order = 5
 					},
 					vertical = {
@@ -800,12 +804,13 @@ function TinyXStats:Options()
 							self:Stats()
 							self:SetTextAnchors()
 						end,
-						disabled = function() return InCombatLockdown() end,
+						disabled = function() return InCombatLockdown() or self.db.char.FrameHide end,
 						order = 6
 					},
 					labels = {
 						name = L["Show labels"],
 						desc = L["Whether or not to show labels for each stat"],
+						width = 'full',
 						type = 'toggle',
 						get = function() return self.db.char.Style.labels end,
 						set = function(info, value)
@@ -822,7 +827,7 @@ function TinyXStats:Options()
 					LDBtext = {
 						name = L["Broker Text"],
 						desc = L["Displays stats in the LDB text field."],
-						width = 'full',
+						--width = 'full',
 						type = 'toggle',
 						get = function() return self.db.char.Style.LDBtext end,
 						set = function(info, value)
@@ -831,15 +836,32 @@ function TinyXStats:Options()
 							else
 								self.db.char.Style.LDBtext = false
 							end
+							self:SetBroker()
 							self:Stats()
 						end,
 						disabled = function() return InCombatLockdown() end,
 						order = 8
 					},
+					hide = {
+						name = L["Hide Frame"],
+						desc = L["Hide the text frame (to show stats only in the LDB text field)"],
+						type = 'toggle',
+						get = function() return self.db.char.FrameHide end,
+						set = function(info, value)
+							if(value) then
+								self.db.char.FrameHide = true
+							else
+								self.db.char.FrameHide = false
+							end
+							self:SetFrameVisible()
+						end,
+						disabled = function() return InCombatLockdown() end,
+						order = 9
+					},
 					spaceline4 = {
 						name = " ",
 						type = 'description',
-						order = 9,
+						order = 20,
 					},
 					record = {
 						name = L["Announce records"],
@@ -854,7 +876,7 @@ function TinyXStats:Options()
 							end
 						end,
 						disabled = function() return InCombatLockdown() end,
-						order = 10
+						order = 21
 					},
 					recordSound = {
 						name = L["Play sound on record"],
@@ -869,12 +891,12 @@ function TinyXStats:Options()
 							end
 						end,
 						disabled = function() return InCombatLockdown() end,
-						order = 11,
+						order = 22,
 					},
 					spaceline5 = {
 						name = " ",
 						type = 'description',
-						order = 12,
+						order = 30,
 					},
 					selectSound = {
 						name = L["Sound"],
@@ -884,11 +906,10 @@ function TinyXStats:Options()
 						set = function(info, value) self.db.char.RecordSoundFile = value end,
 						values = AceGUIWidgetLSMlists.sound,
 						disabled = function() return InCombatLockdown() end,
-						order = 13,
+						order = 31,
 					},
 				}
 			},
-			
 		}
 	}
 	

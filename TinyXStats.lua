@@ -375,6 +375,26 @@ function TinyXStats:SetDragScript()
 	end
 end
 
+function TinyXStats:SetFrameVisible()
+
+	if self.db.char.FrameHide then
+		self.frame:SetPoint("BOTTOMLEFT", UIParent, "BOTTOMLEFT", -1000, -1000)
+	else
+		self.frame:SetPoint("BOTTOMLEFT", UIParent, "BOTTOMLEFT", self.db.char.xPosition, self.db.char.yPosition)
+	end
+	
+end
+
+function TinyXStats:SetBroker()
+
+	if self.db.char.Style.LDBtext then
+		TSBroker.label = ""
+	else
+		TSBroker.label = AddonName
+	end
+		
+end
+
 function TinyXStats:InitializeFrame()
 	self.frame:SetPoint("BOTTOMLEFT", UIParent, "BOTTOMLEFT", self.db.char.xPosition, self.db.char.yPosition)
 	local font = media:Fetch("font", self.db.char.Font)
@@ -392,6 +412,8 @@ function TinyXStats:InitializeFrame()
 	self:SetTextAnchors()
 	self:SetStringColors()
 	self:SetDragScript()
+	self:SetFrameVisible()
+	self:SetBroker()
 	self:Stats()
 end
 
