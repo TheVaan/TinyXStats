@@ -37,6 +37,7 @@ enable-nolib-creation: no
 
 tools-used:
     - libdatabroker-1-1
+	- LibGroupTalents-1-0
 	
 ignore:
 	- CHANGELOG.txt
