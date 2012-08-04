@@ -7,6 +7,7 @@ if not TinyXStats then return end
 local AddonName = "TinyXStats"
 local L = LibStub:GetLibrary("AceLocale-3.0"):GetLocale(AddonName)
 local media = LibStub:GetLibrary("LibSharedMedia-3.0")
+local currentBuild = select(4, GetBuildInfo())
 
 TinyXStats.fonteffects = {
 	["none"] = L["NONE"],
@@ -670,7 +671,12 @@ function TinyXStats:Options()
 							if IsShiftKeyDown() then
 								TinyXStatsDB = {}
 							else
-								local spec = "Spec"..GetActiveTalentGroup()
+								local spec = "Spec"
+								if currentBuild  >= 50000 then
+									spec = spec..GetActiveSpecGroup()
+								else
+									spec = spec..GetActiveTalentGroup()
+								end
 								for stat, num in pairs(self.defaults.char[spec]) do
 									--if string.find(stat,"Highest") then
 										self.db.char[spec][stat] = num

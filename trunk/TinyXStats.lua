@@ -11,7 +11,7 @@ local AceAddon = LibStub("AceAddon-3.0")
 local media = LibStub:GetLibrary("LibSharedMedia-3.0")
 TinyXStats = AceAddon:NewAddon(AddonName, "AceConsole-3.0", "AceEvent-3.0", "AceTimer-3.0")
 local L = LibStub:GetLibrary("AceLocale-3.0"):GetLocale(AddonName)
-local LGT = LibStub:GetLibrary("LibGroupTalents-1.0");
+local LGT --= LibStub:GetLibrary("LibGroupTalents-1.0");
 
 local ldb = LibStub:GetLibrary("LibDataBroker-1.1");
 local TSBroker = ldb:NewDataObject(AddonName, {
@@ -24,6 +24,10 @@ local TSBroker = ldb:NewDataObject(AddonName, {
 local isInFight = false
 local SpecChangedPause = GetTime()
 local MasteryName = GetSpellInfo(86474)
+local currentBuild = select(4, GetBuildInfo())
+if currentBuild  < 50000 then
+	LGT = LibStub:GetLibrary("LibGroupTalents-1.0");
+end
 
 local backdrop = {
 	bgFile = "Interface\\Tooltips\\UI-Tooltip-Background",
@@ -475,7 +479,7 @@ end
 
 function TinyXStats:OnEvent(event, arg1) 
 	Debug(event,arg1)
-	if (event == "PLAYER_TALENT_UPDATE") then	--/run TinyXStats:OnEvent("PLAYER_TALENT_UPDATE")
+	if ((event == "PLAYER_TALENT_UPDATE") or (event == "PLAYER_ENTERING_WORLD")) then
 		self:ScheduleTimer("GetUnitRole", 3)
 	end
 	if ((event == "PLAYER_REGEN_ENABLED") or (event == "PLAYER_ENTERING_WORLD")) then
@@ -643,32 +647,78 @@ end
 
 function TinyXStats:GetUnitRole()
 	self.class = select(2, UnitClass("player"))
-	local role = ""
-	if self.class == "HUNTER" then
-		role = "hunter"
-	else
-		role = LGT:GetUnitRole("player",true)
-	end
-	if not role then
-		if GetAttackPower() > GetSpellDamage() then
-			role = "melee"
+	local role
+	if currentBuild  >= 50000 then
+		local Talent = GetSpecialization()
+		if Talent then 
+			role = GetSpecializationRole(Talent, false, false);
+		end
+		if not role then
+			if GetAttackPower() > GetSpellDamage() then
+				role = "melee"
+			else
+				role = "caster"
+			end
 		else
-			role = "caster"
+			if role == "HEALER" then
+				role = "healer"
+			elseif role == "TANK" then
+				role = "tank"
+			elseif role == "DAMAGER" then
+				if self.class == "HUNTER" then
+					role = "hunter"
+				elseif (self.class == "MAGE" or self.class == "WARLOCK" or self.class == "PRIEST") then
+					role = "caster"
+				elseif (self.class == "SHAMAN" and Talent == 1) then
+					role = "caster"
+				elseif (class == "DRUID" and Talent == 1) then
+					role = "caster"
+				else
+					role = "melee"
+				end
+			end
+		end
+		if (not self.PlayerRole or self.PlayerRole ~= role) then
+			self.PlayerRole = role
+			if GetMasteryEffect() then
+				self.Mastery = GetMasteryEffect()
+			end
+			self:Stats()
+		end
+	else
+		if self.class == "HUNTER" then
+			role = "hunter"
+		else
+			role = LGT:GetUnitRole("player",true)
+		end
+		if not role then
+			if GetAttackPower() > GetSpellDamage() then
+				role = "melee"
+			else
+				role = "caster"
+			end
+		end
+		if (not self.PlayerRole or self.PlayerRole ~= role) then
+			self.PlayerRole = role
+			self.Mastery = GetSpellInfo(MasteryName)
+			self:Stats()
 		end
 	end
-	if (not self.PlayerRole or self.PlayerRole ~= role) then
-		self.PlayerRole = role
-		self.Mastery = GetSpellInfo(MasteryName)
-		self:Stats()
-	end
-		
+	
 	Debug("you are:", role, self.Mastery)
 	return role
 end
 
 function TinyXStats:Stats()
 	local style = self.db.char.Style
-	local spec = "Spec"..GetActiveTalentGroup()
+	local mastery = string.format("%.2f", GetMastery())
+	local spec = "Spec"
+	if currentBuild >= 50000 then
+		spec = spec..GetActiveSpecGroup()
+		mastery = string.format("%.2f", GetMasteryEffect())
+	else
+		spec = spec..GetActiveTalentGroup()
+	end
 	local spelldmg = GetSpellDamage()
 	local pow = GetAttackPower()
 	local crit = string.format("%.2f",GetCrit())
@@ -682,7 +732,6 @@ function TinyXStats:Stats()
 		end
 	end
 	local hit = GetHit()
-	local mastery = string.format("%.2f", GetMastery())
 	local s, spirit = UnitStat("player", 5)
 	local base, casting = GetManaRegen()
 	base = floor(base * 5.0)
