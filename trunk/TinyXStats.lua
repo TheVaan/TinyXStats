@@ -252,9 +252,9 @@ TinyXStats.frame:RegisterForDrag("LeftButton")
 TinyXStats.strings = {
 	spString = TinyXStats.frame:CreateFontString(),
 	apString = TinyXStats.frame:CreateFontString(),
-	critString = TinyXStats.frame:CreateFontString(),
 	hasteString = TinyXStats.frame:CreateFontString(),
 	hitString = TinyXStats.frame:CreateFontString(),
+	critString = TinyXStats.frame:CreateFontString(),
 	masteryString = TinyXStats.frame:CreateFontString(),
 	spiritString = TinyXStats.frame:CreateFontString(),
 	mp5String = TinyXStats.frame:CreateFontString(),
@@ -265,9 +265,9 @@ TinyXStats.strings = {
 	
 	spRecordString = TinyXStats.frame:CreateFontString(),
 	apRecordString = TinyXStats.frame:CreateFontString(),
-	critRecordString = TinyXStats.frame:CreateFontString(),
 	hasteRecordString = TinyXStats.frame:CreateFontString(),
 	hitRecordString = TinyXStats.frame:CreateFontString(),
+	critRecordString = TinyXStats.frame:CreateFontString(),
 	masteryRecordString = TinyXStats.frame:CreateFontString(),
 	spiritRecordString = TinyXStats.frame:CreateFontString(),
 	mp5RecordString = TinyXStats.frame:CreateFontString(),
@@ -311,10 +311,10 @@ function TinyXStats:SetTextAnchors()
 	if (not self.db.char.Style.vertical) then
 		self.strings.spString:SetPoint("TOPLEFT", self.frame,"TOPLEFT", offsetX, offsetY)
 		self.strings.apString:SetPoint("TOPLEFT", self.strings.spString, "TOPRIGHT", offsetX, offsetY)
-		self.strings.critString:SetPoint("TOPLEFT", self.strings.apString, "TOPRIGHT", offsetX, offsetY)
-		self.strings.hasteString:SetPoint("TOPLEFT", self.strings.critString, "TOPRIGHT", offsetX, offsetY)
+		self.strings.hasteString:SetPoint("TOPLEFT", self.strings.apString, "TOPRIGHT", offsetX, offsetY)
 		self.strings.hitString:SetPoint("TOPLEFT", self.strings.hasteString, "TOPRIGHT", offsetX, offsetY)
-		self.strings.masteryString:SetPoint("TOPLEFT", self.strings.hitString, "TOPRIGHT", offsetX, offsetY)
+		self.strings.critString:SetPoint("TOPLEFT", self.strings.hitString, "TOPRIGHT", offsetX, offsetY)
+		self.strings.masteryString:SetPoint("TOPLEFT", self.strings.critString, "TOPRIGHT", offsetX, offsetY)
 		self.strings.spiritString:SetPoint("TOPLEFT", self.strings.masteryString, "TOPRIGHT", offsetX, offsetY)
 		self.strings.mp5String:SetPoint("TOPLEFT", self.strings.spiritString, "TOPRIGHT", offsetX, offsetY)
 		self.strings.dcString:SetPoint("TOPLEFT", self.strings.mp5String, "TOPRIGHT", offsetX, offsetY)
@@ -324,10 +324,10 @@ function TinyXStats:SetTextAnchors()
 
 		self.strings.spRecordString:SetPoint("TOPLEFT", self.strings.spString, "BOTTOMLEFT")
 		self.strings.apRecordString:SetPoint("TOPLEFT", self.strings.spRecordString, "TOPRIGHT", offsetX, offsetY)
-		self.strings.critRecordString:SetPoint("TOPLEFT", self.strings.apRecordString, "TOPRIGHT", offsetX, offsetY)
-		self.strings.hasteRecordString:SetPoint("TOPLEFT", self.strings.critRecordString, "TOPRIGHT", offsetX, offsetY)
+		self.strings.hasteRecordString:SetPoint("TOPLEFT", self.strings.apRecordString, "TOPRIGHT", offsetX, offsetY)
 		self.strings.hitRecordString:SetPoint("TOPLEFT", self.strings.hasteRecordString, "TOPRIGHT", offsetX, offsetY)
-		self.strings.masteryRecordString:SetPoint("TOPLEFT", self.strings.hitRecordString, "TOPRIGHT", offsetX, offsetY)
+		self.strings.critRecordString:SetPoint("TOPLEFT", self.strings.hitRecordString, "TOPRIGHT", offsetX, offsetY)
+		self.strings.masteryRecordString:SetPoint("TOPLEFT", self.strings.critRecordString, "TOPRIGHT", offsetX, offsetY)
 		self.strings.spiritRecordString:SetPoint("TOPLEFT", self.strings.masteryRecordString, "TOPRIGHT", offsetX, offsetY)
 		self.strings.mp5RecordString:SetPoint("TOPLEFT", self.strings.spiritRecordString, "TOPRIGHT", offsetX, offsetY)
 		self.strings.dcRecordString:SetPoint("TOPLEFT", self.strings.mp5RecordString, "TOPRIGHT", offsetX, offsetY)
@@ -337,10 +337,10 @@ function TinyXStats:SetTextAnchors()
 	else
 		self.strings.spString:SetPoint("TOPLEFT", self.frame,"TOPLEFT", offsetX, offsetY)
 		self.strings.apString:SetPoint("TOPLEFT", self.strings.spString, "BOTTOMLEFT")
-		self.strings.critString:SetPoint("TOPLEFT", self.strings.apString, "BOTTOMLEFT")
-		self.strings.hasteString:SetPoint("TOPLEFT", self.strings.critString, "BOTTOMLEFT")
+		self.strings.hasteString:SetPoint("TOPLEFT", self.strings.apString, "BOTTOMLEFT")
 		self.strings.hitString:SetPoint("TOPLEFT", self.strings.hasteString, "BOTTOMLEFT")
-		self.strings.masteryString:SetPoint("TOPLEFT", self.strings.hitString, "BOTTOMLEFT")
+		self.strings.critString:SetPoint("TOPLEFT", self.strings.hitString, "BOTTOMLEFT")
+		self.strings.masteryString:SetPoint("TOPLEFT", self.strings.critString, "BOTTOMLEFT")
 		self.strings.spiritString:SetPoint("TOPLEFT", self.strings.masteryString, "BOTTOMLEFT")
 		self.strings.mp5String:SetPoint("TOPLEFT", self.strings.spiritString, "BOTTOMLEFT")
 		self.strings.dcString:SetPoint("TOPLEFT", self.strings.mp5String, "BOTTOMLEFT")
@@ -350,9 +350,9 @@ function TinyXStats:SetTextAnchors()
 
 		self.strings.spRecordString:SetPoint("TOPLEFT", self.strings.spString, "TOPRIGHT", offsetX, offsetY)
 		self.strings.apRecordString:SetPoint("TOPLEFT", self.strings.apString, "TOPRIGHT", offsetX, offsetY)
-		self.strings.critRecordString:SetPoint("TOPLEFT", self.strings.critString, "TOPRIGHT", offsetX, offsetY)
 		self.strings.hasteRecordString:SetPoint("TOPLEFT", self.strings.hasteString, "TOPRIGHT", offsetX, offsetY)
 		self.strings.hitRecordString:SetPoint("TOPLEFT", self.strings.hitString, "TOPRIGHT", offsetX, offsetY)
+		self.strings.critRecordString:SetPoint("TOPLEFT", self.strings.critString, "TOPRIGHT", offsetX, offsetY)
 		self.strings.masteryRecordString:SetPoint("TOPLEFT", self.strings.masteryString, "TOPRIGHT", offsetX, offsetY)
 		self.strings.spiritRecordString:SetPoint("TOPLEFT", self.strings.spiritString, "TOPRIGHT", offsetX, offsetY)
 		self.strings.mp5RecordString:SetPoint("TOPLEFT", self.strings.mp5String, "TOPRIGHT", offsetX, offsetY)
@@ -470,11 +470,23 @@ function TinyXStats:LibSharedMedia_Registered()
 	end
 end
 
-local orgSetActiveTalentGroup = _G.SetActiveTalentGroup;
+local orgSetActiveSpecGroup
+if currentBuild  > 50000 then
+	orgSetActiveSpecGroup = SetActiveSpecGroup;
+else
+	orgSetActiveSpecGroup = _G.SetActiveTalentGroup;
+end
+function SetActiveSpecGroup(...)	
+	SpecChangedPause = GetTime() + 30
+	TinyXStats:ScheduleTimer("Stats", 32)
+	Debug("Set SpecChangedPause")
+	return orgSetActiveSpecGroup(...)
+end
 function SetActiveTalentGroup(...)	
 	SpecChangedPause = GetTime() + 30
 	TinyXStats:ScheduleTimer("Stats", 32)
-	return orgSetActiveTalentGroup(...)
+	Debug("Set SpecChangedPause")
+	return orgSetActiveSpecGroup(...)
 end
 
 function TinyXStats:OnEvent(event, arg1) 
@@ -564,8 +576,14 @@ local function GetCrit()
 end
 
 local function GetHaste()
-	-- berechnet den Faktor Tempo/prozent ~128,05
-	local FaktorHastePercent = GetCombatRating(CR_HASTE_SPELL)/GetCombatRatingBonus(CR_HASTE_SPELL)
+	-- berechnet den Faktor Tempo/prozent ~128,05 bei lvl 85
+	local CR = GetCombatRating(CR_HASTE_SPELL)
+	local CRB = GetCombatRatingBonus(CR_HASTE_SPELL)
+	local FaktorHastePercent = 0
+	
+	if (CRB and CRB > 0 and CR and CR > 0) then--  Division by zero fix ?	
+		FaktorHastePercent = CR/CRB
+	end
 	
 	local hasteperc = UnitSpellHaste("player")
 	local haste = hasteperc * FaktorHastePercent
@@ -710,6 +728,7 @@ function TinyXStats:GetUnitRole()
 end
 
 function TinyXStats:Stats()
+	Debug("Stats()")
 	local style = self.db.char.Style
 	local mastery = string.format("%.2f", GetMastery())
 	local spec = "Spec"
@@ -760,13 +779,6 @@ function TinyXStats:Stats()
 				recordIsBroken = true
 			end
 		end
-		if (style.Crit[self.PlayerRole] and tonumber(crit) > tonumber(self.db.char[spec].HighestCrit)) then
-			self.db.char[spec].HighestCrit = crit
-			if (self.db.char.RecordMsg == true) then
-				DEFAULT_CHAT_FRAME:AddMessage(recordBroken..SPELL_CRIT_CHANCE..": |c00ffef00".. self.db.char[spec].HighestCrit.."%|r")
-				recordIsBroken = true
-			end
-		end
 		if (style.Haste[self.PlayerRole] or style.HastePerc[self.PlayerRole]) then
 			if (tonumber(haste) > tonumber(self.db.char[spec].HighestHaste) or tonumber(hasteperc) > tonumber(self.db.char[spec].HighestHastePerc)) then
 				self.db.char[spec].HighestHaste = haste
@@ -811,6 +823,13 @@ function TinyXStats:Stats()
 			self.db.char[spec].HighestHit = hit
 			if (self.db.char.RecordMsg == true) then
 				DEFAULT_CHAT_FRAME:AddMessage(recordBroken..STAT_HIT_CHANCE..": |c00ffef00"..self.db.char[spec].HighestHit.."%|r")
+				recordIsBroken = true
+			end
+		end
+		if (style.Crit[self.PlayerRole] and tonumber(crit) > tonumber(self.db.char[spec].HighestCrit)) then
+			self.db.char[spec].HighestCrit = crit
+			if (self.db.char.RecordMsg == true) then
+				DEFAULT_CHAT_FRAME:AddMessage(recordBroken..SPELL_CRIT_CHANCE..": |c00ffef00".. self.db.char[spec].HighestCrit.."%|r")
 				recordIsBroken = true
 			end
 		end
@@ -885,6 +904,8 @@ function TinyXStats:Stats()
 				recordIsBroken = true
 			end
 		end
+	else
+		Debug("rekords skipped SpecChangedPause")
 	end
 	
 	if ((recordIsBroken == true) and (self.db.char.RecordSound == true)) then
@@ -961,39 +982,6 @@ function TinyXStats:Stats()
 	else
 		self.strings.apString:SetText("")
 		self.strings.apRecordString:SetText("")
-	end
-	if (style.Crit[self.PlayerRole]) then
-		local critTempString = " "
-		local critRecordTempString = " "
-		ldbString = ldbString..HexColor("crit")
-		if (style.labels) then
-			critTempString = critTempString..L["Crit:"]
-			ldbString = ldbString..L["Crit:"]
-		end
-		critTempString = critTempString..crit.."%"
-		ldbString = ldbString..crit.."% "
-		if (style.showRecords) then
-			ldbRecord = ldbRecord..HexColor("crit")
-			if (style.vertical) then
-				if (style.labels) then
-					ldbRecord = ldbRecord..L["Crit:"]
-				end
-				critRecordTempString = critRecordTempString.."("..self.db.char[spec].HighestCrit.."%)"
-				ldbRecord = ldbRecord..self.db.char[spec].HighestCrit.."% "
-			else
-				if (style.labels) then
-					critRecordTempString = critRecordTempString..L["Crit:"]
-					ldbRecord = ldbRecord..L["Crit:"]
-				end
-				critRecordTempString = critRecordTempString..self.db.char[spec].HighestCrit.."%"
-				ldbRecord = ldbRecord..self.db.char[spec].HighestCrit.."% "
-			end
-		end
-		self.strings.critString:SetText(critTempString)
-		self.strings.critRecordString:SetText(critRecordTempString)
-	else
-		self.strings.critString:SetText("")
-		self.strings.critRecordString:SetText("")
 	end
 	if (style.Haste[self.PlayerRole]) then
 		local hasteTempString = " "
@@ -1119,6 +1107,39 @@ function TinyXStats:Stats()
 		self.strings.hitString:SetText("")
 		self.strings.hitRecordString:SetText("")
 	end
+	if (style.Crit[self.PlayerRole]) then
+		local critTempString = " "
+		local critRecordTempString = " "
+		ldbString = ldbString..HexColor("crit")
+		if (style.labels) then
+			critTempString = critTempString..L["Crit:"]
+			ldbString = ldbString..L["Crit:"]
+		end
+		critTempString = critTempString..crit.."%"
+		ldbString = ldbString..crit.."% "
+		if (style.showRecords) then
+			ldbRecord = ldbRecord..HexColor("crit")
+			if (style.vertical) then
+				if (style.labels) then
+					ldbRecord = ldbRecord..L["Crit:"]
+				end
+				critRecordTempString = critRecordTempString.."("..self.db.char[spec].HighestCrit.."%)"
+				ldbRecord = ldbRecord..self.db.char[spec].HighestCrit.."% "
+			else
+				if (style.labels) then
+					critRecordTempString = critRecordTempString..L["Crit:"]
+					ldbRecord = ldbRecord..L["Crit:"]
+				end
+				critRecordTempString = critRecordTempString..self.db.char[spec].HighestCrit.."%"
+				ldbRecord = ldbRecord..self.db.char[spec].HighestCrit.."% "
+			end
+		end
+		self.strings.critString:SetText(critTempString)
+		self.strings.critRecordString:SetText(critRecordTempString)
+	else
+		self.strings.critString:SetText("")
+		self.strings.critRecordString:SetText("")
+	end
 	if (style.Mastery[self.PlayerRole] and self.Mastery) then
 		local masteryTempString = " "
 		local masteryRecordTempString = " "
@@ -1127,23 +1148,23 @@ function TinyXStats:Stats()
 			masteryTempString = masteryTempString..L["Mas:"]
 			ldbString = ldbString..L["Mas:"]
 		end
-		masteryTempString = masteryTempString..mastery
-		ldbString = ldbString..mastery.." "
+		masteryTempString = masteryTempString..mastery.."%"
+		ldbString = ldbString..mastery.."% "
 		if (style.showRecords) then
 			ldbRecord = ldbRecord..HexColor("mastery")
 			if (style.vertical) then
 				if (style.labels) then
 					ldbRecord = ldbRecord..L["Mas:"]
 				end
-				masteryRecordTempString = masteryRecordTempString.."("..self.db.char[spec].HighestMastery..")"
-				ldbRecord = ldbRecord..self.db.char[spec].HighestMastery.." "
+				masteryRecordTempString = masteryRecordTempString.."("..self.db.char[spec].HighestMastery.."%)"
+				ldbRecord = ldbRecord..self.db.char[spec].HighestMastery.."% "
 			else
 				if (style.labels) then
 					masteryRecordTempString = masteryRecordTempString..L["Mas:"]
 					ldbRecord = ldbRecord..L["Mas:"]
 				end
-				masteryRecordTempString = masteryRecordTempString..self.db.char[spec].HighestMastery
-				ldbRecord = ldbRecord..self.db.char[spec].HighestMastery.." "
+				masteryRecordTempString = masteryRecordTempString..self.db.char[spec].HighestMastery.."%"
+				ldbRecord = ldbRecord..self.db.char[spec].HighestMastery.."% "
 			end
 		end
 		self.strings.masteryString:SetText(masteryTempString)
