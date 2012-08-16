@@ -149,42 +149,6 @@ function TinyXStats:Options()
 						end,
 						order = 4,
 					},
-					crit = {
-						hidden = function() return not self.defaults.char.Style.Crit[TinyXStats.PlayerRole] end,
-						name = SPELL_CRIT_CHANCE,
-						desc = SPELL_CRIT_CHANCE.." "..SHOW.."/"..HIDE,
-						width = 'double',
-						type = 'toggle',
-						get = function() return self.db.char.Style.Crit[TinyXStats.PlayerRole] end,
-						set = function(info, value)
-							if(value) then
-								self.db.char.Style.Crit[TinyXStats.PlayerRole] = true
-							else
-								self.db.char.Style.Crit[TinyXStats.PlayerRole] = false
-							end
-							self:Stats()
-						end,
-						disabled = function() return InCombatLockdown() end,
-						order = 5
-					},
-					critcolor = {
-						hidden = function() return not self.defaults.char.Style.Crit[TinyXStats.PlayerRole] end,
-						name = "",
-						desc = "",
-						width = 'half',
-						type = 'color',
-						get = function()
-							local c = self.db.char.Color.crit
-							return c.r, c.g, c.b
-						end,
-						set = function(info, r, g, b)
-							local c = self.db.char.Color.crit
-							c.r, c.g, c.b = r, g, b
-							self:SetStringColors()
-							self:Stats()
-						end,
-						order = 6,
-					},
 					haste = {
 						hidden = function() return not self.defaults.char.Style.Haste[TinyXStats.PlayerRole] end,
 						name = SPELL_HASTE,
@@ -202,7 +166,7 @@ function TinyXStats:Options()
 							self:Stats()
 						end,
 						disabled = function() return InCombatLockdown() end,
-						order = 7
+						order = 5
 					},
 					hastecolor = {
 						hidden = function() return not self.defaults.char.Style.Haste[TinyXStats.PlayerRole] end,
@@ -220,7 +184,7 @@ function TinyXStats:Options()
 							self:SetStringColors()
 							self:Stats()
 						end,
-						order = 8,
+						order = 6,
 					},
 					speed = {
 						hidden = function() return not self.defaults.char.Style.Speed[TinyXStats.PlayerRole] end,
@@ -238,7 +202,7 @@ function TinyXStats:Options()
 							self:Stats()
 						end,
 						disabled = function() return InCombatLockdown() end,
-						order = 7,
+						order = 5,
 					},
 					speedcolor = {
 						hidden = function() return not self.defaults.char.Style.Speed[TinyXStats.PlayerRole] end,
@@ -256,7 +220,7 @@ function TinyXStats:Options()
 							self:SetStringColors()
 							self:Stats()
 						end,
-						order = 8,
+						order = 6,
 					},
 					hasteperc = {
 						hidden = function() return not self.defaults.char.Style.Haste[TinyXStats.PlayerRole] end,
@@ -275,7 +239,7 @@ function TinyXStats:Options()
 							self:Stats()
 						end,
 						disabled = function() return InCombatLockdown() end,
-						order = 9
+						order = 7
 					},
 					hit = {
 						hidden = function() return not self.defaults.char.Style.Hit[TinyXStats.PlayerRole] end,
@@ -293,7 +257,7 @@ function TinyXStats:Options()
 							self:Stats()
 						end,
 						disabled = function() return InCombatLockdown() end,
-						order = 10
+						order = 8
 					},
 					hitcolor = {
 						hidden = function() return not self.defaults.char.Style.Hit[TinyXStats.PlayerRole] end,
@@ -307,6 +271,42 @@ function TinyXStats:Options()
 						end,
 						set = function(info, r, g, b)
 							local c = self.db.char.Color.hit
+							c.r, c.g, c.b = r, g, b
+							self:SetStringColors()
+							self:Stats()
+						end,
+						order = 9,
+					},
+					crit = {
+						hidden = function() return not self.defaults.char.Style.Crit[TinyXStats.PlayerRole] end,
+						name = SPELL_CRIT_CHANCE,
+						desc = SPELL_CRIT_CHANCE.." "..SHOW.."/"..HIDE,
+						width = 'double',
+						type = 'toggle',
+						get = function() return self.db.char.Style.Crit[TinyXStats.PlayerRole] end,
+						set = function(info, value)
+							if(value) then
+								self.db.char.Style.Crit[TinyXStats.PlayerRole] = true
+							else
+								self.db.char.Style.Crit[TinyXStats.PlayerRole] = false
+							end
+							self:Stats()
+						end,
+						disabled = function() return InCombatLockdown() end,
+						order = 10
+					},
+					critcolor = {
+						hidden = function() return not self.defaults.char.Style.Crit[TinyXStats.PlayerRole] end,
+						name = "",
+						desc = "",
+						width = 'half',
+						type = 'color',
+						get = function()
+							local c = self.db.char.Color.crit
+							return c.r, c.g, c.b
+						end,
+						set = function(info, r, g, b)
+							local c = self.db.char.Color.crit
 							c.r, c.g, c.b = r, g, b
 							self:SetStringColors()
 							self:Stats()
