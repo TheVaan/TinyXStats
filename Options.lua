@@ -668,22 +668,18 @@ function TinyXStats:Options()
 						desc = L["Clears your current records"],
 						type = 'execute',
 						func = function()
-							if IsShiftKeyDown() then
-								TinyXStatsDB = {}
+							local spec = "Spec"
+							if currentBuild  >= 50000 then
+								spec = spec..GetActiveSpecGroup()
 							else
-								local spec = "Spec"
-								if currentBuild  >= 50000 then
-									spec = spec..GetActiveSpecGroup()
-								else
-									spec = spec..GetActiveTalentGroup()
-								end
-								for stat, num in pairs(self.defaults.char[spec]) do
-									--if string.find(stat,"Highest") then
-										self.db.char[spec][stat] = num
-									--end
-								end
-								self:Stats()
+								spec = spec..GetActiveTalentGroup()
 							end
+							for stat, num in pairs(self.defaults.char[spec]) do
+								--if string.find(stat,"Highest") then
+									self.db.char[spec][stat] = num
+								--end
+							end
+							self:Stats()
 						end,
 						disabled = function() return InCombatLockdown() end,
 						order = 32

@@ -477,14 +477,14 @@ else
 	orgSetActiveSpecGroup = _G.SetActiveTalentGroup;
 end
 function SetActiveSpecGroup(...)	
-	SpecChangedPause = GetTime() + 30
-	TinyXStats:ScheduleTimer("Stats", 32)
+	SpecChangedPause = GetTime() + 60
+	TinyXStats:ScheduleTimer("Stats", 62)
 	Debug("Set SpecChangedPause")
 	return orgSetActiveSpecGroup(...)
 end
 function SetActiveTalentGroup(...)	
-	SpecChangedPause = GetTime() + 30
-	TinyXStats:ScheduleTimer("Stats", 32)
+	SpecChangedPause = GetTime() + 60
+	TinyXStats:ScheduleTimer("Stats", 62)
 	Debug("Set SpecChangedPause")
 	return orgSetActiveSpecGroup(...)
 end
