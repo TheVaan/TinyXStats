@@ -1,4 +1,5 @@
 === r19 ===
+
 * update SetActiveTalentGroup -> SetActiveSpecGroup
 * update GetActiveTalentGroup -> GetActiveSpecGroup
 * Haste Division by zero fix
