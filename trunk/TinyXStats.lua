@@ -11,7 +11,6 @@ local AceAddon = LibStub("AceAddon-3.0")
 local media = LibStub:GetLibrary("LibSharedMedia-3.0")
 TinyXStats = AceAddon:NewAddon(AddonName, "AceConsole-3.0", "AceEvent-3.0", "AceTimer-3.0")
 local L = LibStub:GetLibrary("AceLocale-3.0"):GetLocale(AddonName)
-local LGT --= LibStub:GetLibrary("LibGroupTalents-1.0");
 
 local ldb = LibStub:GetLibrary("LibDataBroker-1.1");
 local TSBroker = ldb:NewDataObject(AddonName, {
@@ -23,11 +22,6 @@ local TSBroker = ldb:NewDataObject(AddonName, {
 
 local isInFight = false
 local SpecChangedPause = GetTime()
-local MasteryName = GetSpellInfo(86474)
-local currentBuild = select(4, GetBuildInfo())
-if currentBuild  < 50000 then
-	LGT = LibStub:GetLibrary("LibGroupTalents-1.0");
-end
 
 local backdrop = {
 	bgFile = "Interface\\Tooltips\\UI-Tooltip-Background",
@@ -37,7 +31,7 @@ local backdrop = {
 }
 
 local function Debug(...)
-	if TinyXStats.db.profile.debug then
+	if TinyXStats.db.profile and TinyXStats.db.profile.debug then
 		local text = ""
 		for i = 1, select("#", ...) do
 			if type(select(i, ...)) == "boolean" then
@@ -313,11 +307,11 @@ function TinyXStats:SetTextAnchors()
 		self.strings.apString:SetPoint("TOPLEFT", self.strings.spString, "TOPRIGHT", offsetX, offsetY)
 		self.strings.hasteString:SetPoint("TOPLEFT", self.strings.apString, "TOPRIGHT", offsetX, offsetY)
 		self.strings.hitString:SetPoint("TOPLEFT", self.strings.hasteString, "TOPRIGHT", offsetX, offsetY)
-		self.strings.critString:SetPoint("TOPLEFT", self.strings.hitString, "TOPRIGHT", offsetX, offsetY)
-		self.strings.masteryString:SetPoint("TOPLEFT", self.strings.critString, "TOPRIGHT", offsetX, offsetY)
-		self.strings.spiritString:SetPoint("TOPLEFT", self.strings.masteryString, "TOPRIGHT", offsetX, offsetY)
+		self.strings.spiritString:SetPoint("TOPLEFT", self.strings.hitString, "TOPRIGHT", offsetX, offsetY)
 		self.strings.mp5String:SetPoint("TOPLEFT", self.strings.spiritString, "TOPRIGHT", offsetX, offsetY)
-		self.strings.dcString:SetPoint("TOPLEFT", self.strings.mp5String, "TOPRIGHT", offsetX, offsetY)
+		self.strings.critString:SetPoint("TOPLEFT", self.strings.mp5String, "TOPRIGHT", offsetX, offsetY)
+		self.strings.masteryString:SetPoint("TOPLEFT", self.strings.critString, "TOPRIGHT", offsetX, offsetY)
+		self.strings.dcString:SetPoint("TOPLEFT", self.strings.masteryString, "TOPRIGHT", offsetX, offsetY)
 		self.strings.pcString:SetPoint("TOPLEFT", self.strings.dcString, "TOPRIGHT", offsetX, offsetY)
 		self.strings.bcString:SetPoint("TOPLEFT", self.strings.pcString, "TOPRIGHT", offsetX, offsetY)
 		self.strings.taString:SetPoint("TOPLEFT", self.strings.bcString, "TOPRIGHT", offsetX, offsetY)
@@ -326,11 +320,11 @@ function TinyXStats:SetTextAnchors()
 		self.strings.apRecordString:SetPoint("TOPLEFT", self.strings.spRecordString, "TOPRIGHT", offsetX, offsetY)
 		self.strings.hasteRecordString:SetPoint("TOPLEFT", self.strings.apRecordString, "TOPRIGHT", offsetX, offsetY)
 		self.strings.hitRecordString:SetPoint("TOPLEFT", self.strings.hasteRecordString, "TOPRIGHT", offsetX, offsetY)
-		self.strings.critRecordString:SetPoint("TOPLEFT", self.strings.hitRecordString, "TOPRIGHT", offsetX, offsetY)
-		self.strings.masteryRecordString:SetPoint("TOPLEFT", self.strings.critRecordString, "TOPRIGHT", offsetX, offsetY)
-		self.strings.spiritRecordString:SetPoint("TOPLEFT", self.strings.masteryRecordString, "TOPRIGHT", offsetX, offsetY)
+		self.strings.spiritRecordString:SetPoint("TOPLEFT", self.strings.hitRecordString, "TOPRIGHT", offsetX, offsetY)
 		self.strings.mp5RecordString:SetPoint("TOPLEFT", self.strings.spiritRecordString, "TOPRIGHT", offsetX, offsetY)
-		self.strings.dcRecordString:SetPoint("TOPLEFT", self.strings.mp5RecordString, "TOPRIGHT", offsetX, offsetY)
+		self.strings.critRecordString:SetPoint("TOPLEFT", self.strings.mp5RecordString, "TOPRIGHT", offsetX, offsetY)
+		self.strings.masteryRecordString:SetPoint("TOPLEFT", self.strings.critRecordString, "TOPRIGHT", offsetX, offsetY)
+		self.strings.dcRecordString:SetPoint("TOPLEFT", self.strings.masteryRecordString, "TOPRIGHT", offsetX, offsetY)
 		self.strings.pcRecordString:SetPoint("TOPLEFT", self.strings.dcRecordString, "TOPRIGHT", offsetX, offsetY)
 		self.strings.bcRecordString:SetPoint("TOPLEFT", self.strings.pcRecordString, "TOPRIGHT", offsetX, offsetY)
 		self.strings.taRecordString:SetPoint("TOPLEFT", self.strings.bcRecordString, "TOPRIGHT", offsetX, offsetY)
@@ -339,11 +333,11 @@ function TinyXStats:SetTextAnchors()
 		self.strings.apString:SetPoint("TOPLEFT", self.strings.spString, "BOTTOMLEFT")
 		self.strings.hasteString:SetPoint("TOPLEFT", self.strings.apString, "BOTTOMLEFT")
 		self.strings.hitString:SetPoint("TOPLEFT", self.strings.hasteString, "BOTTOMLEFT")
-		self.strings.critString:SetPoint("TOPLEFT", self.strings.hitString, "BOTTOMLEFT")
-		self.strings.masteryString:SetPoint("TOPLEFT", self.strings.critString, "BOTTOMLEFT")
-		self.strings.spiritString:SetPoint("TOPLEFT", self.strings.masteryString, "BOTTOMLEFT")
+		self.strings.spiritString:SetPoint("TOPLEFT", self.strings.hitString, "BOTTOMLEFT")
 		self.strings.mp5String:SetPoint("TOPLEFT", self.strings.spiritString, "BOTTOMLEFT")
-		self.strings.dcString:SetPoint("TOPLEFT", self.strings.mp5String, "BOTTOMLEFT")
+		self.strings.critString:SetPoint("TOPLEFT", self.strings.mp5String, "BOTTOMLEFT")
+		self.strings.masteryString:SetPoint("TOPLEFT", self.strings.critString, "BOTTOMLEFT")
+		self.strings.dcString:SetPoint("TOPLEFT", self.strings.masteryString, "BOTTOMLEFT")
 		self.strings.pcString:SetPoint("TOPLEFT", self.strings.dcString, "BOTTOMLEFT")
 		self.strings.bcString:SetPoint("TOPLEFT", self.strings.pcString, "BOTTOMLEFT")
 		self.strings.taString:SetPoint("TOPLEFT", self.strings.bcString, "BOTTOMLEFT")
@@ -352,10 +346,10 @@ function TinyXStats:SetTextAnchors()
 		self.strings.apRecordString:SetPoint("TOPLEFT", self.strings.apString, "TOPRIGHT", offsetX, offsetY)
 		self.strings.hasteRecordString:SetPoint("TOPLEFT", self.strings.hasteString, "TOPRIGHT", offsetX, offsetY)
 		self.strings.hitRecordString:SetPoint("TOPLEFT", self.strings.hitString, "TOPRIGHT", offsetX, offsetY)
-		self.strings.critRecordString:SetPoint("TOPLEFT", self.strings.critString, "TOPRIGHT", offsetX, offsetY)
-		self.strings.masteryRecordString:SetPoint("TOPLEFT", self.strings.masteryString, "TOPRIGHT", offsetX, offsetY)
 		self.strings.spiritRecordString:SetPoint("TOPLEFT", self.strings.spiritString, "TOPRIGHT", offsetX, offsetY)
 		self.strings.mp5RecordString:SetPoint("TOPLEFT", self.strings.mp5String, "TOPRIGHT", offsetX, offsetY)
+		self.strings.critRecordString:SetPoint("TOPLEFT", self.strings.critString, "TOPRIGHT", offsetX, offsetY)
+		self.strings.masteryRecordString:SetPoint("TOPLEFT", self.strings.masteryString, "TOPRIGHT", offsetX, offsetY)
 		self.strings.dcRecordString:SetPoint("TOPLEFT", self.strings.dcString, "TOPRIGHT", offsetX, offsetY)
 		self.strings.pcRecordString:SetPoint("TOPLEFT", self.strings.pcString, "TOPRIGHT", offsetX, offsetY)
 		self.strings.bcRecordString:SetPoint("TOPLEFT", self.strings.bcString, "TOPRIGHT", offsetX, offsetY)
@@ -470,19 +464,8 @@ function TinyXStats:LibSharedMedia_Registered()
 	end
 end
 
-local orgSetActiveSpecGroup
-if currentBuild  > 50000 then
-	orgSetActiveSpecGroup = SetActiveSpecGroup;
-else
-	orgSetActiveSpecGroup = _G.SetActiveTalentGroup;
-end
+local orgSetActiveSpecGroup = SetActiveSpecGroup;
 function SetActiveSpecGroup(...)	
-	SpecChangedPause = GetTime() + 60
-	TinyXStats:ScheduleTimer("Stats", 62)
-	Debug("Set SpecChangedPause")
-	return orgSetActiveSpecGroup(...)
-end
-function SetActiveTalentGroup(...)	
 	SpecChangedPause = GetTime() + 60
 	TinyXStats:ScheduleTimer("Stats", 62)
 	Debug("Set SpecChangedPause")
@@ -621,10 +604,11 @@ end
 
 local function GetRangedSpeed(spec)
 	-- If no ranged attack then set to n/a
-	local hasRelic = UnitHasRelicSlot("player");	
-	local rangedTexture = GetInventoryItemTexture("player", 18);
+	--local hasRelic = UnitHasRelicSlot("player");	
+	--local rangedTexture = GetInventoryItemTexture("player", 18);
 	local fastestSpeed = TinyXStats.db.char[spec].FastestRs
-	if ( rangedTexture and not hasRelic ) then
+	--if ( rangedTexture and not hasRelic ) then
+	if IsRangedWeapon() then
 		local speed = UnitRangedDamage("player")
 		if speed > 0.00 then
 			return string.format("%.2f",speed ),fastestSpeed
@@ -666,63 +650,43 @@ end
 function TinyXStats:GetUnitRole()
 	self.class = select(2, UnitClass("player"))
 	local role
-	if currentBuild  >= 50000 then
-		local Talent = GetSpecialization()
-		if Talent then 
-			role = GetSpecializationRole(Talent, false, false);
-		end
-		if not role then
-			if GetAttackPower() > GetSpellDamage() then
-				role = "melee"
-			else
-				role = "caster"
-			end
+	local Talent = GetSpecialization()
+	if Talent then 
+		role = GetSpecializationRole(Talent, false, false);
+	end
+	if not role then
+		if GetAttackPower() > GetSpellDamage() then
+			role = "melee"
 		else
-			if role == "HEALER" then
-				role = "healer"
-			elseif role == "TANK" then
-				role = "tank"
-			elseif role == "DAMAGER" then
-				if self.class == "HUNTER" then
-					role = "hunter"
-				elseif (self.class == "MAGE" or self.class == "WARLOCK" or self.class == "PRIEST") then
-					role = "caster"
-				elseif (self.class == "SHAMAN" and Talent == 1) then
-					role = "caster"
-				elseif (class == "DRUID" and Talent == 1) then
-					role = "caster"
-				else
-					role = "melee"
-				end
-			end
-		end
-		if (not self.PlayerRole or self.PlayerRole ~= role) then
-			self.PlayerRole = role
-			if GetMasteryEffect() then
-				self.Mastery = GetMasteryEffect()
-			end
-			self:Stats()
+			role = "caster"
 		end
 	else
-		if self.class == "HUNTER" then
-			role = "hunter"
-		else
-			role = LGT:GetUnitRole("player",true)
-		end
-		if not role then
-			if GetAttackPower() > GetSpellDamage() then
-				role = "melee"
-			else
+		if role == "HEALER" then
+			role = "healer"
+		elseif role == "TANK" then
+			role = "tank"
+		elseif role == "DAMAGER" then
+			if self.class == "HUNTER" then
+				role = "hunter"
+			elseif (self.class == "MAGE" or self.class == "WARLOCK" or self.class == "PRIEST") then
 				role = "caster"
+			elseif (self.class == "SHAMAN" and Talent == 1) then
+				role = "caster"
+			elseif (class == "DRUID" and Talent == 1) then
+				role = "caster"
+			else
+				role = "melee"
 			end
 		end
-		if (not self.PlayerRole or self.PlayerRole ~= role) then
-			self.PlayerRole = role
-			self.Mastery = GetSpellInfo(MasteryName)
-			self:Stats()
-		end
 	end
-	
+	if (not self.PlayerRole or self.PlayerRole ~= role) then
+		self.PlayerRole = role
+		if GetMasteryEffect() then
+			self.Mastery = GetMasteryEffect()
+		end
+		self:Stats()
+	end
+		
 	Debug("you are:", role, self.Mastery)
 	return role
 end
@@ -730,14 +694,8 @@ end
 function TinyXStats:Stats()
 	Debug("Stats()")
 	local style = self.db.char.Style
-	local mastery = string.format("%.2f", GetMastery())
-	local spec = "Spec"
-	if currentBuild >= 50000 then
-		spec = spec..GetActiveSpecGroup()
-		mastery = string.format("%.2f", GetMasteryEffect())
-	else
-		spec = spec..GetActiveTalentGroup()
-	end
+	local mastery = string.format("%.2f", GetMasteryEffect())
+	local spec = "Spec"..GetActiveSpecGroup()
 	local spelldmg = GetSpellDamage()
 	local pow = GetAttackPower()
 	local crit = string.format("%.2f",GetCrit())
@@ -914,6 +872,8 @@ function TinyXStats:Stats()
 	
 	local ldbString = ""
 	local ldbRecord = ""
+	local mp5TempString = " "
+	local mp5RecordTempString = " "
 	
 	if (style.showRecords) then ldbRecord = "|n" end
 	
@@ -1107,72 +1067,6 @@ function TinyXStats:Stats()
 		self.strings.hitString:SetText("")
 		self.strings.hitRecordString:SetText("")
 	end
-	if (style.Crit[self.PlayerRole]) then
-		local critTempString = " "
-		local critRecordTempString = " "
-		ldbString = ldbString..HexColor("crit")
-		if (style.labels) then
-			critTempString = critTempString..L["Crit:"]
-			ldbString = ldbString..L["Crit:"]
-		end
-		critTempString = critTempString..crit.."%"
-		ldbString = ldbString..crit.."% "
-		if (style.showRecords) then
-			ldbRecord = ldbRecord..HexColor("crit")
-			if (style.vertical) then
-				if (style.labels) then
-					ldbRecord = ldbRecord..L["Crit:"]
-				end
-				critRecordTempString = critRecordTempString.."("..self.db.char[spec].HighestCrit.."%)"
-				ldbRecord = ldbRecord..self.db.char[spec].HighestCrit.."% "
-			else
-				if (style.labels) then
-					critRecordTempString = critRecordTempString..L["Crit:"]
-					ldbRecord = ldbRecord..L["Crit:"]
-				end
-				critRecordTempString = critRecordTempString..self.db.char[spec].HighestCrit.."%"
-				ldbRecord = ldbRecord..self.db.char[spec].HighestCrit.."% "
-			end
-		end
-		self.strings.critString:SetText(critTempString)
-		self.strings.critRecordString:SetText(critRecordTempString)
-	else
-		self.strings.critString:SetText("")
-		self.strings.critRecordString:SetText("")
-	end
-	if (style.Mastery[self.PlayerRole] and self.Mastery) then
-		local masteryTempString = " "
-		local masteryRecordTempString = " "
-		ldbString = ldbString..HexColor("mastery")
-		if (style.labels) then
-			masteryTempString = masteryTempString..L["Mas:"]
-			ldbString = ldbString..L["Mas:"]
-		end
-		masteryTempString = masteryTempString..mastery.."%"
-		ldbString = ldbString..mastery.."% "
-		if (style.showRecords) then
-			ldbRecord = ldbRecord..HexColor("mastery")
-			if (style.vertical) then
-				if (style.labels) then
-					ldbRecord = ldbRecord..L["Mas:"]
-				end
-				masteryRecordTempString = masteryRecordTempString.."("..self.db.char[spec].HighestMastery.."%)"
-				ldbRecord = ldbRecord..self.db.char[spec].HighestMastery.."% "
-			else
-				if (style.labels) then
-					masteryRecordTempString = masteryRecordTempString..L["Mas:"]
-					ldbRecord = ldbRecord..L["Mas:"]
-				end
-				masteryRecordTempString = masteryRecordTempString..self.db.char[spec].HighestMastery.."%"
-				ldbRecord = ldbRecord..self.db.char[spec].HighestMastery.."% "
-			end
-		end
-		self.strings.masteryString:SetText(masteryTempString)
-		self.strings.masteryRecordString:SetText(masteryRecordTempString)
-	else
-		self.strings.masteryString:SetText("")
-		self.strings.masteryRecordString:SetText("")
-	end
 	if (style.Spirit[self.PlayerRole]) then
 		local spiritTempString = " "
 		local spiritRecordTempString = " "
@@ -1206,10 +1100,6 @@ function TinyXStats:Stats()
 		self.strings.spiritString:SetText("")
 		self.strings.spiritRecordString:SetText("")
 	end
-		
-	local mp5TempString = " "
-	local mp5RecordTempString = " "
-	
 	if (style.MP5[self.PlayerRole]) then
 		ldbString = ldbString..HexColor("mp5")
 		if (style.labels) then
@@ -1343,6 +1233,72 @@ function TinyXStats:Stats()
 		not style.Fr[self.PlayerRole]) then
 			self.strings.mp5String:SetText("")
 			self.strings.mp5RecordString:SetText("")
+	end
+	if (style.Crit[self.PlayerRole]) then
+		local critTempString = " "
+		local critRecordTempString = " "
+		ldbString = ldbString..HexColor("crit")
+		if (style.labels) then
+			critTempString = critTempString..L["Crit:"]
+			ldbString = ldbString..L["Crit:"]
+		end
+		critTempString = critTempString..crit.."%"
+		ldbString = ldbString..crit.."% "
+		if (style.showRecords) then
+			ldbRecord = ldbRecord..HexColor("crit")
+			if (style.vertical) then
+				if (style.labels) then
+					ldbRecord = ldbRecord..L["Crit:"]
+				end
+				critRecordTempString = critRecordTempString.."("..self.db.char[spec].HighestCrit.."%)"
+				ldbRecord = ldbRecord..self.db.char[spec].HighestCrit.."% "
+			else
+				if (style.labels) then
+					critRecordTempString = critRecordTempString..L["Crit:"]
+					ldbRecord = ldbRecord..L["Crit:"]
+				end
+				critRecordTempString = critRecordTempString..self.db.char[spec].HighestCrit.."%"
+				ldbRecord = ldbRecord..self.db.char[spec].HighestCrit.."% "
+			end
+		end
+		self.strings.critString:SetText(critTempString)
+		self.strings.critRecordString:SetText(critRecordTempString)
+	else
+		self.strings.critString:SetText("")
+		self.strings.critRecordString:SetText("")
+	end
+	if (style.Mastery[self.PlayerRole] and self.Mastery) then
+		local masteryTempString = " "
+		local masteryRecordTempString = " "
+		ldbString = ldbString..HexColor("mastery")
+		if (style.labels) then
+			masteryTempString = masteryTempString..L["Mas:"]
+			ldbString = ldbString..L["Mas:"]
+		end
+		masteryTempString = masteryTempString..mastery.."%"
+		ldbString = ldbString..mastery.."% "
+		if (style.showRecords) then
+			ldbRecord = ldbRecord..HexColor("mastery")
+			if (style.vertical) then
+				if (style.labels) then
+					ldbRecord = ldbRecord..L["Mas:"]
+				end
+				masteryRecordTempString = masteryRecordTempString.."("..self.db.char[spec].HighestMastery.."%)"
+				ldbRecord = ldbRecord..self.db.char[spec].HighestMastery.."% "
+			else
+				if (style.labels) then
+					masteryRecordTempString = masteryRecordTempString..L["Mas:"]
+					ldbRecord = ldbRecord..L["Mas:"]
+				end
+				masteryRecordTempString = masteryRecordTempString..self.db.char[spec].HighestMastery.."%"
+				ldbRecord = ldbRecord..self.db.char[spec].HighestMastery.."% "
+			end
+		end
+		self.strings.masteryString:SetText(masteryTempString)
+		self.strings.masteryRecordString:SetText(masteryRecordTempString)
+	else
+		self.strings.masteryString:SetText("")
+		self.strings.masteryRecordString:SetText("")
 	end
 	if (style.DC[self.PlayerRole]) then
 		local dcTempString = " "
