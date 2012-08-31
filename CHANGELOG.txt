@@ -1,3 +1,12 @@
+=== r24 ===
+
+* toc 50001
+* LibTalentQuery-1.0 and LibGroupTalents-1.0 removed
+* del old codes from 4.3.4
+* fix Bug "index field "profile" (a nil value)"
+* fix RangedSpeed for Hunters
+* sorted Stats to match the CharacterStatsPane
+
 === r19 ===
 
 * update SetActiveTalentGroup -> SetActiveSpecGroup
