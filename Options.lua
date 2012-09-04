@@ -21,6 +21,10 @@ TinyXStats.RoleLocale = {
 	tank = PLAYERSTAT_DEFENSES
 }
 
+local function GetMastery()
+	return (UnitLevel("player") >= SHOW_MASTERY_LEVEL)
+end
+
 function TinyXStats:Options()
 	
 	local options = {
@@ -107,7 +111,6 @@ function TinyXStats:Options()
 						set = function(info, r, g, b)
 							local c = self.db.char.Color.sp
 							c.r, c.g, c.b = r, g, b
-							self:SetStringColors()
 							self:Stats()
 						end,
 						order = 4,
@@ -143,7 +146,6 @@ function TinyXStats:Options()
 						set = function(info, r, g, b)
 							local c = self.db.char.Color.ap
 							c.r, c.g, c.b = r, g, b
-							self:SetStringColors()
 							self:Stats()
 						end,
 						order = 4,
@@ -180,7 +182,6 @@ function TinyXStats:Options()
 						set = function(info, r, g, b)
 							local c = self.db.char.Color.haste
 							c.r, c.g, c.b = r, g, b
-							self:SetStringColors()
 							self:Stats()
 						end,
 						order = 6,
@@ -216,7 +217,6 @@ function TinyXStats:Options()
 						set = function(info, r, g, b)
 							local c = self.db.char.Color.haste
 							c.r, c.g, c.b = r, g, b
-							self:SetStringColors()
 							self:Stats()
 						end,
 						order = 6,
@@ -271,7 +271,6 @@ function TinyXStats:Options()
 						set = function(info, r, g, b)
 							local c = self.db.char.Color.hit
 							c.r, c.g, c.b = r, g, b
-							self:SetStringColors()
 							self:Stats()
 						end,
 						order = 9,
@@ -307,7 +306,6 @@ function TinyXStats:Options()
 						set = function(info, r, g, b)
 							local c = self.db.char.Color.spirit
 							c.r, c.g, c.b = r, g, b
-							self:SetStringColors()
 							self:Stats()
 						end,
 						order = 11,
@@ -344,7 +342,6 @@ function TinyXStats:Options()
 						set = function(info, r, g, b)
 							local c = self.db.char.Color.mp5
 							c.r, c.g, c.b = r, g, b
-							self:SetStringColors()
 							self:Stats()
 						end,
 						order = 13,
@@ -455,13 +452,12 @@ function TinyXStats:Options()
 						set = function(info, r, g, b)
 							local c = self.db.char.Color.crit
 							c.r, c.g, c.b = r, g, b
-							self:SetStringColors()
 							self:Stats()
 						end,
 						order = 17,
 					},
 					mastery = {
-						hidden = function() return not (self.defaults.char.Style.Mastery[TinyXStats.PlayerRole] and self.Mastery) end,
+						hidden = function() return not (self.defaults.char.Style.Mastery[TinyXStats.PlayerRole] and GetMastery()) end,
 						name = STAT_MASTERY,
 						desc = STAT_MASTERY.." "..SHOW.."/"..HIDE,
 						width = 'double',
@@ -479,7 +475,7 @@ function TinyXStats:Options()
 						order = 18
 					},
 					masterycolor = {
-						hidden = function() return not (self.defaults.char.Style.Mastery[TinyXStats.PlayerRole] and self.Mastery) end,
+						hidden = function() return not (self.defaults.char.Style.Mastery[TinyXStats.PlayerRole] and GetMastery()) end,
 						name = "",
 						desc = "",
 						width = 'half',
@@ -491,7 +487,6 @@ function TinyXStats:Options()
 						set = function(info, r, g, b)
 							local c = self.db.char.Color.mastery
 							c.r, c.g, c.b = r, g, b
-							self:SetStringColors()
 							self:Stats()
 						end,
 						order = 19,
@@ -563,7 +558,6 @@ function TinyXStats:Options()
 						set = function(info, r, g, b)
 							local c = self.db.char.Color.pc
 							c.r, c.g, c.b = r, g, b
-							self:SetStringColors()
 							self:Stats()
 						end,
 						order = 23,
@@ -599,7 +593,6 @@ function TinyXStats:Options()
 						set = function(info, r, g, b)
 							local c = self.db.char.Color.bc
 							c.r, c.g, c.b = r, g, b
-							self:SetStringColors()
 							self:Stats()
 						end,
 						order = 25,
@@ -669,9 +662,7 @@ function TinyXStats:Options()
 						func = function()
 							local spec = "Spec"..GetActiveSpecGroup()
 							for stat, num in pairs(self.defaults.char[spec]) do
-								--if string.find(stat,"Highest") then
-									self.db.char[spec][stat] = num
-								--end
+								self.db.char[spec][stat] = num
 							end
 							self:Stats()
 						end,
@@ -688,7 +679,6 @@ function TinyXStats:Options()
 								self.db.char.Color[stat].g = c.g
 								self.db.char.Color[stat].b = c.b 								
 							end
-							self:SetStringColors()
 							self:Stats()
 						end,
 						disabled = function() return InCombatLockdown() end,
@@ -798,7 +788,6 @@ function TinyXStats:Options()
 								self.db.char.Style.vertical = false
 							end
 							self:Stats()
-							self:SetTextAnchors()
 						end,
 						disabled = function() return InCombatLockdown() or self.db.char.FrameHide end,
 						order = 6
