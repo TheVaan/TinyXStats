@@ -1,3 +1,11 @@
+=== r26 ===
+
+* Mastery Stat dependent from SHOW_MASTERY_LEVEL
+* Fix range definition when not Specialization set (lvl < 10)
+* New Write Record MSG Code
+* New Write String System (Switch to one String)
+* result: reduced from 1441 lines to 855 lines
+
 === r24 ===
 
 * toc 50001
