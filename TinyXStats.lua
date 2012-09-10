@@ -608,7 +608,7 @@ function TinyXStats:GetUnitRole()
 				role = "caster"
 			elseif (self.class == "SHAMAN" and Talent == 1) then
 				role = "caster"
-			elseif (class == "DRUID" and Talent == 1) then
+			elseif (self.class == "DRUID" and Talent == 1) then
 				role = "caster"
 			else
 				role = "melee"
