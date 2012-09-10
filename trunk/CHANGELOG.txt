@@ -1,3 +1,7 @@
+=== r27 ===
+
+* fix Druid Role bug (class -> self.class)
+
 === r26 ===
 
 * Mastery Stat dependent from SHOW_MASTERY_LEVEL
