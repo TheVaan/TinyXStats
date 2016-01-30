@@ -13,11 +13,11 @@ debug = true
 
 local AddonName = "TinyXStats"
 local AceAddon = LibStub("AceAddon-3.0")
-local media = LibStub:GetLibrary("LibSharedMedia-3.0")
+local media = LibStub("LibSharedMedia-3.0")
 TinyXStats = AceAddon:NewAddon(AddonName, "AceConsole-3.0", "AceEvent-3.0", "AceTimer-3.0")
-local L = LibStub:GetLibrary("AceLocale-3.0"):GetLocale(AddonName)
+local L = LibStub("AceLocale-3.0"):GetLocale(AddonName)
 
-local ldb = LibStub:GetLibrary("LibDataBroker-1.1");
+local ldb = LibStub("LibDataBroker-1.1");
 local TSBroker = ldb:NewDataObject(AddonName, {
 	type = "data source",
 	label = AddonName,
