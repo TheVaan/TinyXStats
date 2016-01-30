@@ -1,7 +1,11 @@
+-- TinyXStats @project-version@ by @project-author@
+-- Project revision: @project-revision@
 --
--- File version: @file-revision@
--- Project: @project-revision@
---
+-- Options.lua:
+-- File revision: @file-revision@
+-- Last modified: @file-date-iso@
+-- Author: @file-author@
+
 if not TinyXStats then return end
 
 local AddonName = "TinyXStats"
@@ -26,7 +30,7 @@ local function GetMastery()
 end
 
 function TinyXStats:Options()
-	
+
 	local options = {
 		name = AddonName.." "..GetAddOnMetadata(AddonName,"Version"),
 	    handler = TinyXStats,
@@ -36,14 +40,9 @@ function TinyXStats:Options()
 				name = L["Reset position"],
 				desc = L["Resets the frame's position"],
 				type = "execute",
-				func = function() 
-						if IsShiftKeyDown() then
-							self.db.profile.debug = not self.db.profile.debug
-							print(AddonName,"- Debug:",self.db.profile.debug)
-						else
-							self.db.char.FrameHide = false
-							self.frame:ClearAllPoints() self.frame:SetPoint("CENTER", UIParent, "CENTER")
-						end
+				func = function()
+						self.db.char.FrameHide = false
+						self.frame:ClearAllPoints() self.frame:SetPoint("CENTER", UIParent, "CENTER")
 					end,
 				disabled = function() return InCombatLockdown() end,
 				order = 1
@@ -122,7 +121,7 @@ function TinyXStats:Options()
 						width = 'double',
 						type = 'toggle',
 						get = function() return self.db.char.Style.AP[TinyXStats.PlayerRole] end,
-						set = function(info, value)				
+						set = function(info, value)
 							if(value) then
 								self.db.char.Style.AP[TinyXStats.PlayerRole] = true
 							else
@@ -193,7 +192,7 @@ function TinyXStats:Options()
 						width = 'double',
 						type = 'toggle',
 						get = function() return self.db.char.Style.Speed[TinyXStats.PlayerRole] end,
-						set = function(info, value)				
+						set = function(info, value)
 							if(value) then
 								self.db.char.Style.Speed[TinyXStats.PlayerRole] = true
 							else
@@ -240,41 +239,6 @@ function TinyXStats:Options()
 						disabled = function() return InCombatLockdown() end,
 						order = 7
 					},
-					hit = {
-						hidden = function() return not self.defaults.char.Style.Hit[TinyXStats.PlayerRole] end,
-						name = STAT_HIT_CHANCE,
-						desc = STAT_HIT_CHANCE.." "..SHOW.."/"..HIDE,
-						width = 'double',
-						type = 'toggle',
-						get = function() return self.db.char.Style.Hit[TinyXStats.PlayerRole] end,
-						set = function(info, value)
-							if(value) then
-								self.db.char.Style.Hit[TinyXStats.PlayerRole] = true
-							else
-								self.db.char.Style.Hit[TinyXStats.PlayerRole] = false
-							end
-							self:Stats()
-						end,
-						disabled = function() return InCombatLockdown() end,
-						order = 8
-					},
-					hitcolor = {
-						hidden = function() return not self.defaults.char.Style.Hit[TinyXStats.PlayerRole] end,
-						name = "",
-						desc = "",
-						width = 'half',
-						type = 'color',
-						get = function()
-							local c = self.db.char.Color.hit
-							return c.r, c.g, c.b
-						end,
-						set = function(info, r, g, b)
-							local c = self.db.char.Color.hit
-							c.r, c.g, c.b = r, g, b
-							self:Stats()
-						end,
-						order = 9,
-					},
 					spirit = {
 						hidden = function() return not self.defaults.char.Style.Spirit[TinyXStats.PlayerRole] end,
 						name = ITEM_MOD_SPIRIT_SHORT,
@@ -291,7 +255,7 @@ function TinyXStats:Options()
 							self:Stats()
 						end,
 						disabled = function() return InCombatLockdown() end,
-						order = 10
+						order = 8
 					},
 					spiritcolor = {
 						hidden = function() return not self.defaults.char.Style.Spirit[TinyXStats.PlayerRole] end,
@@ -308,7 +272,7 @@ function TinyXStats:Options()
 							c.r, c.g, c.b = r, g, b
 							self:Stats()
 						end,
-						order = 11,
+						order = 9,
 					},
 					mp5 = {
 						hidden = function() return not self.defaults.char.Style.Spirit[TinyXStats.PlayerRole] end,
@@ -327,7 +291,7 @@ function TinyXStats:Options()
 							self:Stats()
 						end,
 						disabled = function() return InCombatLockdown() end,
-						order = 12
+						order = 10
 					},
 					mp5color = {
 						hidden = function() return not self.defaults.char.Style.Spirit[TinyXStats.PlayerRole] end,
@@ -344,7 +308,7 @@ function TinyXStats:Options()
 							c.r, c.g, c.b = r, g, b
 							self:Stats()
 						end,
-						order = 13,
+						order = 11,
 					},
 					mp5ic = {
 						hidden = function() return not self.defaults.char.Style.Spirit[TinyXStats.PlayerRole] end,
@@ -363,7 +327,7 @@ function TinyXStats:Options()
 							self:Stats()
 						end,
 						disabled = function() return InCombatLockdown() end,
-						order = 14
+						order = 12
 					},
 					mp5auto = {
 						hidden = function() return not self.defaults.char.Style.Spirit[TinyXStats.PlayerRole] end,
@@ -383,7 +347,7 @@ function TinyXStats:Options()
 							self:Stats()
 						end,
 						disabled = function() return InCombatLockdown() end,
-						order = 15
+						order = 13
 					},
 					fr = {
 						hidden = function() return not self.defaults.char.Style.Fr[TinyXStats.PlayerRole] end,
@@ -392,7 +356,7 @@ function TinyXStats:Options()
 						width = 'double',
 						type = 'toggle',
 						get = function() return self.db.char.Style.Fr[TinyXStats.PlayerRole] end,
-						set = function(info, value)				
+						set = function(info, value)
 							if(value) then
 								self.db.char.Style.Fr[TinyXStats.PlayerRole] = true
 							else
@@ -401,7 +365,7 @@ function TinyXStats:Options()
 							self:Stats()
 						end,
 						disabled = function() return InCombatLockdown() end,
-						order = 12,
+						order = 14,
 					},
 					frcolor = {
 						hidden = function() return not self.defaults.char.Style.Fr[TinyXStats.PlayerRole] end,
@@ -419,12 +383,12 @@ function TinyXStats:Options()
 							self:SetStringColors()
 							self:Stats()
 						end,
-						order = 13,
+						order = 15
 					},
 					crit = {
 						hidden = function() return not self.defaults.char.Style.Crit[TinyXStats.PlayerRole] end,
-						name = SPELL_CRIT_CHANCE,
-						desc = SPELL_CRIT_CHANCE.." "..SHOW.."/"..HIDE,
+						name = CRIT_CHANCE,
+						desc = CRIT_CHANCE.." "..SHOW.."/"..HIDE,
 						width = 'double',
 						type = 'toggle',
 						get = function() return self.db.char.Style.Crit[TinyXStats.PlayerRole] end,
@@ -454,7 +418,7 @@ function TinyXStats:Options()
 							c.r, c.g, c.b = r, g, b
 							self:Stats()
 						end,
-						order = 17,
+						order = 17
 					},
 					mastery = {
 						hidden = function() return not (self.defaults.char.Style.Mastery[TinyXStats.PlayerRole] and GetMastery()) end,
@@ -489,7 +453,41 @@ function TinyXStats:Options()
 							c.r, c.g, c.b = r, g, b
 							self:Stats()
 						end,
-						order = 19,
+						order = 19
+					},
+					multistrike = {
+						name = STAT_MULTISTRIKE,
+						desc = STAT_MULTISTRIKE.." "..show.."/"..hide,
+						width = 'double',
+						type = 'toggle',
+						get = function() return self.db.char.Style.Multistrike end,
+						set = function(info, value)
+							if(value) then
+								self.db.char.Style.Multistrike = true
+							else
+								self.db.char.Style.Multistrike = false
+							end
+							self:Stats()
+						end,
+						disabled = function() return InCombatLockdown() end,
+						order = 20
+					},
+					multistrikecolor = {
+						name = "",
+						desc = "",
+						width = 'half',
+						type = 'color',
+						get = function()
+							local c = self.db.char.Color.multistrike
+							return c.r, c.g, c.b
+						end,
+						set = function(info, r, g, b)
+							local c = self.db.char.Color.multistrike
+							c.r, c.g, c.b = r, g, b
+							self:SetStringColors()
+							self:Stats()
+						end,
+						order = 21
 					},
 					DC = {
 						hidden = function() return not self.defaults.char.Style.DC[TinyXStats.PlayerRole] end,
@@ -507,7 +505,7 @@ function TinyXStats:Options()
 							self:Stats()
 						end,
 						disabled = function() return InCombatLockdown() end,
-						order = 20
+						order = 22
 					},
 					dccolor = {
 						hidden = function() return not self.defaults.char.Style.DC[TinyXStats.PlayerRole] end,
@@ -525,7 +523,7 @@ function TinyXStats:Options()
 							self:SetStringColors()
 							self:Stats()
 						end,
-						order = 21,
+						order = 23
 					},
 					PC = {
 						hidden = function() return TinyXStats:HideTankStat("PC") end,
@@ -543,7 +541,7 @@ function TinyXStats:Options()
 							self:Stats()
 						end,
 						disabled = function() return InCombatLockdown() end,
-						order = 22
+						order = 24
 					},
 					pccolor = {
 						hidden = function() return TinyXStats:HideTankStat("PC") end,
@@ -560,7 +558,7 @@ function TinyXStats:Options()
 							c.r, c.g, c.b = r, g, b
 							self:Stats()
 						end,
-						order = 23,
+						order = 25
 					},
 					BC = {
 						hidden = function() return TinyXStats:HideTankStat("BC") end,
@@ -578,7 +576,7 @@ function TinyXStats:Options()
 							self:Stats()
 						end,
 						disabled = function() return InCombatLockdown() end,
-						order = 24
+						order = 26
 					},
 					bccolor = {
 						hidden = function() return TinyXStats:HideTankStat("BC") end,
@@ -595,7 +593,7 @@ function TinyXStats:Options()
 							c.r, c.g, c.b = r, g, b
 							self:Stats()
 						end,
-						order = 25,
+						order = 27
 					},
 					TA = {
 						hidden = function() return not self.defaults.char.Style.TA[TinyXStats.PlayerRole] end,
@@ -613,7 +611,7 @@ function TinyXStats:Options()
 							self:Stats()
 						end,
 						disabled = function() return InCombatLockdown() end,
-						order = 25
+						order = 28
 					},
 					tacolor = {
 						hidden = function() return not self.defaults.char.Style.TA[TinyXStats.PlayerRole] end,
@@ -631,7 +629,7 @@ function TinyXStats:Options()
 							self:SetStringColors()
 							self:Stats()
 						end,
-						order = 26,
+						order = 29
 					},
 					header1 = {
 						name = "",
@@ -675,14 +673,14 @@ function TinyXStats:Options()
 						type = 'execute',
 						func = function()
 							for stat, c in pairs(self.defaults.char.Color) do
-								self.db.char.Color[stat].r = c.r 
+								self.db.char.Color[stat].r = c.r
 								self.db.char.Color[stat].g = c.g
-								self.db.char.Color[stat].b = c.b 								
+								self.db.char.Color[stat].b = c.b
 							end
 							self:Stats()
 						end,
 						disabled = function() return InCombatLockdown() end,
-						order = 33,
+						order = 33
 					}
 				}
 			},
@@ -897,6 +895,6 @@ function TinyXStats:Options()
 			},
 		}
 	}
-	
+
 	return options
 end
