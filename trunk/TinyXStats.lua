@@ -1,11 +1,16 @@
---   ----------------------------------------
---  |    TinyXStats by TheVaan and Marhu_    |
---  | based on TMS and TCS - for all classes |
---   ----------------------------------------
+-- TinyXStats @project-version@ by @project-author@
+-- Project revision: @project-revision@
 --
--- File version: @file-revision@
--- Project: @project-revision@
---
+-- TinyCasterStats.lua:
+-- File revision: @file-revision@
+-- Last modified: @file-date-iso@
+-- Author: @file-author@
+
+local debug = false
+--@debug@
+debug = true
+--@end-debug@
+
 local AddonName = "TinyXStats"
 local AceAddon = LibStub("AceAddon-3.0")
 local media = LibStub:GetLibrary("LibSharedMedia-3.0")
@@ -31,7 +36,7 @@ local backdrop = {
 }
 
 local function Debug(...)
-	if TinyXStats.db.profile and TinyXStats.db.profile.debug then
+	if debug then
 		local text = ""
 		for i = 1, select("#", ...) do
 			if type(select(i, ...)) == "boolean" then
@@ -42,7 +47,7 @@ local function Debug(...)
 		end
 		DEFAULT_CHAT_FRAME:AddMessage("|cFFCCCC99"..AddonName..": |r"..text)
 	end
-end	
+end
 
 TinyXStats.fonts = {}
 
@@ -68,12 +73,12 @@ TinyXStats.defaults = {
 			FastestMh = 500,
 			FastestOh = 500,
 			FastestRs = 500,
-			HighestHit = "0.00",
 			HighestMP5if = 0,
 			HighestMP5 = 0,
 			HighestSpirit = 0,
 			HighestFr = "0.00",
 			HighestMastery = "0.00",
+			HighestMultistrike = "0.00",
 			HighestDC = "0.00",
 			HighestPC = "0.00",
 			HighestBC = "0.00",
@@ -88,12 +93,12 @@ TinyXStats.defaults = {
 			FastestMh = 500,
 			FastestOh = 500,
 			FastestRs = 500,
-			HighestHit = "0.00",
 			HighestMP5if = 0,
 			HighestMP5 = 0,
 			HighestSpirit = 0,
 			HighestFr = "0.00",
 			HighestMastery = "0.00",
+			HighestMultistrike = "0.00",
 			HighestDC = "0.00",
 			HighestPC = "0.00",
 			HighestBC = "0.00",
@@ -126,12 +131,6 @@ TinyXStats.defaults = {
 				hunter = true,
 				tank = true
 			},
-			Hit = {
-				caster = true,
-				melee = true,
-				hunter = true,
-				tank = true
-			},
 			Mastery = {
 				healer = true,
 				caster = true,
@@ -139,6 +138,13 @@ TinyXStats.defaults = {
 				hunter = true,
 				tank = true
 			},
+			Multistrike = {
+				healer = true,
+				caster = true,
+				melee = true,
+				hunter = true,
+				tank = true
+			}
 			Spirit = {
 				healer = true,
 				caster = true
@@ -182,11 +188,6 @@ TinyXStats.defaults = {
 				g = 0,
 				b = 0.6549019607843137
 			},
-			hit = {
-				r = 0.07058823529411765,
-				g = 0.7686274509803921,
-				b = 0
-			},
 			haste = {
 				r = 0,
 				g = 0.611764705882353,
@@ -206,6 +207,11 @@ TinyXStats.defaults = {
 				r = 1.0,
 				g = 1.0,
 				b = 1.0
+			},
+			multistrike = {
+				r = 0.9,
+				g = 0.0,
+				b = 0.0
 			},
 			fr = {
 				r = 0.9,
@@ -252,7 +258,7 @@ function TinyXStats:SetDragScript()
 		self.frame:SetScript("OnDragStart", function() DEFAULT_CHAT_FRAME:AddMessage(fixed) end)
 		self.frame:SetScript("OnEnter", nil)
 		self.frame:SetScript("OnLeave", nil)
-	else				
+	else
 		self.frame:SetMovable(true)
 		self.frame:SetScript("OnDragStart", function() self.frame:StartMoving() end)
 		self.frame:SetScript("OnDragStop", function() self.frame:StopMovingOrSizing() self.db.char.xPosition = self.frame:GetLeft() self.db.char.yPosition = self.frame:GetBottom() end)
@@ -268,7 +274,7 @@ function TinyXStats:SetFrameVisible()
 	else
 		self.frame:SetPoint("BOTTOMLEFT", UIParent, "BOTTOMLEFT", self.db.char.xPosition, self.db.char.yPosition)
 	end
-	
+
 end
 
 function TinyXStats:SetBroker()
@@ -278,7 +284,7 @@ function TinyXStats:SetBroker()
 	else
 		TSBroker.label = AddonName
 	end
-		
+
 end
 
 function TinyXStats:InitializeFrame()
@@ -291,7 +297,7 @@ function TinyXStats:InitializeFrame()
 	end
 	self.string:SetJustifyH("LEFT")
 	self.string:SetJustifyV("MIDDLE")
-	
+
 	self:SetDragScript()
 	self:SetFrameVisible()
 	self:SetBroker()
@@ -310,14 +316,14 @@ function TinyXStats:OnInitialize()
 	self:RegisterChatCommand(AddonName, function() AceConfigDialog:Open(AddonName) end)
 	self.optionsFrame = AceConfigDialog:AddToBlizOptions(AddonName, AddonName)
 	self.db:RegisterDefaults(self.defaults)
-	
+
 	local version = GetAddOnMetadata(AddonName,"Version")
 	local loaded = L["Open the configuration menu with /txs or /TinyXStats"].."|r"
 	DEFAULT_CHAT_FRAME:AddMessage("|cffffd700"..AddonName.." |cff00ff00~v"..version.."~|cffffd700: "..loaded)
-	
+
 	TSBroker.OnClick = function(frame, button)	AceConfigDialog:Open(AddonName)	end
 	TSBroker.OnTooltipShow = function(tt) tt:AddLine(AddonName) end
-	
+
 end
 
 function TinyXStats:OnEnable()
@@ -341,21 +347,21 @@ function TinyXStats:LibSharedMedia_Registered()
 	media:Register("sound", "Fanfare1", [[Interface\Addons\TinyXStats\Sound\Fanfare.ogg]])
 	media:Register("sound", "Fanfare2", [[Interface\Addons\TinyXStats\Sound\Fanfare2.ogg]])
 	media:Register("sound", "Fanfare3", [[Interface\Addons\TinyXStats\Sound\Fanfare3.ogg]])
-	
+
 	for k, v in pairs(media:List("font")) do
 		self.fonts[v] = v
 	end
 end
 
 local orgSetActiveSpecGroup = SetActiveSpecGroup;
-function SetActiveSpecGroup(...)	
+function SetActiveSpecGroup(...)
 	SpecChangedPause = GetTime() + 60
 	TinyXStats:ScheduleTimer("Stats", 62)
 	Debug("Set SpecChangedPause")
 	return orgSetActiveSpecGroup(...)
 end
 
-function TinyXStats:OnEvent(event, arg1) 
+function TinyXStats:OnEvent(event, arg1)
 	Debug(event,arg1)
 	if ((event == "PLAYER_TALENT_UPDATE") or (event == "PLAYER_ENTERING_WORLD")) then
 		self:ScheduleTimer("GetUnitRole", 3)
@@ -382,7 +388,7 @@ local function HexColor(stat)
 	local c = TinyXStats.db.char.Color[stat]
 	local hexColor = string.format("|cff%2X%2X%2X", 255*c.r, 255*c.g, 255*c.b)
 	return hexColor
-	
+
 end
 
 local function MsgRecord(name,value)
@@ -490,14 +496,14 @@ local function GetHaste()
 	local CR = GetCombatRating(CR_HASTE_SPELL)
 	local CRB = GetCombatRatingBonus(CR_HASTE_SPELL)
 	local FaktorHastePercent = 0
-	
-	if (CRB and CRB > 0 and CR and CR > 0) then--  Division by zero fix ?	
+
+	if (CRB and CRB > 0 and CR and CR > 0) then--  Division by zero fix ?
 		FaktorHastePercent = CR/CRB
 	end
-	
+
 	local hasteperc = UnitSpellHaste("player")
 	local haste = hasteperc * FaktorHastePercent
-	
+
 	return string.format("%.0f",haste), string.format("%.2f",hasteperc)
 end
 
@@ -523,9 +529,9 @@ local function GetWeaponSpeed(spec)
 			mainSpeed = 500
 			offSpeed = nil
 			fastestSpeed = 500
-		end	
+		end
 		fastestSpeed = TinyXStats.db.char[spec].FastestMh.."s "..TinyXStats.db.char[spec].FastestOh
-	end	
+	end
 	return mainSpeed, offSpeed, speed, fastestSpeed
 end
 
@@ -543,20 +549,7 @@ local function GetRangedSpeed(spec)
 	else
 		return NOT_APPLICABLE, fastestSpeed
 	end
-	
-end
 
-local function GetHit()
-	local CombatRating = 0
-	local HitModifier = 0
-	if TinyXStats.PlayerRole == "healer" or TinyXStats.PlayerRole == "caster" then
-		CombatRating = GetCombatRatingBonus(CR_HIT_SPELL) or 0;
-		HitModifier = GetSpellHitModifier() or 0;
-	else
-		CombatRating = GetCombatRatingBonus(CR_HIT_MELEE) or 0;
-		HitModifier = GetHitModifier() or 0;
-	end
-	return string.format("%.2f", CombatRating + HitModifier);
 end
 
 local function GetDefense()
@@ -585,7 +578,7 @@ function TinyXStats:GetUnitRole()
 	self.class = select(2, UnitClass("player"))
 	local role
 	local Talent = GetSpecialization()
-	if Talent then 
+	if Talent then
 		role = GetSpecializationRole(Talent, false, false);
 	end
 	if not role then
@@ -619,7 +612,7 @@ function TinyXStats:GetUnitRole()
 		self.PlayerRole = role
 		self:Stats()
 	end
-		
+
 	Debug("you are:", role)
 	return role
 end
@@ -628,6 +621,7 @@ function TinyXStats:Stats()
 	Debug("Stats()")
 	local style = self.db.char.Style
 	local mastery = GetMastery()
+	local multistrike = string.format("%.2f", GetMultistrike())
 	local spec = "Spec"..GetActiveSpecGroup()
 	local spelldmg = GetSpellDamage()
 	local pow = GetAttackPower()
@@ -641,7 +635,6 @@ function TinyXStats:Stats()
 			mainSpeed, offSpeed, speed, fastestSpeed = GetWeaponSpeed(spec)
 		end
 	end
-	local hit = GetHit()
 	local s, spirit = UnitStat("player", 5)
 	local base, casting = GetManaRegen()
 	base = floor(base * 5.0)
@@ -651,9 +644,9 @@ function TinyXStats:Stats()
 	if self.PlayerRole == "tank" then
 		TAvoidance,DodgeChance,ParryChance,BlockChance = GetDefense()
 	end
-	
+
 	local recordIsBroken = false
-	
+
 	if SpecChangedPause <= GetTime() then
 		if (style.SP[self.PlayerRole] and tonumber(spelldmg) > tonumber(self.db.char[spec].HighestSpelldmg)) then
 			self.db.char[spec].HighestSpelldmg = spelldmg
@@ -691,10 +684,6 @@ function TinyXStats:Stats()
 				end
 			end
 		end
-		if (style.Hit[self.PlayerRole] and tonumber(hit) > tonumber(self.db.char[spec].HighestHit)) then
-			self.db.char[spec].HighestHit = hit
-			recordIsBroken = MsgRecord(STAT_HIT_CHANCE,hit) or recordIsBroken
-		end
 		if (style.Crit[self.PlayerRole] and tonumber(crit) > tonumber(self.db.char[spec].HighestCrit)) then
 			self.db.char[spec].HighestCrit = crit
 			recordIsBroken = MsgRecord(SPELL_CRIT_CHANCE,crit) or recordIsBroken
@@ -703,9 +692,15 @@ function TinyXStats:Stats()
 			self.db.char[spec].HighestMastery = mastery
 			recordIsBroken = MsgRecord(STAT_MASTERY,mastery) or recordIsBroken
 		end
+
+		if (style.Multistrike[self.PlayerRole] and multistrike) and (tonumber(multistrike) > tonumber(self.db.char[spec].HighestMultistrike))
+			self.db.char[spec].HighestMastery = mastery
+			recordIsBroken = MsgRecord(STAT_MASTERY,mastery) or recordIsBroken
+		end
+
 		if (style.Spirit[self.PlayerRole] and tonumber(spirit) > tonumber(self.db.char[spec].HighestSpirit)) then
-			self.db.char[spec].HighestSpirit = spirit
-			recordIsBroken = MsgRecord(ITEM_MOD_SPIRIT_SHORT,spirit) or recordIsBroken
+			self.db.char[spec].HighestMultistrike = multistrike
+			recordIsBroken = MsgRecord(STAT_MULTISTRIKE,multistrike) or recordIsBroken
 		end
 		if (style.MP5[self.PlayerRole] or style.MP5ic[self.PlayerRole] or style.MP5auto[self.PlayerRole]) then
 			if (tonumber(base) > tonumber(self.db.char[spec].HighestMP5)) then
@@ -740,16 +735,16 @@ function TinyXStats:Stats()
 	else
 		Debug("rekords skipped SpecChangedPause")
 	end
-	
+
 	if ((recordIsBroken == true) and (self.db.char.RecordSound == true)) then
 		PlaySoundFile(media:Fetch("sound", self.db.char.RecordSoundFile),"Master")
 	end
-	
+
 	self.ldbString = ""
 	self.ldbRecord = ""
 	self.CString = ""
 	self.RString = ""
-	
+
 	if (style.SP[self.PlayerRole]) then
 		SetLabel("sp",L["Sp:"])
 		SetWerte(spelldmg,self.db.char[spec].HighestSpelldmg)
@@ -771,11 +766,6 @@ function TinyXStats:Stats()
 	elseif (style.Speed[self.PlayerRole]) then
 		SetLabel("haste",L["Speed:"])
 		SetWerte(speed.."s",fastestSpeed.."s")
-		FormatRString()
-	end
-	if (style.Hit[self.PlayerRole]) then
-		SetLabel("hit",L["Hit:"])
-		SetWerte(hit.."%",self.db.char[spec].HighestHit.."%")
 		FormatRString()
 	end
 	if (style.Spirit[self.PlayerRole]) then
@@ -817,6 +807,11 @@ function TinyXStats:Stats()
 		SetWerte(mastery.."%",self.db.char[spec].HighestMastery.."%")
 		FormatRString()
 	end
+	if (style.Muktistrike[self.PlayerRole] and multistrike) then
+		SetLabel("multistrike",L["MS:"])
+		SetWerte(multistrike.."%",self.db.char[spec].HighestMultistrike.."%")
+		FormatRString()
+	end
 	if (style.DC[self.PlayerRole]) then
 		SetLabel("dc",L["DC:"])
 		SetWerte(DodgeChance.."%",self.db.char[spec].HighestDC.."%")
@@ -837,20 +832,19 @@ function TinyXStats:Stats()
 		SetWerte(TAvoidance.."%",self.db.char[spec].HighestTA.."%")
 		FormatRString()
 	end
-	
+
 	if style.showRecords then
 		if not style.vertical then
 			self.CString = self.CString.."|n"..self.RString
 		end
-		self.ldbString = self.ldbString.."|n"..self.ldbRecord 
+		self.ldbString = self.ldbString.."|n"..self.ldbRecord
 	end
-	
+
 	self.string:SetText(self.CString)
-		
+
 	if (style.LDBtext) then
 		TSBroker.text = self.ldbString.."|r"
 	else
 		TSBroker.text = ""
 	end
 end
-
