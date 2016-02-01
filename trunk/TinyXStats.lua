@@ -144,7 +144,7 @@ TinyXStats.defaults = {
 				melee = true,
 				hunter = true,
 				tank = true
-			}
+			},
 			Spirit = {
 				healer = true,
 				caster = true
@@ -692,15 +692,13 @@ function TinyXStats:Stats()
 			self.db.char[spec].HighestMastery = mastery
 			recordIsBroken = MsgRecord(STAT_MASTERY,mastery) or recordIsBroken
 		end
-
-		if (style.Multistrike[self.PlayerRole] and multistrike) and (tonumber(multistrike) > tonumber(self.db.char[spec].HighestMultistrike))
-			self.db.char[spec].HighestMastery = mastery
-			recordIsBroken = MsgRecord(STAT_MASTERY,mastery) or recordIsBroken
-		end
-
-		if (style.Spirit[self.PlayerRole] and tonumber(spirit) > tonumber(self.db.char[spec].HighestSpirit)) then
+		if (style.Multistrike[self.PlayerRole] and multistrike) and (tonumber(multistrike) > tonumber(self.db.char[spec].HighestMultistrike)) then
 			self.db.char[spec].HighestMultistrike = multistrike
-			recordIsBroken = MsgRecord(STAT_MULTISTRIKE,multistrike) or recordIsBroken
+			recordIsBroken = MsgRecord(STAT_MASTERY,multistrike) or recordIsBroken
+		end
+		if (style.Spirit[self.PlayerRole] and tonumber(spirit) > tonumber(self.db.char[spec].HighestSpirit)) then
+			self.db.char[spec].HighestSpirit = spirit
+			recordIsBroken = MsgRecord(ITEM_MOD_SPIRIT_SHORT,spirit) or recordIsBroken
 		end
 		if (style.MP5[self.PlayerRole] or style.MP5ic[self.PlayerRole] or style.MP5auto[self.PlayerRole]) then
 			if (tonumber(base) > tonumber(self.db.char[spec].HighestMP5)) then
@@ -807,7 +805,7 @@ function TinyXStats:Stats()
 		SetWerte(mastery.."%",self.db.char[spec].HighestMastery.."%")
 		FormatRString()
 	end
-	if (style.Muktistrike[self.PlayerRole] and multistrike) then
+	if (style.Multistrike[self.PlayerRole] and multistrike) then
 		SetLabel("multistrike",L["MS:"])
 		SetWerte(multistrike.."%",self.db.char[spec].HighestMultistrike.."%")
 		FormatRString()
