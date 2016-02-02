@@ -694,7 +694,7 @@ function TinyXStats:Stats()
 		end
 		if (style.Multistrike[self.PlayerRole] and multistrike) and (tonumber(multistrike) > tonumber(self.db.char[spec].HighestMultistrike)) then
 			self.db.char[spec].HighestMultistrike = multistrike
-			recordIsBroken = MsgRecord(STAT_MASTERY,multistrike) or recordIsBroken
+			recordIsBroken = MsgRecord(STAT_MULTISTRIKE,multistrike) or recordIsBroken
 		end
 		if (style.Spirit[self.PlayerRole] and tonumber(spirit) > tonumber(self.db.char[spec].HighestSpirit)) then
 			self.db.char[spec].HighestSpirit = spirit
