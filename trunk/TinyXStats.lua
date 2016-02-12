@@ -82,7 +82,8 @@ TinyXStats.defaults = {
 			HighestDC = "0.00",
 			HighestPC = "0.00",
 			HighestBC = "0.00",
-			HighestTA = "0.00"
+			HighestTA = "0.00",
+			HighestVersatility = "0.00"
 		},
 		Spec2 = {
 			HighestSpelldmg = 0,
@@ -102,7 +103,8 @@ TinyXStats.defaults = {
 			HighestDC = "0.00",
 			HighestPC = "0.00",
 			HighestBC = "0.00",
-			HighestTA = "0.00"
+			HighestTA = "0.00",
+			HighestVersatility = "0.00"
 		},
 		Style = {
 			SP = {
@@ -162,6 +164,13 @@ TinyXStats.defaults = {
 				tank = true
 			},
 			TA = {
+				tank = true
+			},
+			Versatility = {
+				healer = true,
+				caster = true,
+				melee = true,
+				hunter = true,
 				tank = true
 			},
 			MP5 = {},
@@ -237,6 +246,11 @@ TinyXStats.defaults = {
 				r = 0.6941176470588235,
 				g = 1,
 				b = 0
+			},
+			versatility = {
+				r = 1,
+				g = 0.72156862745098,
+				b = 0.0313725490196078
 			}
 		},
 	}
@@ -413,10 +427,10 @@ local function SetLabel(color,label)
 	TinyXStats.ldbRecord = TinyXStats.ldbRecord..HexColor(color)..(style.labels and label or "")
 end
 
-local function SetWerte(Wert,Highest)
-	TinyXStats.CString = TinyXStats.CString..Wert
+local function SetValues(Value,Highest)
+	TinyXStats.CString = TinyXStats.CString..Value
 	TinyXStats.RString = TinyXStats.RString..Highest
-	TinyXStats.ldbString = TinyXStats.ldbString..Wert.." "
+	TinyXStats.ldbString = TinyXStats.ldbString..Value.." "
 	TinyXStats.ldbRecord = TinyXStats.ldbRecord..Highest.." "
 end
 
@@ -622,6 +636,7 @@ function TinyXStats:Stats()
 	local style = self.db.char.Style
 	local mastery = GetMastery()
 	local multistrike = string.format("%.2f", GetMultistrike())
+	local versatility = string.format("%.2f",GetCombatRating(29)/130)
 	local spec = "Spec"..GetActiveSpecGroup()
 	local spelldmg = GetSpellDamage()
 	local pow = GetAttackPower()
@@ -730,6 +745,10 @@ function TinyXStats:Stats()
 			self.db.char[spec].HighestTA = TAvoidance
 			recordIsBroken = MsgRecord(L["Total Avoidance"],TAvoidance) or recordIsBroken
 		end
+		if (style.Versatility[self.PlayerRole] and tonumber(versatility) > tonumber(self.db.char[spec].HighestVersatility)) then
+			self.db.char[spec].HighestVersatility = versatility
+			recordIsBroken = MsgRecord(STAT_VERSATILITY,versatility) or recordIsBroken
+		end
 	else
 		Debug("rekords skipped SpecChangedPause")
 	end
@@ -745,89 +764,94 @@ function TinyXStats:Stats()
 
 	if (style.SP[self.PlayerRole]) then
 		SetLabel("sp",L["Sp:"])
-		SetWerte(spelldmg,self.db.char[spec].HighestSpelldmg)
+		SetValues(spelldmg,self.db.char[spec].HighestSpelldmg)
 		FormatRString()
 	end
 	if (style.AP[self.PlayerRole]) then
 		SetLabel("ap",L["Ap:"])
-		SetWerte(pow,self.db.char[spec].HighestAp)
+		SetValues(pow,self.db.char[spec].HighestAp)
 		FormatRString()
 	end
 	if (style.Haste[self.PlayerRole]) then
 		SetLabel("haste",L["Haste:"])
-		SetWerte(haste,self.db.char[spec].HighestHaste)
+		SetValues(haste,self.db.char[spec].HighestHaste)
 		FormatRString()
 	elseif (style.HastePerc[self.PlayerRole]) then
 		SetLabel("haste",SPELL_HASTE_ABBR..":")
-		SetWerte(hasteperc.."%",self.db.char[spec].HighestHastePerc.."%")
+		SetValues(hasteperc.."%",self.db.char[spec].HighestHastePerc.."%")
 		FormatRString()
 	elseif (style.Speed[self.PlayerRole]) then
 		SetLabel("haste",L["Speed:"])
-		SetWerte(speed.."s",fastestSpeed.."s")
+		SetValues(speed.."s",fastestSpeed.."s")
 		FormatRString()
 	end
 	if (style.Spirit[self.PlayerRole]) then
 		SetLabel("spirit",L["Spi:"])
-		SetWerte(spirit,self.db.char[spec].HighestSpirit)
+		SetValues(spirit,self.db.char[spec].HighestSpirit)
 		FormatRString()
 	end
 	if (style.MP5[self.PlayerRole]) then
 		SetLabel("mp5",L["MP5:"])
-		SetWerte(base.."mp5",self.db.char[spec].HighestMP5.."mp5")
+		SetValues(base.."mp5",self.db.char[spec].HighestMP5.."mp5")
 		FormatRString()
 	end
 	if (style.MP5ic[self.PlayerRole]) then
 		SetLabel("mp5",L["MP5-ic:"])
-		SetWerte(casting.."mp5",self.db.char[spec].HighestMP5if.."mp5")
+		SetValues(casting.."mp5",self.db.char[spec].HighestMP5if.."mp5")
 		FormatRString()
 	end
 	if (style.MP5auto[self.PlayerRole]) then
 		SetLabel("mp5",L["MP5:"])
 		if (isInFight) then
-			SetWerte(casting.."mp5",self.db.char[spec].HighestMP5if.."mp5")
+			SetValues(casting.."mp5",self.db.char[spec].HighestMP5if.."mp5")
 		else
-			SetWerte(base.."mp5",self.RString..self.db.char[spec].HighestMP5.."mp5")
+			SetValues(base.."mp5",self.RString..self.db.char[spec].HighestMP5.."mp5")
 		end
 		FormatRString()
 	end
 	if (style.Fr[self.PlayerRole]) then
 		SetLabel("fr",L["FR:"])
-		SetWerte(fr,self.db.char[spec].HighestFr)
+		SetValues(fr,self.db.char[spec].HighestFr)
 		FormatRString()
 	end
 	if (style.Crit[self.PlayerRole]) then
 		SetLabel("crit",L["Crit:"])
-		SetWerte(crit.."%",self.db.char[spec].HighestCrit.."%")
+		SetValues(crit.."%",self.db.char[spec].HighestCrit.."%")
 		FormatRString()
 	end
 	if (style.Mastery[self.PlayerRole] and mastery) then
 		SetLabel("mastery",L["Mas:"])
-		SetWerte(mastery.."%",self.db.char[spec].HighestMastery.."%")
+		SetValues(mastery.."%",self.db.char[spec].HighestMastery.."%")
 		FormatRString()
 	end
 	if (style.Multistrike[self.PlayerRole] and multistrike) then
 		SetLabel("multistrike",L["MS:"])
-		SetWerte(multistrike.."%",self.db.char[spec].HighestMultistrike.."%")
+		SetValues(multistrike.."%",self.db.char[spec].HighestMultistrike.."%")
 		FormatRString()
 	end
 	if (style.DC[self.PlayerRole]) then
 		SetLabel("dc",L["DC:"])
-		SetWerte(DodgeChance.."%",self.db.char[spec].HighestDC.."%")
+		SetValues(DodgeChance.."%",self.db.char[spec].HighestDC.."%")
 		FormatRString()
 	end
 	if (style.PC[self.PlayerRole] and not TinyXStats:HideTankStat("PC")) then
 		SetLabel("pc",L["PC:"])
-		SetWerte(ParryChance.."%",self.db.char[spec].HighestPC.."%")
+		SetValues(ParryChance.."%",self.db.char[spec].HighestPC.."%")
 		FormatRString()
 	end
 	if (style.BC[self.PlayerRole] and not TinyXStats:HideTankStat("BC")) then
 		SetLabel("bc",L["BC:"])
-		SetWerte(BlockChance.."%",self.db.char[spec].HighestBC.."%")
+		SetValues(BlockChance.."%",self.db.char[spec].HighestBC.."%")
 		FormatRString()
 	end
 	if (style.TA[self.PlayerRole]) then
 		SetLabel("ta",L["TA:"])
-		SetWerte(TAvoidance.."%",self.db.char[spec].HighestTA.."%")
+		SetValues(TAvoidance.."%",self.db.char[spec].HighestTA.."%")
+		FormatRString()
+	end
+	if (style.Versatility[self.PlayerRole]) then
+		SetLabel("versatility",L["Vers:"])
+		SetValues(versatility.."%",self.db.char[spec].HighestVersatility.."%")
 		FormatRString()
 	end
 
