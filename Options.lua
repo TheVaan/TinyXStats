@@ -490,6 +490,40 @@ function TinyXStats:Options()
 						end,
 						order = 21
 					},
+					versatility = {
+						name = STAT_VERSATILITY,
+						desc = STAT_VERSATILITY.." "..show.."/"..hide,
+						width = 'double',
+						type = 'toggle',
+						get = function() return self.db.char.Style.Versatility[TinyXStats.PlayerRole] end,
+						set = function(info, value)
+							if(value) then
+								self.db.char.Style.Versatility[TinyXStats.PlayerRole] = true
+							else
+								self.db.char.Style.Versatility[TinyXStats.PlayerRole] = false
+							end
+							self:Stats()
+						end,
+						disabled = function() return InCombatLockdown() end,
+						order = 22
+					},
+					versatilitycolor = {
+						hidden = function() return not (self.defaults.char.Style.Versatility[TinyXStats.PlayerRole]) end,
+						name = "",
+						desc = "",
+						width = 'half',
+						type = 'color',
+						get = function()
+							local c = self.db.char.Color.versatility
+							return c.r, c.g, c.b
+						end,
+						set = function(info, r, g, b)
+							local c = self.db.char.Color.versatility
+							c.r, c.g, c.b = r, g, b
+							self:Stats()
+						end,
+						order = 23
+					},
 					DC = {
 						hidden = function() return not self.defaults.char.Style.DC[TinyXStats.PlayerRole] end,
 						name = STAT_DODGE,
@@ -506,7 +540,7 @@ function TinyXStats:Options()
 							self:Stats()
 						end,
 						disabled = function() return InCombatLockdown() end,
-						order = 22
+						order = 24
 					},
 					dccolor = {
 						hidden = function() return not self.defaults.char.Style.DC[TinyXStats.PlayerRole] end,
@@ -524,7 +558,7 @@ function TinyXStats:Options()
 							self:SetStringColors()
 							self:Stats()
 						end,
-						order = 23
+						order = 25
 					},
 					PC = {
 						hidden = function() return TinyXStats:HideTankStat("PC") end,
@@ -542,7 +576,7 @@ function TinyXStats:Options()
 							self:Stats()
 						end,
 						disabled = function() return InCombatLockdown() end,
-						order = 24
+						order = 26
 					},
 					pccolor = {
 						hidden = function() return TinyXStats:HideTankStat("PC") end,
@@ -559,7 +593,7 @@ function TinyXStats:Options()
 							c.r, c.g, c.b = r, g, b
 							self:Stats()
 						end,
-						order = 25
+						order = 27
 					},
 					BC = {
 						hidden = function() return TinyXStats:HideTankStat("BC") end,
@@ -577,7 +611,7 @@ function TinyXStats:Options()
 							self:Stats()
 						end,
 						disabled = function() return InCombatLockdown() end,
-						order = 26
+						order = 28
 					},
 					bccolor = {
 						hidden = function() return TinyXStats:HideTankStat("BC") end,
@@ -594,7 +628,7 @@ function TinyXStats:Options()
 							c.r, c.g, c.b = r, g, b
 							self:Stats()
 						end,
-						order = 27
+						order = 29
 					},
 					TA = {
 						hidden = function() return not self.defaults.char.Style.TA[TinyXStats.PlayerRole] end,
@@ -612,7 +646,7 @@ function TinyXStats:Options()
 							self:Stats()
 						end,
 						disabled = function() return InCombatLockdown() end,
-						order = 28
+						order = 30
 					},
 					tacolor = {
 						hidden = function() return not self.defaults.char.Style.TA[TinyXStats.PlayerRole] end,
@@ -630,12 +664,12 @@ function TinyXStats:Options()
 							self:SetStringColors()
 							self:Stats()
 						end,
-						order = 29
+						order = 31
 					},
 					header1 = {
 						name = "",
 						type = 'header',
-						order = 30
+						order = 32
 					},
 					showrecords = {
 						name = L["Show records"],
@@ -652,7 +686,7 @@ function TinyXStats:Options()
 							self:Stats()
 						end,
 						disabled = function() return InCombatLockdown() end,
-						order = 31
+						order = 33
 					},
 					resetrecords = {
 						name = L["Reset records"],
@@ -666,7 +700,7 @@ function TinyXStats:Options()
 							self:Stats()
 						end,
 						disabled = function() return InCombatLockdown() end,
-						order = 32
+						order = 34
 					},
 					resetcolor = {
 						name = L["Reset colors"],
@@ -681,7 +715,7 @@ function TinyXStats:Options()
 							self:Stats()
 						end,
 						disabled = function() return InCombatLockdown() end,
-						order = 33
+						order = 35
 					}
 				}
 			},
