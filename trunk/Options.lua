@@ -456,40 +456,6 @@ function TinyXStats:Options()
 						end,
 						order = 19
 					},
-					multistrike = {
-						name = STAT_MULTISTRIKE,
-						desc = STAT_MULTISTRIKE.." "..show.."/"..hide,
-						width = 'double',
-						type = 'toggle',
-						get = function() return self.db.char.Style.Multistrike[TinyXStats.PlayerRole] end,
-						set = function(info, value)
-							if(value) then
-								self.db.char.Style.Multistrike[TinyXStats.PlayerRole] = true
-							else
-								self.db.char.Style.Multistrike[TinyXStats.PlayerRole] = false
-							end
-							self:Stats()
-						end,
-						disabled = function() return InCombatLockdown() end,
-						order = 20
-					},
-					multistrikecolor = {
-						hidden = function() return not (self.defaults.char.Style.Multistrike[TinyXStats.PlayerRole]) end,
-						name = "",
-						desc = "",
-						width = 'half',
-						type = 'color',
-						get = function()
-							local c = self.db.char.Color.multistrike
-							return c.r, c.g, c.b
-						end,
-						set = function(info, r, g, b)
-							local c = self.db.char.Color.multistrike
-							c.r, c.g, c.b = r, g, b
-							self:Stats()
-						end,
-						order = 21
-					},
 					versatility = {
 						name = STAT_VERSATILITY,
 						desc = STAT_VERSATILITY.." "..show.."/"..hide,

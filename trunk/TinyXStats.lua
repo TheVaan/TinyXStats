@@ -78,7 +78,6 @@ TinyXStats.defaults = {
 			HighestSpirit = 0,
 			HighestFr = "0.00",
 			HighestMastery = "0.00",
-			HighestMultistrike = "0.00",
 			HighestDC = "0.00",
 			HighestPC = "0.00",
 			HighestBC = "0.00",
@@ -99,7 +98,6 @@ TinyXStats.defaults = {
 			HighestSpirit = 0,
 			HighestFr = "0.00",
 			HighestMastery = "0.00",
-			HighestMultistrike = "0.00",
 			HighestDC = "0.00",
 			HighestPC = "0.00",
 			HighestBC = "0.00",
@@ -134,13 +132,6 @@ TinyXStats.defaults = {
 				tank = true
 			},
 			Mastery = {
-				healer = true,
-				caster = true,
-				melee = true,
-				hunter = true,
-				tank = true
-			},
-			Multistrike = {
 				healer = true,
 				caster = true,
 				melee = true,
@@ -216,11 +207,6 @@ TinyXStats.defaults = {
 				r = 1.0,
 				g = 1.0,
 				b = 1.0
-			},
-			multistrike = {
-				r = 0.9,
-				g = 0.0,
-				b = 0.0
 			},
 			fr = {
 				r = 0.9,
@@ -635,7 +621,6 @@ function TinyXStats:Stats()
 	Debug("Stats()")
 	local style = self.db.char.Style
 	local mastery = GetMastery()
-	local multistrike = string.format("%.2f", GetMultistrike())
 	local versatility = string.format("%.2f",GetCombatRating(29)/130)
 	local spec = "Spec"..GetActiveSpecGroup()
 	local spelldmg = GetSpellDamage()
@@ -706,10 +691,6 @@ function TinyXStats:Stats()
 		if (style.Mastery[self.PlayerRole] and mastery) and (tonumber(mastery) > tonumber(self.db.char[spec].HighestMastery)) then
 			self.db.char[spec].HighestMastery = mastery
 			recordIsBroken = MsgRecord(STAT_MASTERY,mastery) or recordIsBroken
-		end
-		if (style.Multistrike[self.PlayerRole] and multistrike) and (tonumber(multistrike) > tonumber(self.db.char[spec].HighestMultistrike)) then
-			self.db.char[spec].HighestMultistrike = multistrike
-			recordIsBroken = MsgRecord(STAT_MULTISTRIKE,multistrike) or recordIsBroken
 		end
 		if (style.Spirit[self.PlayerRole] and tonumber(spirit) > tonumber(self.db.char[spec].HighestSpirit)) then
 			self.db.char[spec].HighestSpirit = spirit
@@ -822,11 +803,6 @@ function TinyXStats:Stats()
 	if (style.Mastery[self.PlayerRole] and mastery) then
 		SetLabel("mastery",L["Mas:"])
 		SetValues(mastery.."%",self.db.char[spec].HighestMastery.."%")
-		FormatRString()
-	end
-	if (style.Multistrike[self.PlayerRole] and multistrike) then
-		SetLabel("multistrike",L["MS:"])
-		SetValues(multistrike.."%",self.db.char[spec].HighestMultistrike.."%")
 		FormatRString()
 	end
 	if (style.DC[self.PlayerRole]) then
