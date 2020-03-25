@@ -654,6 +654,23 @@ function TinyXStats:Options()
 						disabled = function() return InCombatLockdown() end,
 						order = 33
 					},
+					showrecordsldb = {
+						name = L["Show records on Broker"],
+						desc = L["Whether or not to show record values on Broker"],
+						width = 'full',
+						type = 'toggle',
+						get = function() return self.db.char.Style.showRecordsLDB end,
+						set = function(info, value)
+							if(value) then
+								self.db.char.Style.showRecordsLDB = true
+							else
+								self.db.char.Style.showRecordsLDB = false
+							end
+							self:Stats()
+						end,
+						disabled = function() return InCombatLockdown() end,
+						order = 33
+					},
 					resetrecords = {
 						name = L["Reset records"],
 						desc = L["Clears your current records"],
@@ -666,7 +683,7 @@ function TinyXStats:Options()
 							self:Stats()
 						end,
 						disabled = function() return InCombatLockdown() end,
-						order = 34
+						order = 35
 					},
 					resetcolor = {
 						name = L["Reset colors"],
@@ -681,7 +698,7 @@ function TinyXStats:Options()
 							self:Stats()
 						end,
 						disabled = function() return InCombatLockdown() end,
-						order = 35
+						order = 36
 					}
 				}
 			},
@@ -808,24 +825,6 @@ function TinyXStats:Options()
 						disabled = function() return InCombatLockdown() end,
 						order = 7
 					},
-					LDBtext = {
-						name = L["Broker Text"],
-						desc = L["Displays stats in the LDB text field."],
-						--width = 'full',
-						type = 'toggle',
-						get = function() return self.db.char.Style.LDBtext end,
-						set = function(info, value)
-							if(value) then
-								self.db.char.Style.LDBtext = true
-							else
-								self.db.char.Style.LDBtext = false
-							end
-							self:SetBroker()
-							self:Stats()
-						end,
-						disabled = function() return InCombatLockdown() end,
-						order = 8
-					},
 					hide = {
 						name = L["Hide Frame"],
 						desc = L["Hide the text frame (to show stats only in the LDB text field)"],
@@ -840,7 +839,7 @@ function TinyXStats:Options()
 							self:SetFrameVisible()
 						end,
 						disabled = function() return InCombatLockdown() end,
-						order = 9
+						order = 8
 					},
 					spaceline4 = {
 						name = " ",

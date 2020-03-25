@@ -168,9 +168,9 @@ TinyXStats.defaults = {
 			MP5ic = {},
 			MP5auto = {},
 			showRecords = true,
+			showRecordsLDB = true,
 			vertical = false,
-			labels = false,
-			LDBtext = true
+			labels = false
 		},
 		Color = {
 			sp = {
@@ -239,6 +239,7 @@ TinyXStats.defaults = {
 				b = 0.0313725490196078
 			}
 		},
+		DBver = 2
 	}
 }
 
@@ -277,16 +278,6 @@ function TinyXStats:SetFrameVisible()
 
 end
 
-function TinyXStats:SetBroker()
-
-	if self.db.char.Style.LDBtext then
-		TSBroker.label = ""
-	else
-		TSBroker.label = AddonName
-	end
-
-end
-
 function TinyXStats:InitializeFrame()
 	local font = media:Fetch("font", self.db.char.Font)
 	self.frame:SetPoint("BOTTOMLEFT", UIParent, "BOTTOMLEFT", self.db.char.xPosition, self.db.char.yPosition)
@@ -300,7 +291,6 @@ function TinyXStats:InitializeFrame()
 
 	self:SetDragScript()
 	self:SetFrameVisible()
-	self:SetBroker()
 	self:Stats()
 end
 
@@ -835,14 +825,14 @@ function TinyXStats:Stats()
 		if not style.vertical then
 			self.CString = self.CString.."|n"..self.RString
 		end
+	end
+
+	if style.showRecordsLDB then
 		self.ldbString = self.ldbString.."|n"..self.ldbRecord
 	end
 
 	self.string:SetText(self.CString)
 
-	if (style.LDBtext) then
-		TSBroker.text = self.ldbString.."|r"
-	else
-		TSBroker.text = ""
-	end
+	TSBroker.text = self.ldbString.."|r"
+	
 end
