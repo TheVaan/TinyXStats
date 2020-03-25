@@ -75,7 +75,6 @@ TinyXStats.defaults = {
 			FastestRs = 500,
 			HighestMP5if = 0,
 			HighestMP5 = 0,
-			HighestSpirit = 0,
 			HighestFr = "0.00",
 			HighestMastery = "0.00",
 			HighestDC = "0.00",
@@ -95,7 +94,6 @@ TinyXStats.defaults = {
 			FastestRs = 500,
 			HighestMP5if = 0,
 			HighestMP5 = 0,
-			HighestSpirit = 0,
 			HighestFr = "0.00",
 			HighestMastery = "0.00",
 			HighestDC = "0.00",
@@ -138,10 +136,6 @@ TinyXStats.defaults = {
 				hunter = true,
 				tank = true
 			},
-			Spirit = {
-				healer = true,
-				caster = true
-			},
 			Fr = {
 				hunter = true
 			},
@@ -164,7 +158,10 @@ TinyXStats.defaults = {
 				hunter = true,
 				tank = true
 			},
-			MP5 = {},
+			MP5 = {
+				healer = true,
+				caster = true
+			},
 			MP5ic = {},
 			MP5auto = {},
 			showRecords = true,
@@ -194,11 +191,6 @@ TinyXStats.defaults = {
 				b = 1.0
 			},
 			mp5 = {
-				r = 1.0,
-				g = 1.0,
-				b = 1.0
-			},
-			spirit = {
 				r = 1.0,
 				g = 1.0,
 				b = 1.0
@@ -239,7 +231,7 @@ TinyXStats.defaults = {
 				b = 0.0313725490196078
 			}
 		},
-		DBver = 2
+		DBver = 3
 	}
 }
 
@@ -625,7 +617,6 @@ function TinyXStats:Stats()
 			mainSpeed, offSpeed, speed, fastestSpeed = GetWeaponSpeed(spec)
 		end
 	end
-	local s, spirit = UnitStat("player", 5)
 	local base, casting = GetManaRegen()
 	base = floor(base * 5.0)
 	casting = floor(casting * 5.0)
@@ -681,10 +672,6 @@ function TinyXStats:Stats()
 		if (style.Mastery[self.PlayerRole] and mastery) and (tonumber(mastery) > tonumber(self.db.char[spec].HighestMastery)) then
 			self.db.char[spec].HighestMastery = mastery
 			recordIsBroken = MsgRecord(STAT_MASTERY,mastery) or recordIsBroken
-		end
-		if (style.Spirit[self.PlayerRole] and tonumber(spirit) > tonumber(self.db.char[spec].HighestSpirit)) then
-			self.db.char[spec].HighestSpirit = spirit
-			recordIsBroken = MsgRecord(ITEM_MOD_SPIRIT_SHORT,spirit) or recordIsBroken
 		end
 		if (style.MP5[self.PlayerRole] or style.MP5ic[self.PlayerRole] or style.MP5auto[self.PlayerRole]) then
 			if (tonumber(base) > tonumber(self.db.char[spec].HighestMP5)) then
@@ -754,11 +741,6 @@ function TinyXStats:Stats()
 	elseif (style.Speed[self.PlayerRole]) then
 		SetLabel("haste",L["Speed:"])
 		SetValues(speed.."s",fastestSpeed.."s")
-		FormatRString()
-	end
-	if (style.Spirit[self.PlayerRole]) then
-		SetLabel("spirit",L["Spi:"])
-		SetValues(spirit,self.db.char[spec].HighestSpirit)
 		FormatRString()
 	end
 	if (style.MP5[self.PlayerRole]) then
