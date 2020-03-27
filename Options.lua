@@ -75,11 +75,6 @@ function TinyXStats:Options()
 						type = 'header',
 						order = 1,
 					},
-					spaceline1 = {
-						name = "\n",
-						type = 'description',
-						order = 2,
-					},
 					spelldmg = {
 						hidden = function() return not self.defaults.char.Style.SP[TinyXStats.PlayerRole] end,
 						name = STAT_SPELLPOWER,
@@ -96,7 +91,7 @@ function TinyXStats:Options()
 							self:Stats()
 						end,
 						disabled = function() return InCombatLockdown() end,
-						order = 3
+						order = 2,
 					},
 					spelldmgcolor = {
 						hidden = function() return not self.defaults.char.Style.SP[TinyXStats.PlayerRole] end,
@@ -113,7 +108,7 @@ function TinyXStats:Options()
 							c.r, c.g, c.b = r, g, b
 							self:Stats()
 						end,
-						order = 4,
+						order = 3,
 					},
 					ap = {
 						hidden = function() return not self.defaults.char.Style.AP[TinyXStats.PlayerRole] end,
@@ -131,7 +126,7 @@ function TinyXStats:Options()
 							self:Stats()
 						end,
 						disabled = function() return InCombatLockdown() end,
-						order = 3,
+						order = 4,
 					},
 					apcolor = {
 						hidden = function() return not self.defaults.char.Style.AP[TinyXStats.PlayerRole] end,
@@ -148,7 +143,7 @@ function TinyXStats:Options()
 							c.r, c.g, c.b = r, g, b
 							self:Stats()
 						end,
-						order = 4,
+						order = 5,
 					},
 					haste = {
 						hidden = function() return not self.defaults.char.Style.Haste[TinyXStats.PlayerRole] end,
@@ -167,7 +162,7 @@ function TinyXStats:Options()
 							self:Stats()
 						end,
 						disabled = function() return InCombatLockdown() end,
-						order = 5
+						order = 6,
 					},
 					hastecolor = {
 						hidden = function() return not self.defaults.char.Style.Haste[TinyXStats.PlayerRole] end,
@@ -184,7 +179,7 @@ function TinyXStats:Options()
 							c.r, c.g, c.b = r, g, b
 							self:Stats()
 						end,
-						order = 6,
+						order = 7,
 					},
 					speed = {
 						hidden = function() return not self.defaults.char.Style.Speed[TinyXStats.PlayerRole] end,
@@ -202,7 +197,7 @@ function TinyXStats:Options()
 							self:Stats()
 						end,
 						disabled = function() return InCombatLockdown() end,
-						order = 5,
+						order = 8,
 					},
 					speedcolor = {
 						hidden = function() return not self.defaults.char.Style.Speed[TinyXStats.PlayerRole] end,
@@ -219,7 +214,7 @@ function TinyXStats:Options()
 							c.r, c.g, c.b = r, g, b
 							self:Stats()
 						end,
-						order = 6,
+						order = 9,
 					},
 					hasteperc = {
 						hidden = function() return not self.defaults.char.Style.Haste[TinyXStats.PlayerRole] end,
@@ -238,7 +233,7 @@ function TinyXStats:Options()
 							self:Stats()
 						end,
 						disabled = function() return InCombatLockdown() end,
-						order = 7
+						order = 10,
 					},
 					mp5 = {
 						hidden = function() return not self.defaults.char.Style.MP5[TinyXStats.PlayerRole] end,
@@ -257,7 +252,7 @@ function TinyXStats:Options()
 							self:Stats()
 						end,
 						disabled = function() return InCombatLockdown() end,
-						order = 8
+						order = 11,
 					},
 					mp5color = {
 						hidden = function() return not self.defaults.char.Style.MP5[TinyXStats.PlayerRole] end,
@@ -274,7 +269,7 @@ function TinyXStats:Options()
 							c.r, c.g, c.b = r, g, b
 							self:Stats()
 						end,
-						order = 9,
+						order = 12,
 					},
 					mp5ic = {
 						hidden = function() return not self.defaults.char.Style.MP5[TinyXStats.PlayerRole] end,
@@ -293,7 +288,7 @@ function TinyXStats:Options()
 							self:Stats()
 						end,
 						disabled = function() return InCombatLockdown() end,
-						order = 10
+						order = 13,
 					},
 					mp5auto = {
 						hidden = function() return not self.defaults.char.Style.MP5[TinyXStats.PlayerRole] end,
@@ -313,7 +308,7 @@ function TinyXStats:Options()
 							self:Stats()
 						end,
 						disabled = function() return InCombatLockdown() end,
-						order = 11
+						order = 14,
 					},
 					fr = {
 						hidden = function() return not self.defaults.char.Style.Fr[TinyXStats.PlayerRole] end,
@@ -331,7 +326,7 @@ function TinyXStats:Options()
 							self:Stats()
 						end,
 						disabled = function() return InCombatLockdown() end,
-						order = 12,
+						order = 15,
 					},
 					frcolor = {
 						hidden = function() return not self.defaults.char.Style.Fr[TinyXStats.PlayerRole] end,
@@ -346,10 +341,9 @@ function TinyXStats:Options()
 						set = function(info, r, g, b)
 							local c = self.db.char.Color.fr
 							c.r, c.g, c.b = r, g, b
-							self:SetStringColors()
 							self:Stats()
 						end,
-						order = 13
+						order = 16,
 					},
 					crit = {
 						hidden = function() return not self.defaults.char.Style.Crit[TinyXStats.PlayerRole] end,
@@ -367,7 +361,7 @@ function TinyXStats:Options()
 							self:Stats()
 						end,
 						disabled = function() return InCombatLockdown() end,
-						order = 14
+						order = 17,
 					},
 					critcolor = {
 						hidden = function() return not self.defaults.char.Style.Crit[TinyXStats.PlayerRole] end,
@@ -384,7 +378,7 @@ function TinyXStats:Options()
 							c.r, c.g, c.b = r, g, b
 							self:Stats()
 						end,
-						order = 15
+						order = 18,
 					},
 					mastery = {
 						hidden = function() return not (self.defaults.char.Style.Mastery[TinyXStats.PlayerRole] and GetMastery()) end,
@@ -402,7 +396,7 @@ function TinyXStats:Options()
 							self:Stats()
 						end,
 						disabled = function() return InCombatLockdown() end,
-						order = 16
+						order = 19,
 					},
 					masterycolor = {
 						hidden = function() return not self.defaults.char.Style.Mastery[TinyXStats.PlayerRole] and GetMastery() end,
@@ -419,7 +413,7 @@ function TinyXStats:Options()
 							c.r, c.g, c.b = r, g, b
 							self:Stats()
 						end,
-						order = 17
+						order = 20,
 					},
 					versatility = {
 						name = STAT_VERSATILITY,
@@ -436,7 +430,7 @@ function TinyXStats:Options()
 							self:Stats()
 						end,
 						disabled = function() return InCombatLockdown() end,
-						order = 20
+						order = 21,
 					},
 					versatilitycolor = {
 						hidden = function() return not (self.defaults.char.Style.Versatility[TinyXStats.PlayerRole]) end,
@@ -453,7 +447,7 @@ function TinyXStats:Options()
 							c.r, c.g, c.b = r, g, b
 							self:Stats()
 						end,
-						order = 21
+						order = 22,
 					},
 					DC = {
 						hidden = function() return not self.defaults.char.Style.DC[TinyXStats.PlayerRole] end,
@@ -471,7 +465,7 @@ function TinyXStats:Options()
 							self:Stats()
 						end,
 						disabled = function() return InCombatLockdown() end,
-						order = 22
+						order = 23,
 					},
 					dccolor = {
 						hidden = function() return not self.defaults.char.Style.DC[TinyXStats.PlayerRole] end,
@@ -486,10 +480,9 @@ function TinyXStats:Options()
 						set = function(info, r, g, b)
 							local c = self.db.char.Color.dc
 							c.r, c.g, c.b = r, g, b
-							self:SetStringColors()
 							self:Stats()
 						end,
-						order = 23
+						order = 24,
 					},
 					PC = {
 						hidden = function() return TinyXStats:HideTankStat("PC") end,
@@ -507,7 +500,7 @@ function TinyXStats:Options()
 							self:Stats()
 						end,
 						disabled = function() return InCombatLockdown() end,
-						order = 24
+						order = 25,
 					},
 					pccolor = {
 						hidden = function() return TinyXStats:HideTankStat("PC") end,
@@ -524,7 +517,7 @@ function TinyXStats:Options()
 							c.r, c.g, c.b = r, g, b
 							self:Stats()
 						end,
-						order = 25
+						order = 26,
 					},
 					BC = {
 						hidden = function() return TinyXStats:HideTankStat("BC") end,
@@ -542,7 +535,7 @@ function TinyXStats:Options()
 							self:Stats()
 						end,
 						disabled = function() return InCombatLockdown() end,
-						order = 26
+						order = 27,
 					},
 					bccolor = {
 						hidden = function() return TinyXStats:HideTankStat("BC") end,
@@ -559,7 +552,7 @@ function TinyXStats:Options()
 							c.r, c.g, c.b = r, g, b
 							self:Stats()
 						end,
-						order = 27
+						order = 28,
 					},
 					TA = {
 						hidden = function() return not self.defaults.char.Style.TA[TinyXStats.PlayerRole] end,
@@ -577,7 +570,7 @@ function TinyXStats:Options()
 							self:Stats()
 						end,
 						disabled = function() return InCombatLockdown() end,
-						order = 28
+						order = 29,
 					},
 					tacolor = {
 						hidden = function() return not self.defaults.char.Style.TA[TinyXStats.PlayerRole] end,
@@ -592,15 +585,14 @@ function TinyXStats:Options()
 						set = function(info, r, g, b)
 							local c = self.db.char.Color.ta
 							c.r, c.g, c.b = r, g, b
-							self:SetStringColors()
 							self:Stats()
 						end,
-						order = 29
+						order = 30,
 					},
 					header1 = {
 						name = "",
 						type = 'header',
-						order = 30
+						order = 31,
 					},
 					showrecords = {
 						name = L["Show records"],
@@ -617,7 +609,7 @@ function TinyXStats:Options()
 							self:Stats()
 						end,
 						disabled = function() return InCombatLockdown() end,
-						order = 31
+						order = 32,
 					},
 					showrecordsldb = {
 						name = L["Show records on Broker"],
@@ -634,7 +626,7 @@ function TinyXStats:Options()
 							self:Stats()
 						end,
 						disabled = function() return InCombatLockdown() end,
-						order = 32
+						order = 33,
 					},
 					resetrecords = {
 						name = L["Reset records"],
@@ -648,7 +640,7 @@ function TinyXStats:Options()
 							self:Stats()
 						end,
 						disabled = function() return InCombatLockdown() end,
-						order = 33
+						order = 34,
 					},
 					resetcolor = {
 						name = L["Reset colors"],
@@ -663,7 +655,7 @@ function TinyXStats:Options()
 							self:Stats()
 						end,
 						disabled = function() return InCombatLockdown() end,
-						order = 34
+						order = 35,
 					}
 				}
 			},
@@ -688,7 +680,7 @@ function TinyXStats:Options()
 							self.frame:SetAlpha(self.db.char.outOfCombatAlpha)
 						end,
 						disabled = function() return InCombatLockdown() or self.db.char.FrameHide end,
-						order = 1
+						order = 1,
 					},
 					icalpha = {
 						name = L["Text Alpha"].." "..L["in combat"],
@@ -705,7 +697,7 @@ function TinyXStats:Options()
 							self.frame:SetAlpha(self.db.char.inCombatAlpha)
 						end,
 						disabled = function() return InCombatLockdown() or self.db.char.FrameHide end,
-						order = 2
+						order = 2,
 					},
 					barfontsize = {
 						name = FONT_SIZE,
@@ -724,7 +716,7 @@ function TinyXStats:Options()
 							self:InitializeFrame()
 						end,
 						disabled = function() return InCombatLockdown() or self.db.char.FrameHide end,
-						order = 3
+						order = 3,
 					},
 					font = {
 						name = L["Font"],
@@ -739,7 +731,7 @@ function TinyXStats:Options()
 						end,
 						values = self.fonts,
 						disabled = function() return InCombatLockdown() or self.db.char.FrameHide end,
-						order = 4
+						order = 4,
 					},
 					fonteffect = {
 						name = L["Font border"],
@@ -754,7 +746,7 @@ function TinyXStats:Options()
 						end,
 						values = self.fonteffects,
 						disabled = function() return InCombatLockdown() or self.db.char.FrameHide end,
-						order = 5
+						order = 5,
 					},
 					vertical = {
 						name = L["Display stats vertically"],
@@ -771,7 +763,7 @@ function TinyXStats:Options()
 							self:Stats()
 						end,
 						disabled = function() return InCombatLockdown() or self.db.char.FrameHide end,
-						order = 6
+						order = 6,
 					},
 					labels = {
 						name = L["Show labels"],
@@ -788,7 +780,7 @@ function TinyXStats:Options()
 							self:Stats()
 						end,
 						disabled = function() return InCombatLockdown() end,
-						order = 7
+						order = 7,
 					},
 					hide = {
 						name = L["Hide Frame"],
@@ -804,7 +796,7 @@ function TinyXStats:Options()
 							self:SetFrameVisible()
 						end,
 						disabled = function() return InCombatLockdown() end,
-						order = 8
+						order = 8,
 					},
 					spaceline4 = {
 						name = " ",
@@ -824,7 +816,7 @@ function TinyXStats:Options()
 							end
 						end,
 						disabled = function() return InCombatLockdown() end,
-						order = 21
+						order = 21,
 					},
 					recordSound = {
 						name = L["Play sound on record"],
