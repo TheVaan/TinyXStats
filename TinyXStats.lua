@@ -121,7 +121,10 @@ TinyXStats.defaults = {
 			},
 			Haste = {
 				healer = true,
-				caster = true
+				caster = true,
+				melee = true,
+				hunter = true,
+				tank = true
 			},
 			HastePerc = {},
 			Speed = {
