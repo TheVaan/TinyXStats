@@ -181,41 +181,6 @@ function TinyXStats:Options()
 						end,
 						order = 7,
 					},
-					speed = {
-						hidden = function() return not self.defaults.char.Style.Speed[TinyXStats.PlayerRole] end,
-						name = WEAPON_SPEED,
-						desc = WEAPON_SPEED.." "..show.."/"..hide,
-						width = 'double',
-						type = 'toggle',
-						get = function() return self.db.char.Style.Speed[TinyXStats.PlayerRole] end,
-						set = function(info, value)
-							if(value) then
-								self.db.char.Style.Speed[TinyXStats.PlayerRole] = true
-							else
-								self.db.char.Style.Speed[TinyXStats.PlayerRole] = false
-							end
-							self:Stats()
-						end,
-						disabled = function() return InCombatLockdown() end,
-						order = 8,
-					},
-					speedcolor = {
-						hidden = function() return not self.defaults.char.Style.Speed[TinyXStats.PlayerRole] end,
-						name = "",
-						desc = "",
-						width = 'half',
-						type = 'color',
-						get = function()
-							local c = self.db.char.Color.haste
-							return c.r, c.g, c.b
-						end,
-						set = function(info, r, g, b)
-							local c = self.db.char.Color.haste
-							c.r, c.g, c.b = r, g, b
-							self:Stats()
-						end,
-						order = 9,
-					},
 					hasteperc = {
 						hidden = function() return not self.defaults.char.Style.Haste[TinyXStats.PlayerRole] end,
 						name = L["Percent Haste"],
@@ -233,6 +198,41 @@ function TinyXStats:Options()
 							self:Stats()
 						end,
 						disabled = function() return InCombatLockdown() end,
+						order = 8,
+					},
+					speed = {
+						hidden = function() return not self.defaults.char.Style.Speed[TinyXStats.PlayerRole] end,
+						name = WEAPON_SPEED,
+						desc = WEAPON_SPEED.." "..show.."/"..hide,
+						width = 'double',
+						type = 'toggle',
+						get = function() return self.db.char.Style.Speed[TinyXStats.PlayerRole] end,
+						set = function(info, value)
+							if(value) then
+								self.db.char.Style.Speed[TinyXStats.PlayerRole] = true
+							else
+								self.db.char.Style.Speed[TinyXStats.PlayerRole] = false
+							end
+							self:Stats()
+						end,
+						disabled = function() return InCombatLockdown() end,
+						order = 9,
+					},
+					speedcolor = {
+						hidden = function() return not self.defaults.char.Style.Speed[TinyXStats.PlayerRole] end,
+						name = "",
+						desc = "",
+						width = 'half',
+						type = 'color',
+						get = function()
+							local c = self.db.char.Color.haste
+							return c.r, c.g, c.b
+						end,
+						set = function(info, r, g, b)
+							local c = self.db.char.Color.haste
+							c.r, c.g, c.b = r, g, b
+							self:Stats()
+						end,
 						order = 10,
 					},
 					mp5 = {
@@ -557,7 +557,7 @@ function TinyXStats:Options()
 					TA = {
 						hidden = function() return not self.defaults.char.Style.TA[TinyXStats.PlayerRole] end,
 						name = L["Total Avoidance"],
-						desc = L["Total Avoidance"].." "..show.."/"..hide,
+						desc = L["Total Avoidance"].." "..L["(miss + doge + parry + block)"].." "..show.."/"..hide,
 						width = 'double',
 						type = 'toggle',
 						get = function() return self.db.char.Style.TA[TinyXStats.PlayerRole] end,

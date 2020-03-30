@@ -676,6 +676,10 @@ function TinyXStats:Stats()
 			self.db.char[spec].HighestMastery = mastery
 			recordIsBroken = MsgRecord(STAT_MASTERY,mastery) or recordIsBroken
 		end
+		if (style.Versatility[self.PlayerRole] and tonumber(versatility) > tonumber(self.db.char[spec].HighestVersatility)) then
+			self.db.char[spec].HighestVersatility = versatility
+			recordIsBroken = MsgRecord(STAT_VERSATILITY,versatility) or recordIsBroken
+		end
 		if (style.MP5[self.PlayerRole] or style.MP5ic[self.PlayerRole] or style.MP5auto[self.PlayerRole]) then
 			if (tonumber(base) > tonumber(self.db.char[spec].HighestMP5)) then
 				self.db.char[spec].HighestMP5 = base
@@ -705,10 +709,6 @@ function TinyXStats:Stats()
 		if (style.TA[self.PlayerRole] and tonumber(TAvoidance) > tonumber(self.db.char[spec].HighestTA)) then
 			self.db.char[spec].HighestTA = TAvoidance
 			recordIsBroken = MsgRecord(L["Total Avoidance"],TAvoidance) or recordIsBroken
-		end
-		if (style.Versatility[self.PlayerRole] and tonumber(versatility) > tonumber(self.db.char[spec].HighestVersatility)) then
-			self.db.char[spec].HighestVersatility = versatility
-			recordIsBroken = MsgRecord(STAT_VERSATILITY,versatility) or recordIsBroken
 		end
 	else
 		Debug("rekords skipped SpecChangedPause")
@@ -780,6 +780,11 @@ function TinyXStats:Stats()
 		SetValues(mastery.."%",self.db.char[spec].HighestMastery.."%")
 		FormatRString()
 	end
+	if (style.Versatility[self.PlayerRole]) then
+		SetLabel("versatility",L["Vers:"])
+		SetValues(versatility.."%",self.db.char[spec].HighestVersatility.."%")
+		FormatRString()
+	end
 	if (style.DC[self.PlayerRole]) then
 		SetLabel("dc",L["DC:"])
 		SetValues(DodgeChance.."%",self.db.char[spec].HighestDC.."%")
@@ -798,11 +803,6 @@ function TinyXStats:Stats()
 	if (style.TA[self.PlayerRole]) then
 		SetLabel("ta",L["TA:"])
 		SetValues(TAvoidance.."%",self.db.char[spec].HighestTA.."%")
-		FormatRString()
-	end
-	if (style.Versatility[self.PlayerRole]) then
-		SetLabel("versatility",L["Vers:"])
-		SetValues(versatility.."%",self.db.char[spec].HighestVersatility.."%")
 		FormatRString()
 	end
 
