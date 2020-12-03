@@ -17,7 +17,7 @@ local media = LibStub("LibSharedMedia-3.0")
 TinyXStats = AceAddon:NewAddon(AddonName, "AceConsole-3.0", "AceEvent-3.0", "AceTimer-3.0")
 local L = LibStub("AceLocale-3.0"):GetLocale(AddonName)
 
-local ldb = LibStub("LibDataBroker-1.1");
+local ldb = LibStub("LibDataBroker-1.1")
 local TSBroker = ldb:NewDataObject(AddonName, {
 	type = "data source",
 	label = AddonName,
@@ -338,7 +338,7 @@ function TinyXStats:LibSharedMedia_Registered()
 	end
 end
 
-local orgSetActiveSpecGroup = SetActiveSpecGroup;
+local orgSetActiveSpecGroup = SetActiveSpecGroup
 function SetActiveSpecGroup(...)
 	SpecChangedPause = GetTime() + 60
 	TinyXStats:ScheduleTimer("Stats", 62)
@@ -451,7 +451,7 @@ end
 
 local function GetSpellDamage()
 	local spelldamage = 0
-	for i = 2, 7, 1 do -- Start at 2 to skip physical damage , MAX_SPELL_SCHOOLS
+	for i = 2, 7, 1 do
 		if (spelldamage < GetSpellBonusDamage(i)) then
 			spelldamage = GetSpellBonusDamage(i)
 		end
@@ -477,12 +477,11 @@ local function GetCrit()
 end
 
 local function GetHaste()
-	-- berechnet den Faktor Tempo/prozent ~128,05 bei lvl 85
 	local CR = GetCombatRating(CR_HASTE_SPELL)
 	local CRB = GetCombatRatingBonus(CR_HASTE_SPELL)
 	local FaktorHastePercent = 0
 
-	if (CRB and CRB > 0 and CR and CR > 0) then--  Division by zero fix ?
+	if (CRB and CRB > 0 and CR and CR > 0) then
 		FaktorHastePercent = CR/CRB
 	end
 
@@ -539,9 +538,9 @@ end
 
 local function GetDefense()
 	local missChance = select(2, UnitRace("player")) == "NightElf" and 7 or 5
-	local PlayerLevel = UnitLevel("player");
-	local BossLevel   = UnitLevel("player");
-	local defenseDiff = (BossLevel - PlayerLevel) * 0.20 -- bei 85-85 * 0.20 = 0
+	local PlayerLevel = UnitLevel("player")
+	local BossLevel   = UnitLevel("player")
+	local defenseDiff = (BossLevel - PlayerLevel) * 0.20
 	local missChance = max(0, missChance - defenseDiff)
 	local dodgeChance = max(0, GetDodgeChance() - defenseDiff)
 	local parryChance = max(0, GetParryChance() - defenseDiff)
@@ -551,12 +550,8 @@ local function GetDefense()
 end
 
 local function GetMastery()
-	local mastery
-	if (UnitLevel("player") >= SHOW_MASTERY_LEVEL) then
-		mastery = GetMasteryEffect();
-		mastery = format("%.2f", mastery);
-	end
-	return mastery
+	local mastery = GetMasteryEffect()
+	return format("%.2f", mastery)
 end
 
 function TinyXStats:GetUnitRole()
@@ -564,7 +559,7 @@ function TinyXStats:GetUnitRole()
 	local role
 	local Talent = GetSpecialization()
 	if Talent then
-		role = GetSpecializationRole(Talent, false, false);
+		role = GetSpecializationRole(Talent, false, false)
 	end
 	if not role then
 		if self.class == "HUNTER" then

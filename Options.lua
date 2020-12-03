@@ -25,10 +25,6 @@ TinyXStats.RoleLocale = {
 	tank = PLAYERSTAT_DEFENSES
 }
 
-local function GetMastery()
-	return (UnitLevel("player") >= SHOW_MASTERY_LEVEL)
-end
-
 function TinyXStats:Options()
 	local show = string.lower(SHOW)
 	local hide = string.lower(HIDE)
@@ -381,7 +377,7 @@ function TinyXStats:Options()
 						order = 18,
 					},
 					mastery = {
-						hidden = function() return not (self.defaults.char.Style.Mastery[TinyXStats.PlayerRole] and GetMastery()) end,
+						hidden = function() return not self.defaults.char.Style.Mastery[TinyXStats.PlayerRole] end,
 						name = STAT_MASTERY,
 						desc = STAT_MASTERY.." "..show.."/"..hide,
 						width = 'double',
@@ -399,7 +395,7 @@ function TinyXStats:Options()
 						order = 19,
 					},
 					masterycolor = {
-						hidden = function() return not self.defaults.char.Style.Mastery[TinyXStats.PlayerRole] and GetMastery() end,
+						hidden = function() return not self.defaults.char.Style.Mastery[TinyXStats.PlayerRole] end,
 						name = "",
 						desc = "",
 						width = 'half',
@@ -433,7 +429,7 @@ function TinyXStats:Options()
 						order = 21,
 					},
 					versatilitycolor = {
-						hidden = function() return not (self.defaults.char.Style.Versatility[TinyXStats.PlayerRole]) end,
+						hidden = function() return not self.defaults.char.Style.Versatility[TinyXStats.PlayerRole] end,
 						name = "",
 						desc = "",
 						width = 'half',
