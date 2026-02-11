@@ -352,7 +352,6 @@ if SetActiveSpecGroup then
 end
 
 function TinyXStats:OnEvent(event, arg1)
-    Debug(event,arg1)
     if ((event == "PLAYER_TALENT_UPDATE") or (event == "PLAYER_ENTERING_WORLD")) then
         self:ScheduleTimer("GetUnitRole", 3)
     end
