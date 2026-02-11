@@ -17,9 +17,6 @@ local media = LibStub("LibSharedMedia-3.0")
 TinyXStats = AceAddon:NewAddon(AddonName, "AceConsole-3.0", "AceEvent-3.0", "AceTimer-3.0")
 local L = LibStub("AceLocale-3.0"):GetLocale(AddonName)
 
--- Compatibility layer (loaded before this file)
-local Compat = TinyXStats.Compat
-
 local ldb = LibStub("LibDataBroker-1.1")
 local TSBroker = ldb:NewDataObject(AddonName, {
     type = "data source",
@@ -296,6 +293,8 @@ function TinyXStats:OnInitialize()
     local AceConfigReg = LibStub("AceConfigRegistry-3.0")
     local AceConfigDialog = LibStub("AceConfigDialog-3.0")
 
+    local GetAddOnMetadata = GetAddOnMetadata or (C_AddOns and C_AddOns.GetAddOnMetadata)
+    
     self.db = LibStub("AceDB-3.0"):New(AddonName.."DB", TinyXStats.defaults, "char")
     LibStub("AceConfig-3.0"):RegisterOptionsTable(AddonName, self:Options(), "tscmd")
     media.RegisterCallback(self, "LibSharedMedia_Registered")
@@ -446,32 +445,32 @@ end
 
 local function GetAttackPower()
     if TinyXStats.PlayerRole == "hunter" then
-        return Compat.GetAttackPower(true)
+        return TinyXStats.Compat.GetAttackPower(true)
     else
-        return Compat.GetAttackPower(false)
+        return TinyXStats.Compat.GetAttackPower(false)
     end
 end
 
 local function GetSpellDamage()
-    return Compat.GetSpellPower()
+    return TinyXStats.Compat.GetSpellPower()
 end
 
 local function GetCrit()
     if TinyXStats.PlayerRole == "healer" or TinyXStats.PlayerRole == "caster" then
-        return Compat.GetCritChance(true)
+        return TinyXStats.Compat.GetCritChance(true)
     else
-        return Compat.GetCritChance(false)
+        return TinyXStats.Compat.GetCritChance(false)
     end
 end
 
 local function GetHaste()
-    local haste, hasteperc = Compat.GetHaste()
+    local haste, hasteperc = TinyXStats.Compat.GetHaste()
     return string.format("%.0f", haste), hasteperc
 end
 
 local function GetWeaponSpeed(spec)
     local speed, fastestSpeed = 500, 500
-    local mainSpeed, offSpeed = Compat.GetWeaponSpeed()
+    local mainSpeed, offSpeed = TinyXStats.Compat.GetWeaponSpeed()
     if (offSpeed == nil) then
         if (mainSpeed and mainSpeed > 0) then
             mainSpeed = string.format("%.2f", mainSpeed)
@@ -499,7 +498,7 @@ end
 
 local function GetRangedSpeed(spec)
     local fastestSpeed = TinyXStats.db.char[spec].FastestRs
-    local speed = Compat.GetRangedSpeed()
+    local speed = TinyXStats.Compat.GetRangedSpeed()
     if speed then
         return speed, fastestSpeed
     else
@@ -508,20 +507,20 @@ local function GetRangedSpeed(spec)
 end
 
 local function GetDefense()
-    return Compat.GetDefenseStats()
+    return TinyXStats.Compat.GetDefenseStats()
 end
 
 local function GetMastery()
-    local mastery = Compat.GetMastery()
+    local mastery = TinyXStats.Compat.GetMastery()
     return mastery
 end
 
 function TinyXStats:GetUnitRole()
     self.class = select(2, UnitClass("player"))
     local role
-    local Talent = Compat.GetSpecialization()
+    local Talent = TinyXStats.Compat.GetSpecialization()
     if Talent then
-        role = Compat.GetSpecializationRole(Talent)
+        role = TinyXStats.Compat.GetSpecializationRole(Talent)
     end
     if not role then
         if self.class == "HUNTER" then
@@ -563,11 +562,11 @@ function TinyXStats:Stats()
     Debug("Stats()")
     local style = self.db.char.Style
     local mastery = GetMastery()
-    local versatility = Compat.GetVersatility()
+    local versatility = TinyXStats.Compat.GetVersatility()
     if not versatility then
         versatility = "0.00"
     end
-    local spec = "Spec"..Compat.GetActiveSpecGroup()
+    local spec = "Spec"..TinyXStats.Compat.GetActiveSpecGroup()
     local spelldmg = GetSpellDamage()
     local pow = GetAttackPower()
     local crit = string.format("%.2f",GetCrit())
@@ -580,10 +579,10 @@ function TinyXStats:Stats()
             mainSpeed, offSpeed, speed, fastestSpeed = GetWeaponSpeed(spec)
         end
     end
-    local base, casting = Compat.GetManaRegen()
+    local base, casting = TinyXStats.Compat.GetManaRegen()
     base = math.floor(base * 5.0)
     casting = math.floor(casting * 5.0)
-    local fr = string.format("%.2f", Compat.GetPowerRegen() or 0)
+    local fr = string.format("%.2f", TinyXStats.Compat.GetPowerRegen() or 0)
     local DodgeChance,BlockChance,ParryChance,TAvoidance = 0,0,0,0
     if self.PlayerRole == "tank" then
         TAvoidance,DodgeChance,ParryChance,BlockChance = GetDefense()
@@ -636,7 +635,7 @@ function TinyXStats:Stats()
             self.db.char[spec].HighestMastery = mastery
             recordIsBroken = MsgRecord(STAT_MASTERY,mastery) or recordIsBroken
         end
-        if (style.Versatility[self.PlayerRole] and Compat.HasVersatility() and tonumber(versatility) > tonumber(self.db.char[spec].HighestVersatility)) then
+        if (style.Versatility[self.PlayerRole] and TinyXStats.Compat.HasVersatility() and tonumber(versatility) > tonumber(self.db.char[spec].HighestVersatility)) then
             self.db.char[spec].HighestVersatility = versatility
             recordIsBroken = MsgRecord(STAT_VERSATILITY,versatility) or recordIsBroken
         end
@@ -740,7 +739,7 @@ function TinyXStats:Stats()
         SetValues(mastery.."%",self.db.char[spec].HighestMastery.."%")
         FormatRString()
     end
-    if (style.Versatility[self.PlayerRole] and Compat.HasVersatility()) then
+    if (style.Versatility[self.PlayerRole] and TinyXStats.Compat.HasVersatility()) then
         SetLabel("versatility",L["Vers:"])
         SetValues(versatility.."%",self.db.char[spec].HighestVersatility.."%")
         FormatRString()

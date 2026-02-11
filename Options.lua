@@ -27,6 +27,7 @@ TinyXStats.RoleLocale = {
 }
 
 function TinyXStats:Options()
+    local GetAddOnMetadata = GetAddOnMetadata or (C_AddOns and C_AddOns.GetAddOnMetadata)
     local show = string.lower(SHOW)
     local hide = string.lower(HIDE)
     local options = {

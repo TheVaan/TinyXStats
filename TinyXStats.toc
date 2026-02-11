@@ -36,6 +36,6 @@ Localization\ruRU.lua
 Localization\zhCN.lua
 Localization\zhTW.lua
 
-Compat.lua
 TinyXStats.lua
+Compat.lua
 Options.lua

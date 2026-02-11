@@ -2,6 +2,7 @@
 -- Provides version-specific API wrappers for different WoW versions
 
 local Compat = {}
+TinyXStats = TinyXStats or {}
 TinyXStats.Compat = Compat
 
 -- Version detection
