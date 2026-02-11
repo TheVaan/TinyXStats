@@ -1,13 +1,30 @@
-## Interface: 110005
+## Interface: 11508,20505,50503,110005
 ## Title: TinyXStats
-## Version: @project-version@
-## Author: TheVaan
 ## Notes: Shows different stats of you character (Real-time update).|n|cffeda55fBy TheVaan|r
 ## Notes-deDE: Zeigt verschiedene Attribute deines Charakters (Echtzeit-Aktuallisierung).|n|cffeda55fBy TheVaan|r
+## Version: @project-version@
+## Author: TheVaan
+## X-Email: TheVaan@gmail.com
+## LoadSavedVariablesFirst: 1
 ## SavedVariablesPerCharacter: TinyXStatsDB
-## OptionalDeps: AceAddon-3.0, AceConfig-3.0, AceConsole-3.0, AceDB-3.0, AceEvent-3.0, AceGUI-3.0, AceGUI-3.0-SharedMediaWidgets, AceLocale-3.0, AceTimer-3.0, CallbackHandler-1.0, LibDataBroker-1.1, LibSharedMedia-3.0, LibStub
+## OptionalDeps: Ace3, LibDataBroker-1.1
+## X-Curse-Project-ID: 22824
 
-embeds.xml
+#@no-lib-strip@
+Libs\LibStub\LibStub.lua
+Libs\CallbackHandler-1.0\CallbackHandler-1.0.xml
+Libs\LibDataBroker-1.1\LibDataBroker-1.1.lua
+Libs\LibSharedMedia-3.0\lib.xml
+Libs\AceAddon-3.0\AceAddon-3.0.xml
+Libs\AceEvent-3.0\AceEvent-3.0.xml
+Libs\AceTimer-3.0\AceTimer-3.0.xml
+Libs\AceDB-3.0\AceDB-3.0.xml
+Libs\AceLocale-3.0\AceLocale-3.0.xml
+Libs\AceConsole-3.0\AceConsole-3.0.xml
+Libs\AceGUI-3.0\AceGUI-3.0.xml
+Libs\AceConfig-3.0\AceConfig-3.0.xml
+Libs\AceGUI-3.0-SharedMediaWidgets\widget.xml
+#@end-no-lib-strip@
 
 Localization\enUS.lua
 Localization\deDE.lua
