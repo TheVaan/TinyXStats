@@ -1,4 +1,4 @@
-## Interface: 90002
+## Interface: 110005
 ## Title: TinyXStats
 ## Version: @project-version@
 ## Author: TheVaan
@@ -19,5 +19,6 @@ Localization\ruRU.lua
 Localization\zhCN.lua
 Localization\zhTW.lua
 
+Compat.lua
 TinyXStats.lua
 Options.lua
