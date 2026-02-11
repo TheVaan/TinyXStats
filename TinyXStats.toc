@@ -1,4 +1,4 @@
-## Interface: 11508,20505,50503,110005
+## Interface: 11508,20505,50503,110005,120000
 ## Title: TinyXStats
 ## Notes: Shows different stats of you character (Real-time update).|n|cffeda55fBy TheVaan|r
 ## Notes-deDE: Zeigt verschiedene Attribute deines Charakters (Echtzeit-Aktuallisierung).|n|cffeda55fBy TheVaan|r
