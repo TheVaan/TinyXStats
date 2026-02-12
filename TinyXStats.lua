@@ -238,7 +238,7 @@ TinyXStats.defaults = {
     }
 }
 
-TinyXStats.frame = CreateFrame("Frame",AddonName.."Frame",UIParent)
+TinyXStats.frame = CreateFrame("Frame",AddonName.."Frame",UIParent, "BackdropTemplate")
 TinyXStats.frame:SetWidth(100)
 TinyXStats.frame:SetHeight(15)
 TinyXStats.frame:SetFrameStrata("BACKGROUND")
