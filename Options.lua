@@ -708,10 +708,6 @@ function TinyXStats:Options()
                         get = function() return self.db.char.Size end,
                         set = function(info, newValue)
                             self.db.char.Size = newValue
-                            local font = media:Fetch("font", self.db.char.Font)
-                            for k, fontObject in pairs(self.strings) do
-                                fontObject:SetFont(font, self.db.char.Size, self.db.char.FontEffect)
-                            end
                             self:InitializeFrame()
                         end,
                         disabled = function() return InCombatLockdown() or self.db.char.FrameHide end,
@@ -723,10 +719,7 @@ function TinyXStats:Options()
                         get = function() return self.db.char.Font end,
                         set = function(info, newValue)
                             self.db.char.Font = newValue
-                            local font = media:Fetch("font", self.db.char.Font)
-                            for k, fontObject in pairs(self.strings) do
-                                fontObject:SetFont(font, self.db.char.Size, self.db.char.FontEffect)
-                            end
+                            self:InitializeFrame()
                         end,
                         values = self.fonts,
                         disabled = function() return InCombatLockdown() or self.db.char.FrameHide end,
@@ -738,10 +731,7 @@ function TinyXStats:Options()
                         get = function() return self.db.char.FontEffect end,
                         set = function(info, newValue)
                             self.db.char.FontEffect = newValue
-                            local font = media:Fetch("font", self.db.char.Font)
-                            for k, fontObject in pairs(self.strings) do
-                                fontObject:SetFont(font, self.db.char.Size, self.db.char.FontEffect)
-                            end
+                            self:InitializeFrame()
                         end,
                         values = self.fonteffects,
                         disabled = function() return InCombatLockdown() or self.db.char.FrameHide end,
