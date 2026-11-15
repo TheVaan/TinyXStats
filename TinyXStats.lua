@@ -304,6 +304,15 @@ function TinyXStats:OnInitialize()
     self.optionsFrame = AceConfigDialog:AddToBlizOptions(AddonName, AddonName)
     self.db:RegisterDefaults(self.defaults)
 
+    -- Haste % records were saved 100x too high (UnitSpellHaste already returns a percentage)
+    for _, specKey in ipairs({"Spec1", "Spec2"}) do
+        local record = self.db.char[specKey]
+        local hastePerc = record and tonumber(record.HighestHastePerc)
+        if hastePerc and hastePerc > 500 then
+            record.HighestHastePerc = string.format("%.2f", hastePerc / 100)
+        end
+    end
+
     local version = GetAddOnMetadata(AddonName,"Version")
     local loaded = L["Open the configuration menu with /txs or /TinyXStats"].."|r"
     DEFAULT_CHAT_FRAME:AddMessage("|cffffd700"..AddonName.." |cff00ff00~v"..version.."~|cffffd700: "..loaded)
@@ -340,15 +349,16 @@ function TinyXStats:LibSharedMedia_Registered()
     end
 end
 
--- Hook SetActiveSpecGroup if it exists
-if SetActiveSpecGroup then
-    local orgSetActiveSpecGroup = SetActiveSpecGroup
-    function SetActiveSpecGroup(...)
-        SpecChangedPause = GetTime() + 60
-        TinyXStats:ScheduleTimer("Stats", 62)
-        Debug("Set SpecChangedPause")
-        return orgSetActiveSpecGroup(...)
-    end
+-- Pause records while the spec group changes (SetActiveSpecGroup moved into C_SpecializationInfo)
+local function OnSetActiveSpecGroup()
+    SpecChangedPause = GetTime() + 60
+    TinyXStats:ScheduleTimer("Stats", 62)
+    Debug("Set SpecChangedPause")
+end
+if C_SpecializationInfo and C_SpecializationInfo.SetActiveSpecGroup then
+    hooksecurefunc(C_SpecializationInfo, "SetActiveSpecGroup", OnSetActiveSpecGroup)
+elseif SetActiveSpecGroup then
+    hooksecurefunc("SetActiveSpecGroup", OnSetActiveSpecGroup)
 end
 
 function TinyXStats:OnEvent(event, arg1)

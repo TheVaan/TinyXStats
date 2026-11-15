@@ -632,7 +632,7 @@ function TinyXStats:Options()
                         desc = L["Clears your current records"],
                         type = 'execute',
                         func = function()
-                            local spec = "Spec"..GetActiveSpecGroup()
+                            local spec = "Spec"..Compat.GetActiveSpecGroup()
                             for stat, num in pairs(self.defaults.char[spec]) do
                                 self.db.char[spec][stat] = num
                             end
