@@ -593,6 +593,10 @@ function TinyXStats:Stats()
     local pow = GetAttackPower()
     local crit = string.format("%.2f",GetCrit())
     local haste, hasteperc = GetHaste()
+    -- WoW Forever has no haste rating: "Haste" then shows the percentage
+    local hasHasteRating = TinyXStats.Compat.HasHasteRating()
+    local showHaste = style.Haste[self.PlayerRole] and hasHasteRating
+    local showHastePerc = style.HastePerc[self.PlayerRole] or (style.Haste[self.PlayerRole] and not hasHasteRating)
     local mainSpeed, offSpeed, speed, fastestSpeed = 500, nil, 500, 500
     if style.Speed[self.PlayerRole] then
         if self.PlayerRole == "hunter" then
@@ -621,11 +625,13 @@ function TinyXStats:Stats()
             self.db.char[spec].HighestAp = pow
             recordIsBroken = MsgRecord(STAT_ATTACK_POWER,pow) or recordIsBroken
         end
-        if (style.Haste[self.PlayerRole] or style.HastePerc[self.PlayerRole]) then
+        if (showHaste or showHastePerc) then
             if (tonumber(haste) > tonumber(self.db.char[spec].HighestHaste) or tonumber(hasteperc) > tonumber(self.db.char[spec].HighestHastePerc)) then
                 self.db.char[spec].HighestHaste = haste
                 self.db.char[spec].HighestHastePerc = hasteperc
-                recordIsBroken = MsgRecord(SPELL_HASTE,haste) or recordIsBroken
+                if hasHasteRating then
+                    recordIsBroken = MsgRecord(SPELL_HASTE,haste) or recordIsBroken
+                end
                 recordIsBroken = MsgRecord(L["Percent Haste"],hasteperc) or recordIsBroken
             end
         end
@@ -714,15 +720,16 @@ function TinyXStats:Stats()
         SetValues(pow,self.db.char[spec].HighestAp)
         FormatRString()
     end
-    if (style.Haste[self.PlayerRole]) then
+    if (showHaste) then
         SetLabel("haste",L["Haste:"])
         SetValues(haste,self.db.char[spec].HighestHaste)
         FormatRString()
-    elseif (style.HastePerc[self.PlayerRole]) then
+    elseif (showHastePerc) then
         SetLabel("haste",SPELL_HASTE_ABBR..":")
         SetValues(hasteperc.."%",self.db.char[spec].HighestHastePerc.."%")
         FormatRString()
-    elseif (style.Speed[self.PlayerRole]) then
+    end
+    if (style.Speed[self.PlayerRole]) then
         SetLabel("haste",L["Speed:"])
         SetValues(speed.."s",fastestSpeed.."s")
         FormatRString()
